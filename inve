@@ -1,0 +1,9 @@
+#!/bin/sh
+oldpwd="$PWD"
+cd "${0%/*}/.."
+export VIRTUAL_ENV="$PWD"
+cd "$oldpwd"
+export PATH="$VIRTUAL_ENV/bin:$PATH"
+unset PYTHON_HOME
+exec "${@:-$SHELL}"
+
