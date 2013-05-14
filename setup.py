@@ -3,7 +3,8 @@
 from setuptools import setup
 import invewrapper
 
-setup(name='invewrapper',
+setup(
+	name='invewrapper',
 	version='0.1',
 	description='tools to manage multiple virtualenv written in pure python',
 	keywords=[],
@@ -13,6 +14,8 @@ setup(name='invewrapper',
 	license='Simplified BSD License',
 	py_modules=['invewrapper'],
 	package_data={'': ['inve']}, #XXX
-	entry_points={'console_scripts':
-		["{0} = invewrapper:{0}_cmd".format(cmd[:-4]) for cmd in dir(invewrapper) if cmd.endswith("_cmd")]}
+	entry_points={
+		'console_scripts':
+			["{0} = invewrapper:{0}_cmd".format(cmd[:-4])
+			for cmd in dir(invewrapper) if cmd.endswith("_cmd")]}
 )
