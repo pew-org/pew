@@ -13,6 +13,7 @@ setup(
 	url='',
 	license='Simplified BSD License',
 	py_modules=['invewrapper'],
+	install_requires=['virtualenv'],
 	data_files=[('', ['inve'])],  # XXX
 	entry_points={
 		'console_scripts':

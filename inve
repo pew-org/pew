@@ -1,9 +1,21 @@
-#!/bin/sh
-oldpwd="$PWD"
-cd "${0%/*}/.."
-export VIRTUAL_ENV="$PWD"
-cd "$oldpwd"
-export PATH="$VIRTUAL_ENV/bin:$PATH"
-unset PYTHON_HOME
-exec "${@:-$SHELL}"
+#!/usr/bin/env python
 
+import os, sys
+parent = os.path.dirname
+os.environ['VIRTUAL_ENV'] = parent(parent(__file__))
+os.environ['PATH'] = os.pathsep.join([
+		parent(__file__),
+		os.environ['PATH'],
+	])
+try:
+	del os.environ['PYTHONHOME']
+except KeyError:
+	pass
+
+args = sys.argv[1:]
+if args:
+	os.execvp(args[0], args)
+else:
+	sys.stderr.write("Launching subshell in virtual environment. Type 'exit' \
+or 'Ctrl+D' to return.\n")
+	os.execvp(os.environ['SHELL'], [os.environ['SHELL']])

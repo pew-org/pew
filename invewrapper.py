@@ -40,6 +40,13 @@ def get_inve(env):
 	return os.path.join(workon_home, env, env_bin_dir, 'inve')
 
 
+def workon(inve):
+	if sys.platform == 'win32':
+		check_call(['python', inve, 'powershell'])
+	else:
+		check_call([inve])
+
+
 def mkvirtualenv_cmd():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-p', '--python')
@@ -74,7 +81,7 @@ requirements file to install a base set of packages into the new environment.')
 	if args.packages:
 		check_call([inve, 'pip', 'install'] + args.packages)
 	
-	check_call([inve])
+	workon(inve)
 
 
 def rmvirtualenv_cmd():
@@ -146,7 +153,7 @@ def workon_cmd():
 		return
 	else:
 		inve = get_inve(env)
-		check_call([inve])
+		workon(inve)
 
 
 def add2virtualenv_cmd():
