@@ -13,7 +13,7 @@ setup(
 	url='',
 	license='Simplified BSD License',
 	py_modules=['invewrapper'],
-	package_data={'': ['inve']}, #XXX
+	data_files=[('', ['inve'])],  # XXX
 	entry_points={
 		'console_scripts':
 			["{0} = invewrapper:{0}_cmd".format(cmd[:-4])

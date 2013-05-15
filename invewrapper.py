@@ -33,12 +33,7 @@ def chdir(dirname):
 		os.chdir(curdir)
 
 
-source_inve = os.path.normpath(os.path.join(os.path.dirname(
-	__file__), '../../../../bin/inve'))
-# XXX don't know why, but setuptools puts inve inside bin/ instead of lib/
-# even if it's not executable
-if not os.path.exists(source_inve):
-	source_inve = os.path.join(os.path.dirname(__file__), 'inve')
+source_inve = os.path.join(os.path.dirname(__file__), 'inve')
 
 
 def get_inve(env):
