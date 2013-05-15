@@ -11,7 +11,7 @@ setup(
 	author='Dario Bertini',
 	author_email='berdario+pypi@gmail.com',
 	url='',
-	license='Simplified BSD License',
+	license='MIT License',
 	py_modules=['invewrapper'],
 	install_requires=['virtualenv'],
 	data_files=[('', ['inve'])],  # XXX
