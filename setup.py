@@ -10,7 +10,7 @@ setup(
 	keywords=[],
 	author='Dario Bertini',
 	author_email='berdario+pypi@gmail.com',
-	url='',
+	url='https://github.com/berdario/invewrapper',
 	license='MIT License',
 	py_modules=['invewrapper'],
 	install_requires=['virtualenv'],
