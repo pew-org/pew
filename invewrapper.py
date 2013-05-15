@@ -7,8 +7,8 @@ import sys
 import argparse
 import shutil
 import contextlib
-from subprocess import check_call
-
+from subprocess import check_call, check_output
+from glob import glob
 
 env_bin_dir = 'bin'
 if sys.platform in ('win32', 'cygwin'):
@@ -82,11 +82,66 @@ requirements file to install a base set of packages into the new environment.')
 	check_call([inve])
 
 
+def rmvirtualenv_cmd():
+	if len(sys.argv) < 2:
+		print("Please specify an environment", file=sys.stderr)
+		return
+	
+	with chdir(workon_home):
+		for env in sys.argv[1:]:
+			env = os.path.join(workon_home, env)
+			if os.environ.get('VIRTUAL_ENV') == env:
+				print("ERROR: You cannot remove the active environment \
+	(%s)." % env, file=sys.stderr)
+				break
+			try:
+				shutil.rmtree(env)
+			except OSError as e:
+				print("Error while trying to remove the {} env: \
+\n{}".format(env, e.strerror), file=sys.stderr)
+
+
+def showvirtualenv(env):
+	print(env)
+
+
+def showvirtualenv_cmd():
+	try:
+		showvirtualenv(sys.argv[1])
+	except IndexError:
+		if 'VIRTUAL_ENV' in os.environ:
+			showvirtualenv(os.path.basename(os.environ['VIRTUAL_ENV']))
+		else:
+			print('showvirtualenv [env]', file=sys.stderr)
+
+
+def lsvirtualenv(verbose):
+	envs = [env.split(os.path.sep)[-3] for env in
+			glob(os.path.join(workon_home, '*', env_bin_dir, 'inve'))]
+	# I'm checking the presence of inve, this will skip environments
+	# not created with invewrapper, but this is for the best, since you
+	# wouldn't be able to load them
+	if not verbose:
+		print(' '.join(envs))
+	else:
+		for env in envs:
+			showvirtualenv(env)
+
+
+def lsvirtualenv_cmd():
+	parser = argparse.ArgumentParser()
+	p_group = parser.add_mutually_exclusive_group()
+	p_group.add_argument('-b', '--brief', action='store_false')
+	p_group.add_argument('-l', '--long', action='store_true')
+	args = parser.parse_args()
+	lsvirtualenv(args.long)
+
+
 def workon_cmd():
 	try:
 		env = sys.argv[1]
 	except IndexError:
-		lsvirtualenv("-b")
+		lsvirtualenv(False)
 		return
 	
 	env_path = os.path.join(workon_home, env)
@@ -97,3 +152,21 @@ def workon_cmd():
 	else:
 		inve = get_inve(env)
 		check_call([inve])
+
+
+def add2virtualenv_cmd():
+	NotImplemented
+
+
+def lssitepackages_cmd():
+	if 'VIRTUAL_ENV' not in os.environ:
+		print('ERROR: no virtualenv active', file=sys.stderr)
+	else:
+		site = check_output(['python', '-c', 'import distutils; \
+print(distutils.sysconfig.get_python_lib())']).strip()
+		print(' '.join(os.listdir(site)))
+		extra_paths = os.path.join(site, '_virtualenv_path_extension.pth')
+		if os.path.exists(extra_paths):
+			print('from _virtualenv_path_extension.pth:')
+			with open(extra_paths) as extra:
+				print(''.join(extra.readlines()))
