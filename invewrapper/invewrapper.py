@@ -41,13 +41,10 @@ def get_inve(env):
 
 
 def invoke(inve, *args):
-	if sys.platform == 'win32':
-		if not args:
-			check_call(['python', inve, 'powershell'])
-		else:
-			check_call(('python', inve) + args)
+	if sys.platform == 'win32' and not args:
+		check_call(['python', inve, 'powershell'])
 	else:
-		check_call((inve,) + args)
+		check_call(('python', inve) + args)
 
 
 def mkvirtualenv_cmd():
@@ -74,7 +71,7 @@ requirements file to install a base set of packages into the new environment.')
 					dotproject.write(args.project)
 			# temporary workaround: as soon as virtualenv's PR #247 will be
 			# completed I'll remove it
-			shutil.copy2(source_inve, env_bin_dir)
+			shutil.copy(source_inve, env_bin_dir)
 	
 	inve = get_inve(args.envname)
 	
