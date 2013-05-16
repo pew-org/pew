@@ -7,8 +7,11 @@ import sys
 import argparse
 import shutil
 import contextlib
+import locale
 from subprocess import check_call, check_output
 from glob import glob
+
+locale.setlocale(locale.LC_ALL, '')
 
 env_bin_dir = 'bin'
 if sys.platform in ('win32', 'cygwin'):
@@ -165,8 +168,9 @@ def lssitepackages_cmd():
 		print('ERROR: no virtualenv active', file=sys.stderr)
 	else:
 		site = check_output(['python', '-c', 'import distutils; \
-print(distutils.sysconfig.get_python_lib())']).strip()
-		print(' '.join(os.listdir(site)))
+print(distutils.sysconfig.get_python_lib())'])
+		site = site.decode(locale.getlocale()[1]).strip()
+		print(*os.listdir(site))
 		extra_paths = os.path.join(site, '_virtualenv_path_extension.pth')
 		if os.path.exists(extra_paths):
 			print('from _virtualenv_path_extension.pth:')
