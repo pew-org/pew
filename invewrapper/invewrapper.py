@@ -50,6 +50,13 @@ def invoke(inve, *args):
 		check_call(('python', inve) + args)
 
 
+def deploy_inve(target):
+	# temporary workaround: I plan to remove it when virtualenv's PR #247
+	# will be completed
+	if not os.path.exists(target):
+		shutil.copy(source_inve, target)
+
+
 def mkvirtualenv_cmd():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-p', '--python')
@@ -73,9 +80,8 @@ requirements file to install a base set of packages into the new environment.')
 			if args.project:
 				with open('.project', 'w') as dotproject:
 					dotproject.write(args.project)
-			# temporary workaround: as soon as virtualenv's PR #247 will be
-			# completed I'll remove it
-			shutil.copy(source_inve, env_bin_dir)
+			
+	deploy_inve(get_inve(args.envname))
 	
 	inve = get_inve(args.envname)
 	
@@ -123,10 +129,10 @@ def showvirtualenv_cmd():
 
 def lsvirtualenv(verbose):
 	envs = [env.split(os.path.sep)[-3] for env in
-			glob(os.path.join(workon_home, '*', env_bin_dir, 'inve'))]
-	# I'm checking the presence of inve, this will skip environments
-	# not created with invewrapper, but this is for the best, since you
-	# wouldn't be able to load them
+			glob(os.path.join(workon_home, '*', env_bin_dir, 'python'))]
+	for env in envs:
+		deploy_inve(get_inve(env))
+
 	if not verbose:
 		print(' '.join(envs))
 	else:
