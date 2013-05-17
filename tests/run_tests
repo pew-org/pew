@@ -1,0 +1,73 @@
+#!/bin/sh
+
+##
+## ONLY RUN THIS VIA TOX
+##
+
+#set -x
+
+envdir="$1"
+shift
+scripts="$*"
+if [ -z "$scripts" ]
+then
+    scripts=$(ls tests/test*.sh)
+    if [ -z "$scripts" ]
+    then
+        echo "Could not find any test scripts to run" 1>&2
+        exit 1
+    fi
+fi
+
+# Force the tox virtualenv to be active.  
+#
+# Since this script runs from within a separate shell created by tox,
+# the name of the virtualenv (in $VIRTUAL_ENV) is inherited, but the
+# shell functions and other settings created by the activate script
+# are *not* inherited.
+#
+source "$envdir/bin/activate"
+
+# Set up virtualenvwrapper.hook_loader to print more details than usual for debugging.
+#export HOOK_VERBOSE_OPTION=-vvv
+export HOOK_VERBOSE_OPTION="-q"
+
+# Force virtualenvwrapper to use the python interpreter in the
+# tox-created virtualenv.
+export VIRTUALENVWRAPPER_PYTHON="$envdir/bin/python"
+
+# Clear any user settings for the hook directory or log directory
+unset VIRTUALENVWRAPPER_HOOK_DIR
+unset VIRTUALENVWRAPPER_LOG_DIR
+unset VIRTUALENVWRAPPER_VIRTUALENV
+unset VIRTUALENVWRAPPER_VIRTUALENV_ARGS
+
+# Run the test scripts with a little formatting around them to make it
+# easier to find where each script output starts.
+for test_script in $scripts
+do
+
+    for test_shell in bash ksh zsh
+    do
+        test_shell_opts=
+        if [ $test_shell = "zsh" ]; then
+            test_shell_opts="-o shwordsplit"
+        fi
+        export test_shell=$(which $test_shell)
+
+        echo
+        echo '********************************************************************************'
+        echo "Running $test_script"
+        echo "  VIRTUAL_ENV=$VIRTUAL_ENV"
+        echo "  VIRTUALENVWRAPPER_PYTHON=$VIRTUALENVWRAPPER_PYTHON"
+        echo "    $($VIRTUALENVWRAPPER_PYTHON -V 2>&1)"
+        echo "  PYTHONPATH=$PYTHONPATH"
+        echo "  SHELL=$test_shell"
+        echo
+        export SHUNIT_PARENT="$test_script"
+        $test_shell $test_shell_opts $test_script || exit 1
+        echo
+    done
+done
+
+exit 0
