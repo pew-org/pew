@@ -67,6 +67,7 @@ requirements file to install a base set of packages into the new environment.')
 		args.rest = ["--python=%s" % args.python] + args.rest
 	
 	with chdir(workon_home):
+		os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
 		check_call(["virtualenv", args.envname] + args.rest)
 		with chdir(args.envname):
 			if args.project:

@@ -3,3 +3,5 @@ build
 dist
 *.egg-info
 *.pyc
+*.class
+devenv
