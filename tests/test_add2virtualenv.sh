@@ -1,4 +1,5 @@
 #!/bin/sh
+# SKIP
 
 #set -x
 
@@ -9,7 +10,6 @@ export WORKON_HOME="$(echo ${TMPDIR:-/tmp}/WORKON_HOME | sed 's|//|/|g')"
 oneTimeSetUp() {
     rm -rf "$WORKON_HOME"
     mkdir -p "$WORKON_HOME"
-    source "$test_dir/../virtualenvwrapper.sh" >/dev/null 2>&1
 }
 
 oneTimeTearDown() {
@@ -22,12 +22,10 @@ setUp () {
 }
 
 test_add2virtualenv () {
-    mkvirtualenv "pathtest" >/dev/null 2>&1
-    full_path=$(pwd)
-    add2virtualenv "$full_path"
-    cdsitepackages
+    full_path=$(echo "pwd" | mkvirtualenv "pathtest" | tail -n1)
+    echo "add2virtualenv $full_path" | workon "pathtest"
     # Check contents of path file
-    path_file="./_virtualenv_path_extensions.pth"
+    path_file=$(echo "sitepackages_dir" | workon "pathtest")"/_virtualenv_path_extensions.pth"
     assertTrue "No $full_path in $(cat $path_file)" "grep -q $full_path $path_file"
     assertTrue "No path insert code in $(cat $path_file)" "grep -q sys.__egginsert $path_file"
     # Check the path we inserted is actually at the top
@@ -41,77 +39,72 @@ test_add2virtualenv () {
 }
 
 test_add2virtualenv_relative () {
-    mkvirtualenv "pathtest_relative" >/dev/null 2>&1
-    parent_dir=$(dirname $(pwd))
-    base_dir=$(basename $(pwd))
-    add2virtualenv "../$base_dir"
-    cdsitepackages
-    path_file="./_virtualenv_path_extensions.pth"
+    full_path=$(echo "pwd" | mkvirtualenv "pathtest_relative")
+    parent_dir=$(dirname $full_path)
+    base_dir=$(basename $full_path)
+    echo "add2virtualenv ../$base_dir" | workon "pathtest_relative"
+    path_file=$(echo "sitepackages_dir" | workon "pathtest_relative")"/_virtualenv_path_extensions.pth"
     assertTrue "No $parent_dir/$base_dir in \"`cat $path_file`\"" "grep -q \"$parent_dir/$base_dir\" $path_file"
     cd - >/dev/null 2>&1
 }
 
 test_add2virtualenv_space () {
 	# see #132
-    mkvirtualenv "pathtest_space" >/dev/null 2>&1
-    parent_dir=$(dirname $(pwd))
-	cdvirtualenv
+	full_path=$(echo "pwd" | mkvirtualenv "pathtest_space")
+    parent_dir=$(dirname $full_path)
+	cd "$WORKON_HOME/pathtest_space"
 	mkdir 'a b'
-    add2virtualenv 'a b'
-    cdsitepackages
-    path_file="./_virtualenv_path_extensions.pth"
+    echo "add2virtualenv 'a b'" | workon "pathtest_space"
+    path_file=$(echo "sitepackages_dir" | workon "pathtest_space")"/_virtualenv_path_extensions.pth"
     assertTrue "No 'a b' in \"`cat $path_file`\"" "grep -q 'a b' $path_file"
     cd - >/dev/null 2>&1
 }
 
 test_add2virtualenv_ampersand () {
 	# see #132
-    mkvirtualenv "pathtest_ampersand" >/dev/null 2>&1
-    parent_dir=$(dirname $(pwd))
-	cdvirtualenv
+    full_path=$(echo "pwd" | mkvirtualenv "pathtest_ampersand")
+    parent_dir=$(dirname $full_path)
+	cd "$WORKON_HOME/pathtest_ampersand"
 	mkdir 'a & b'
-    add2virtualenv 'a & b'
-    cdsitepackages
-    path_file="./_virtualenv_path_extensions.pth"
+	echo "add2virtualenv 'a & b'" | workon "pathtest_ampersand"
+    path_file=$(echo "sitepackages_dir" | workon "pathtest_ampersand")"/_virtualenv_path_extensions.pth"
     assertTrue "No 'a & b' in \"`cat $path_file`\"" "grep -q 'a & b' $path_file"
     cd - >/dev/null 2>&1
 }
 
 test_add2virtualenv_delete () {
     path_file="./_virtualenv_path_extensions.pth"
-    mkvirtualenv "pathtest_delete" >/dev/null 2>&1
-    cdsitepackages
+    
+    #cd sitepackages_dir
     # Make sure it was added
-    add2virtualenv "/full/path"
+    echo "add2virtualenv /full/path" | mkvirtualenv "pathtest_delete" >/dev/null 2>&1
     assertTrue "No /full/path in $(cat $path_file)" "grep -q /full/path $path_file"
     # Remove it and verify that change
-    add2virtualenv -d "/full/path"
+    echo "add2virtualenv -d /full/path" | workon "pathtest_delete"
     assertFalse "/full/path in `cat $path_file`" "grep -q /full/path $path_file"
     cd - >/dev/null 2>&1
 }
 
 test_add2virtualenv_delete_space () {
     path_file="./_virtualenv_path_extensions.pth"
-    mkvirtualenv "pathtest_delete_space" >/dev/null 2>&1
-    cdsitepackages
+    # cd sitepackages_dir   
     # Make sure it was added
-    add2virtualenv "/full/path with spaces"
+    echo "add2virtualenv '/full/path with spaces'" | mkvirtualenv "pathtest_delete_space" >/dev/null 2>&1
     assertTrue "No /full/path with spaces in $(cat $path_file)" "grep -q '/full/path with spaces' $path_file"
     # Remove it and verify that change
-    add2virtualenv -d "/full/path with spaces"
+    echo "add2virtualenv -d '/full/path with spaces'" | workon "pathtest_delete_space"
     assertFalse "/full/path with spaces in `cat $path_file`" "grep -q '/full/path with spaces' $path_file"
     cd - >/dev/null 2>&1
 }
 
 test_add2virtualenv_delete_ampersand () {
     path_file="./_virtualenv_path_extensions.pth"
-    mkvirtualenv "pathtest_delete_ampersand" >/dev/null 2>&1
-    cdsitepackages
+    # cd sitepackages_dir
     # Make sure it was added
-    add2virtualenv "/full/path & dir"
+    echo "add2virtualenv '/full/path & dir'" | mkvirtualenv "pathtest_delete_ampersand" >/dev/null 2>&1
     assertTrue "No /full/path & dir in $(cat $path_file)" "grep -q '/full/path & dir' $path_file"
     # Remove it and verify that change
-    add2virtualenv -d "/full/path & dir"
+    echo "add2virtualenv -d '/full/path & dir'" | workon "pathtest_delete_ampersand"
     assertFalse "/full/path & dir in `cat $path_file`" "grep -q '/full/path & dir' $path_file"
     cd - >/dev/null 2>&1
 }

@@ -1,4 +1,5 @@
 #!/bin/sh
+# SKIP
 
 #set -x
 
@@ -38,21 +39,21 @@ test_cdvirtual() {
     cd "$start_dir"
 }
 
-test_cdsitepackages () {
+test_cd sitepackages_dir () {
     start_dir="$(pwd)"
-    cdsitepackages
+    cd sitepackages_dir
     pyvers=$(python -V 2>&1 | cut -f2 -d' ' | cut -f1-2 -d.)
     sitepackages="$VIRTUAL_ENV/lib/python${pyvers}/site-packages"
     assertSame "$sitepackages" "$(pwd)"
     cd "$start_dir"
 }
 
-test_cdsitepackages_with_arg () {
+test_cd sitepackages_dir_with_arg () {
     start_dir="$(pwd)"
     pyvers=$(python -V 2>&1 | cut -f2 -d' ' | cut -f1-2 -d.)
     sitepackage_subdir="$VIRTUAL_ENV/lib/python${pyvers}/site-packages/subdir"
     mkdir -p "${sitepackage_subdir}"
-    cdsitepackages subdir
+    cd sitepackages_dir subdir
     assertSame "$sitepackage_subdir" "$(pwd)"
     cd "$start_dir"
 }
@@ -66,12 +67,12 @@ test_cdvirtualenv_no_workon_home () {
     WORKON_HOME="$old_home"
 }
 
-test_cdsitepackages_no_workon_home () {
+test_cd sitepackages_dir_no_workon_home () {
     deactivate 2>&1
     old_home="$WORKON_HOME"
     cd "$WORKON_HOME"
     export WORKON_HOME="$WORKON_HOME/not_there"
-    assertFalse "Was able to change to site-packages" cdsitepackages
+    assertFalse "Was able to change to site-packages" cd sitepackages_dir
     assertSame "$old_home" "$(pwd)"
     WORKON_HOME="$old_home"
 }

@@ -1,4 +1,5 @@
 #!/bin/sh
+# SKIP
 
 #set -x
 
@@ -28,7 +29,7 @@ tearDown () {
 }
 
 test_toggleglobalsitepackages () {
-    ngsp_file="`virtualenvwrapper_get_site_packages_dir`/../no-global-site-packages.txt"
+    ngsp_file="`site_packages_dir`/../no-global-site-packages.txt"
     assertTrue "$ngsp_file does not exist" "[ -f \"$ngsp_file\" ]"
     toggleglobalsitepackages -q
     assertFalse "$ngsp_file exists" "[ -f \"$ngsp_file\" ]"

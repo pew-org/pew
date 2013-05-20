@@ -9,7 +9,6 @@ export WORKON_HOME="$(echo ${TMPDIR:-/tmp}/WORKON_HOME | sed 's|//|/|g')"
 oneTimeSetUp() {
     rm -rf "$WORKON_HOME"
     mkdir -p "$WORKON_HOME"
-    source "$test_dir/../virtualenvwrapper.sh"
 }
 
 oneTimeTearDown() {
@@ -24,9 +23,9 @@ setUp () {
 
 test_requirements_file () {
     echo "IPy" > "$test_dir/requirements.txt"
-    mkvirtualenv -r "$test_dir/requirements.txt" "env3" >/dev/null 2>&1
-    installed=$(pip freeze)
-    assertTrue "IPy not found in $installed" "pip freeze | grep IPy"
+	echo "" | mkvirtualenv -r "$test_dir/requirements.txt" "env3" >/dev/null
+    installed=$(echo "pip freeze" | workon env3  )
+    assertTrue "IPy not found in $installed" "echo $installed | grep IPy=="
 }
 
 . "$test_dir/shunit2"

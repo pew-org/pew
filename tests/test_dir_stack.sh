@@ -19,7 +19,6 @@ oneTimeTearDown() {
 setUp () {
     rm -rf "$WORKON_HOME"
     mkdir -p "$WORKON_HOME"
-    source "$test_dir/../virtualenvwrapper.sh"
     mkdir "$WORKON_HOME/start_here"
     mkdir "$WORKON_HOME/on_the_stack"
     echo
@@ -34,14 +33,12 @@ tearDown() {
 }
 
 test_ticket_101 () {
-    mkvirtualenv some_env
-    deactivate
+    echo "" | mkvirtualenv some_env >/dev/null 2>&1
     cd "$WORKON_HOME/start_here"
     pushd "$WORKON_HOME/on_the_stack"
     rmvirtualenv some_env
-    mkvirtualenv some_env >/dev/null 2>&1
+    echo "" | mkvirtualenv some_env >/dev/null 2>&1
     #echo "After mkvirtualenv: `pwd`"
-    deactivate
     #echo "After deactivate: `pwd`"
     popd
     #echo "After popd: `pwd`"

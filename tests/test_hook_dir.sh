@@ -1,4 +1,5 @@
 #!/bin/sh
+# SKIP
 
 #set -x
 
