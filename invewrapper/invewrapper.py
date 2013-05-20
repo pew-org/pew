@@ -96,8 +96,7 @@ requirements file to install a base set of packages into the new environment.')
 
 def rmvirtualenv_cmd():
 	if len(sys.argv) < 2:
-		print("Please specify an environment", file=sys.stderr)
-		return
+		sys.exit("Please specify an environment")
 	
 	with chdir(workon_home):
 		for env in sys.argv[1:]:
@@ -124,7 +123,7 @@ def showvirtualenv_cmd():
 		if 'VIRTUAL_ENV' in os.environ:
 			showvirtualenv(os.path.basename(os.environ['VIRTUAL_ENV']))
 		else:
-			print('showvirtualenv [env]', file=sys.stderr)
+			sys.exit('showvirtualenv [env]')
 
 
 def lsvirtualenv(verbose):
@@ -158,9 +157,8 @@ def workon_cmd():
 	
 	env_path = os.path.join(workon_home, env)
 	if not os.path.exists(env_path):
-		print("ERROR: Environment '{0}' does not exist. Create it with \
-'mkvirtualenv {0}'.".format(env), file=sys.stderr)
-		return
+		sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
+'mkvirtualenv {0}'.".format(env))
 	else:
 		inve = get_inve(env)
 		invoke(inve)
@@ -170,16 +168,24 @@ def add2virtualenv_cmd():
 	NotImplemented
 
 
-def lssitepackages_cmd():
+def sitepackages_dir():
 	if 'VIRTUAL_ENV' not in os.environ:
-		print('ERROR: no virtualenv active', file=sys.stderr)
+		sys.exit('ERROR: no virtualenv active')
 	else:
 		site = check_output(['python', '-c', 'import distutils; \
 print(distutils.sysconfig.get_python_lib())'])
-		site = site.decode(locale.getlocale()[1]).strip()
-		print(*os.listdir(site))
-		extra_paths = os.path.join(site, '_virtualenv_path_extension.pth')
-		if os.path.exists(extra_paths):
-			print('from _virtualenv_path_extension.pth:')
-			with open(extra_paths) as extra:
-				print(''.join(extra.readlines()))
+		return site.decode(locale.getlocale()[1]).strip()
+
+
+def sitepackages_dir_cmd():
+	print(sitepackages_dir())
+
+
+def lssitepackages_cmd():
+	site = sitepackages_dir()
+	print(*os.listdir(site))
+	extra_paths = os.path.join(site, '_virtualenv_path_extension.pth')
+	if os.path.exists(extra_paths):
+		print('from _virtualenv_path_extension.pth:')
+		with open(extra_paths) as extra:
+			print(''.join(extra.readlines()))
