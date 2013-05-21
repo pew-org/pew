@@ -5,3 +5,5 @@ dist
 *.pyc
 *.class
 devenv
+.tox
+**/#*#

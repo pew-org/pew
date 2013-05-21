@@ -164,10 +164,6 @@ def workon_cmd():
 		invoke(inve)
 
 
-def add2virtualenv_cmd():
-	NotImplemented
-
-
 def sitepackages_dir():
 	if 'VIRTUAL_ENV' not in os.environ:
 		sys.exit('ERROR: no virtualenv active')
@@ -175,6 +171,33 @@ def sitepackages_dir():
 		site = check_output(['python', '-c', 'import distutils; \
 print(distutils.sysconfig.get_python_lib())'])
 		return site.decode(locale.getlocale()[1]).strip()
+
+
+def add2virtualenv_cmd():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-d', dest='remove', action='store_true')
+	parser.add_argument('dirs', nargs='+')
+	args = parser.parse_args()
+	
+	extra_paths = os.path.join(sitepackages_dir(), '_virtualenv_path_extension.pth')
+	new_paths = [os.path.abspath(d) + "\n" for d in args.dirs]
+	if not os.path.exists(extra_paths):
+		with open(extra_paths, 'w') as extra:
+			extra.write('''import sys; sys.__plen = len(sys.path)
+import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)
+''')
+
+	def rewrite(f):
+		with open(extra_paths, 'r+') as extra:
+			to_write = f(extra.readlines())
+			extra.seek(0)
+			extra.truncate()
+			extra.writelines(to_write)
+
+	if args.remove:
+		rewrite(lambda lines: [line for line in lines if line not in new_paths])
+	else:
+		rewrite(lambda lines: lines[0:1] + new_paths + lines[1:])
 
 
 def sitepackages_dir_cmd():
