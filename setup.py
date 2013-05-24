@@ -12,7 +12,7 @@ setup(
 	url='https://github.com/berdario/invewrapper',
 	license='MIT License',
 	packages=['invewrapper'],
-	install_requires=['virtualenv'],
+	install_requires=['virtualenv', 'virtualenv-clone'],
 	package_data={'': ['inve']},  # XXX
 	entry_points={
 		'console_scripts':

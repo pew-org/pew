@@ -8,10 +8,17 @@ import argparse
 import shutil
 import contextlib
 import locale
+import random
 from subprocess import check_call, check_output
 from glob import glob
 
+args = dict(enumerate(sys.argv))
+
 locale.setlocale(locale.LC_ALL, '')
+
+
+def shell(*args):
+	return check_output(*args).decode(locale.getlocale()[1]).strip()
 
 env_bin_dir = 'bin'
 if sys.platform in ('win32', 'cygwin'):
@@ -57,7 +64,33 @@ def deploy_inve(target):
 		shutil.copy(source_inve, target)
 
 
-def mkvirtualenv_cmd():
+def mkvirtualenv(envname, python=None, packages=[], project=None,
+		requirements=None, rest=[]):
+	
+	if python:
+		rest = ["--python=%s" % python] + rest
+	
+	with chdir(workon_home):
+		os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
+		check_call(["virtualenv", envname] + rest)
+		with chdir(envname):
+			if project:
+				with open('.project', 'w') as dotproject:
+					dotproject.write(project)
+			
+	inve = get_inve(envname)
+	deploy_inve(inve)
+	
+	if requirements:
+		invoke(inve, 'pip', 'install', '-r', expandpath(requirements))
+	
+	if packages:
+		invoke(inve, 'pip', 'install', *packages)
+	
+	return inve
+
+
+def mkvirtualenv_argparser():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-p', '--python')
 	parser.add_argument('-i', action='append', dest='packages', help='Install a \
@@ -66,40 +99,22 @@ package after the environment is created. This option may be repeated.')
 project directory to associate with the new environment.')
 	parser.add_argument('-r', dest='requirements', help='Provide a pip \
 requirements file to install a base set of packages into the new environment.')
-	parser.add_argument('envname')
-	parser.add_argument('rest', nargs=argparse.REMAINDER)
+	return parser
 
-	args = parser.parse_args()
-	if args.python:
-		args.rest = ["--python=%s" % args.python] + args.rest
-	
-	with chdir(workon_home):
-		os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
-		check_call(["virtualenv", args.envname] + args.rest)
-		with chdir(args.envname):
-			if args.project:
-				with open('.project', 'w') as dotproject:
-					dotproject.write(args.project)
-			
-	deploy_inve(get_inve(args.envname))
-	
-	inve = get_inve(args.envname)
-	
-	if args.requirements:
-		invoke(inve, 'pip', 'install', '-r', expandpath(args.requirements))
-	
-	if args.packages:
-		invoke(inve, 'pip', 'install', *args.packages)
-	
+
+def mkvirtualenv_cmd():
+	parser = mkvirtualenv_argparser()
+	parser.add_argument('envname')
+	args, rest = parser.parse_known_args()
+
+	inve = mkvirtualenv(args.envname, args.python, args.packages, args.project,
+		args.requirements, rest)
 	invoke(inve)
 
 
-def rmvirtualenv_cmd():
-	if len(sys.argv) < 2:
-		sys.exit("Please specify an environment")
-	
+def rmvirtualenvs(envs):
 	with chdir(workon_home):
-		for env in sys.argv[1:]:
+		for env in envs:
 			env = os.path.join(workon_home, env)
 			if os.environ.get('VIRTUAL_ENV') == env:
 				print("ERROR: You cannot remove the active environment \
@@ -110,6 +125,12 @@ def rmvirtualenv_cmd():
 			except OSError as e:
 				print("Error while trying to remove the {} env: \
 \n{}".format(env, e.strerror), file=sys.stderr)
+
+
+def rmvirtualenv_cmd():
+	if len(sys.argv) < 2:
+		sys.exit("Please specify an environment")
+	rmvirtualenvs(sys.argv[1:])
 
 
 def showvirtualenv(env):
@@ -168,9 +189,8 @@ def sitepackages_dir():
 	if 'VIRTUAL_ENV' not in os.environ:
 		sys.exit('ERROR: no virtualenv active')
 	else:
-		site = check_output(['python', '-c', 'import distutils; \
+		return shell(['python', '-c', 'import distutils; \
 print(distutils.sysconfig.get_python_lib())'])
-		return site.decode(locale.getlocale()[1]).strip()
 
 
 def add2virtualenv_cmd():
@@ -212,3 +232,121 @@ def lssitepackages_cmd():
 		print('from _virtualenv_path_extension.pth:')
 		with open(extra_paths) as extra:
 			print(''.join(extra.readlines()))
+
+
+def toggleglobalsitepackages_cmd():
+	quiet = args.get(1) == '-q'
+	site = sitepackages_dir()
+	ngsp_file = os.path.join(os.path.dirname(site), 'no-global-site-packages.txt')
+	if os.path.exists(ngsp_file):
+		os.remove(ngsp_file)
+		if not quiet:
+			print('Enabled global site-packages')
+	else:
+		with open(ngsp_file, 'w'):
+			if not quiet:
+				print('Disabled global site-packages')
+
+
+def cpvirtualenv_cmd():
+	if len(sys.argv) < 2:
+		sys.exit('Please provide a valid virtualenv to copy')
+	source_name = sys.argv[1]
+	if not os.path.exists(os.path.join(workon_home, source_name)):
+		source = expandpath(source_name)
+		if not os.path.exists(source):
+			sys.exit('Please provide a valid virtualenv to copy')
+	else:
+		source = os.path.join(workon_home, source_name)
+
+	target_name = args.get(2, source_name)
+
+	target = os.path.join(workon_home, target_name)
+	
+	if os.path.exists(target):
+		sys.exit('%s virtualenv already exists.' % target_name)
+
+	print('Copying {0} as {1}'.format(source_name, target_name))
+	check_call(['virtualenv-clone', source, target])
+	inve = get_inve(target_name)
+	deploy_inve(inve)
+	invoke(inve)
+
+
+def setvirtualenvproject(env, project):
+	print('Setting project for {} to {}'.format(os.path.basename(env), project))
+	with open(os.path.join(env, '.project'), 'w') as prj:
+		prj.write(project)
+
+
+def setvirtualenvproject_cmd():
+	env = os.environ.get('VIRTUAL_ENV', args.get(1))
+	project = args.get(2, os.path.abspath('.'))
+	if not env:
+		sys.exit('setvirtualenvproject [env] [project]')
+	setvirtualenvproject(env, project)
+
+
+def mkproject_cmd():
+	parser = mkvirtualenv_argparser()
+	parser.add_argument('envname')
+	parser.add_argument(
+		'-t', action='append', default=[], dest='templates', help='Multiple \
+templates may be selected.  They are applied in the order specified on the \
+command line.')
+
+	args, rest = parser.parse_known_args()
+	
+	projects_home = os.environ.get('PROJECT_HOME', '.')
+	if not os.path.exists(projects_home):
+		sys.exit('ERROR: Projects directory %s does not exist. \
+Create it or set PROJECT_HOME to an existing directory.' % projects_home)
+
+	project = os.path.abspath(os.path.join(projects_home, args.envname))
+	if os.path.exists(project):
+		sys.exit('Project %s already exists.' % args.envname)
+
+	inve = mkvirtualenv(args.envname, args.python, args.packages, args.project,
+		args.requirements, rest)
+
+	os.mkdir(project)
+
+	setvirtualenvproject(os.path.join(workon_home, args.envname), project)
+
+	with chdir(project):
+		for template in args.templates:
+			pass  # XXX hook
+	invoke(inve)
+
+
+def mktmpenv_cmd():
+	parser = mkvirtualenv_argparser()
+	env = '.'
+	while os.path.exists(os.path.join(workon_home, env)):
+		env = hex(random.getrandbits(64))[2:-1]
+
+	args, rest = parser.parse_known_args()
+
+	inve = mkvirtualenv(env, args.python, args.packages, args.project,
+		args.requirements, rest)
+	print('This is a temporary environment. It will be deleted when you exit')
+	invoke(inve)
+
+	rmvirtualenvs([env])
+
+
+def wipeenv_cmd():
+	pkgs = map(lambda d: d.split("==")[0], shell(['pip', 'freeze']).split())
+	to_remove = [pkg for pkg in pkgs if pkg not in ('distribute', 'wsgiref')]
+	if to_remove:
+		print("Uninstalling packages:\n%s" % "\n".join(to_remove))
+		check_call(['pip', 'uninstall', '-y'] + to_remove)
+	else:
+		print("Nothing to remove")
+
+
+def allvirtualenv_cmd():
+	inves = glob(os.path.join(workon_home, '*', env_bin_dir, 'inve'))
+	for inve in inves:
+		print("\n%s:" % inve.split(os.path.sep)[-3])
+		invoke(inve, *sys.argv[1:])
