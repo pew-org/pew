@@ -73,11 +73,10 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
 	with chdir(workon_home):
 		os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
 		check_call(["virtualenv", envname] + rest)
-		with chdir(envname):
-			if project:
-				with open('.project', 'w') as dotproject:
-					dotproject.write(project)
-			
+	
+	if project:
+		setvirtualenvproject(envname, project)
+	
 	inve = get_inve(envname)
 	deploy_inve(inve)
 	
@@ -288,12 +287,20 @@ def setvirtualenvproject_cmd():
 
 
 def mkproject_cmd():
+	if '-l' in sys.argv or '--list' in sys.argv:
+		templates = [t.split(os.path.sep)[-1][9:] for t in
+					glob(os.path.join(workon_home, "template_*"))]
+		print("Available project templates:\n%s" % "\n".join(templates))
+		sys.exit()
+	
 	parser = mkvirtualenv_argparser()
 	parser.add_argument('envname')
 	parser.add_argument(
 		'-t', action='append', default=[], dest='templates', help='Multiple \
 templates may be selected.  They are applied in the order specified on the \
 command line.')
+	parser.add_argument(
+		'-l', '--list', action='store_true', help='List available templates.')
 
 	args, rest = parser.parse_known_args()
 	
@@ -314,9 +321,10 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
 	setvirtualenvproject(os.path.join(workon_home, args.envname), project)
 
 	with chdir(project):
-		for template in args.templates:
-			pass  # XXX hook
-	invoke(inve)
+		for template_name in args.templates:
+			template = os.path.join(workon_home, "template_" + template_name)
+			invoke(inve, template, args.envname, project)
+		invoke(inve)
 
 
 def mktmpenv_cmd():
