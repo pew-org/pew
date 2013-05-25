@@ -2,11 +2,9 @@ Invewrapper
 ===========
 
 [![PyPi version](https://pypip.in/v/invewrapper/badge.png)](https://crate.io/packages/invewrapper/)
-
 [![Build Status](https://travis-ci.org/berdario/invewrapper.png)](https://travis-ci.org/berdario/invewrapper)
 
 Invewrapper is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv).
-
 It is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea/alternative implementation of a better activate script.
 
 The advantage is that invewrapper doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
@@ -15,15 +13,15 @@ It works on bash, zsh, fish, powershell, etc.
 
 Another side effect is that its code is much shorter and (hopefully) easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s (the project upon which this is based). How many Python programmers know at a glance what does `"${out_args[@]-}"` do? or `eval "envname=\$$#"`?
 
-Part of the conciseness of invewrapper is thanks to inve itself: "shelling out" let us avoid to keep track of the previous environment variable values, and to create a deactivate script.
+* Part of the conciseness of invewrapper is thanks to inve itself: "shelling out" let us avoid to keep track of the previous environment variable values, and to create a deactivate script.
 
-Part is thanks to Python libraries, like argparse.
+* Part is thanks to Python libraries, like argparse.
 
-Part is thanks to the stricter python's error handling.
+* Part is thanks to the stricter Python error handling.
 
-Part is thanks to some [differences](#differences-from-virtualenvwrapper).
+* Part is thanks to some [differences](#differences-from-virtualenvwrapper).
 
-Part is also probably due to my objectionable taste for code layout :)
+* Part is also probably due to my objectionable taste for code layout :)
 
 Installation
 ------------
@@ -35,56 +33,63 @@ Usage
 
 You can create a new virtualenv, with a non-default python and specifying some packages to be installed in it, like this:
 
-`~> mkvirtualenv --python=pypy -i django myproject
-Running virtualenv with interpreter /home/dario/Applications/bin/pypy
-New pypy executable in myproject/bin/pypy
-Installing distribute...........................................................................................................................................................................................................................done. Installing pip................done.
-Downloading/unpacking django
-Downloading Django-1.5.1.tar.gz (8.0MB):
-8.0MB downloaded
-Running setup.py egg_info for package django
-
-warning: no previously-included files matching '__pycache__' found under directory '*'
-warning: no previously-included files matching '*.py[co]' found under directory '*'
-Installing collected packages: django [SNIP] Successfully installed django Cleaning up... Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.`
+    ~> mkvirtualenv --python=pypy -i django myproject
+    Running virtualenv with interpreter /home/dario/Applications/bin/pypy
+    New pypy executable in myproject/bin/pypy
+    Installing distribute..................................................................
+    .......................................................................................
+    ..................................................................done.
+    Installing pip................done.
+    Downloading/unpacking django
+    Downloading Django-1.5.1.tar.gz (8.0MB):
+    8.0MB downloaded
+    Running setup.py egg_info for package django
+    
+    warning: no previously-included files matching '__pycache__' found under directory '*'
+    warning: no previously-included files matching '*.py[co]' found under directory '*'
+    Installing collected packages: django
+    [SNIP]
+    Successfully installed django Cleaning up...
+    Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
 
 Once inside, you can check the current python version, list the packages present in its python's site-packages directory, and install additional packages like this:
 
-`myproject ~> python -V
-Python 2.7.3 (b9c3566aa017, May 09 2013, 09:09:14)
-[PyPy 2.0.0 with GCC 4.6.3]
-myproject ~> lssitepackages 
-distribute-0.6.34-py2.7.egg Django-1.5.1-py2.7.egg-info setuptools.pth pip-1.3.1-py2.7.egg easy-install.pth django
-myproject ~> pip install pdbpp
-Downloading/unpacking pdbpp
-[SNIP]
-Successfully installed pdbpp fancycompleter wmctrl pygments pyrepl
-Cleaning up...
-myproject ~> pip freeze
-Django==1.5.1
-Pygments==1.6
-cffi==0.6
-distribute==0.6.34
-fancycompleter==0.4
-pdbpp==0.7.2
-pyrepl==0.8.4
-wmctrl==0.1
-wsgiref==0.1.2
-myproject ~> ^D`
+    myproject ~> python -V
+    Python 2.7.3 (b9c3566aa017, May 09 2013, 09:09:14)
+    [PyPy 2.0.0 with GCC 4.6.3]
+    myproject ~> lssitepackages 
+    distribute-0.6.34-py2.7.egg Django-1.5.1-py2.7.egg-info setuptools.pth pip-1.3.1-py2.7.egg
+    easy-install.pth django
+    myproject ~> pip install pdbpp
+    Downloading/unpacking pdbpp
+    [SNIP]
+    Successfully installed pdbpp fancycompleter wmctrl pygments pyrepl
+    Cleaning up...
+    myproject ~> pip freeze
+    Django==1.5.1
+    Pygments==1.6
+    cffi==0.6
+    distribute==0.6.34
+    fancycompleter==0.4
+    pdbpp==0.7.2
+    pyrepl==0.8.4
+    wmctrl==0.1
+    wsgiref==0.1.2
+    myproject ~> ^D
 
 You can also specify a requirements file, to be passed on to pip, and activate another virtualenv with workon:
 
-`~> mkvirtualenv -r ~/Projects/topaz/requirements.txt topaz
-New python executable in topaz/bin/python
-[SNIP]
-Successfully installed rply pytest invoke requests py
-Cleaning up...
-Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
-topaz ~> ^D
-
-~> workon myproject
-Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
-myproject ~> `
+	~> mkvirtualenv -r ~/Projects/topaz/requirements.txt topaz
+	New python executable in topaz/bin/python
+	[SNIP]
+	Successfully installed rply pytest invoke requests py
+	Cleaning up...
+	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
+	topaz ~> ^D
+	
+	~> workon myproject
+	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
+	myproject ~> 
 
 Command Reference
 -----------------
@@ -198,7 +203,7 @@ You can customize invewrapper's virtualenvs directory location, with the `$XDG_D
 Running Tests
 -------------
 
-invewrapper's test suite is a straight port of virtualenvwrapper's, dropping test related to things absent in invewrapper and converting the scripts to use commands "echoed inside the workon commands" (almost surely there was a better approach, but I wasn't sure how to integrate it with shunit asserts, and I didn't write to rewrite all the tests as well); This means that they're slightly uglier and they spew out more unimportant output when running.
+invewrapper's test suite is a straight port of virtualenvwrapper's, dropping test related to things absent in invewrapper and converting the scripts to use commands "echoed inside the workon commands" (almost surely there was a better approach, but I wasn't sure how to integrate it with shunit asserts, and I didn't want to rewrite all the tests as well); This means that they're slightly uglier and they spew out more unimportant output when running.
 
 The test suite for invewrapper uses [shunit2](http://shunit2.googlecode.com/) and [tox](http://codespeak.net/tox). The shunit2 source is included in the `tests` directory, but tox must be installed separately (`pip install tox`).
 
@@ -232,14 +237,16 @@ and then echoing `__fish_prompt_venv` in the `fish_prompt` function will let you
 
 Likewise, in bash and zsh you can change the `$PS1` variable.
 
-### there's no cd* commands ###
+### there're no cd* commands ###
 
 Due to the fact that the commands cannot change the environment from which they've been called, the `cdvirtualenv`, `cdsitepackages` and `cdproject` are missing.
 
 They can be simply implemented like:
 
 `cd $VIRTUAL_ENV` for `cdvirtualenv`
+
 `cd $(sitepackages_dir)` for `cdsitepackages`
+
 `cd $(cat $VIRTUAL_ENV/.project)` for `cdproject`
 
 Just like in the inve idea, an invewrapper command that returns a string of commands to be sourced could be created, and by putting it in your .bashrc/.zshrc/config.fish these aliases/command creations could be automated.
