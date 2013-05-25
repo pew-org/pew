@@ -30,7 +30,14 @@ def expandpath(path):
 
 workon_home = expandpath(os.environ.get('WORKON_HOME', '~/.virtualenvs'))
 if not os.path.exists(workon_home):
-	os.makedirs(workon_home)
+	if 'linux' in sys.platform and 'WORKON_HOME' not in os.environ:
+		actual_workon = os.path.join(
+			expandpath(os.environ.get('XDG_DATA_HOME', '~/.local/share')),
+			'virtualenvs')
+		os.makedirs(actual_workon)
+		os.symlink(actual_workon, workon_home)
+	else:
+		os.makedirs(workon_home)
 
 
 @contextlib.contextmanager
