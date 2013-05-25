@@ -102,6 +102,7 @@ requirements file to install a base set of packages into the new environment.')
 
 
 def mkvirtualenv_cmd():
+	"""Create a new environment, in $WORKON_HOME."""
 	parser = mkvirtualenv_argparser()
 	parser.add_argument('envname')
 	args, rest = parser.parse_known_args()
@@ -127,6 +128,7 @@ def rmvirtualenvs(envs):
 
 
 def rmvirtualenv_cmd():
+	"""Remove one or more environment, from $WORKON_HOME."""
 	if len(sys.argv) < 2:
 		sys.exit("Please specify an environment")
 	rmvirtualenvs(sys.argv[1:])
@@ -160,6 +162,7 @@ def lsvirtualenv(verbose):
 
 
 def lsvirtualenv_cmd():
+	"""List available environments."""
 	parser = argparse.ArgumentParser()
 	p_group = parser.add_mutually_exclusive_group()
 	p_group.add_argument('-b', '--brief', action='store_false')
@@ -169,6 +172,7 @@ def lsvirtualenv_cmd():
 
 
 def workon_cmd():
+	"""List or change working virtual environments."""
 	try:
 		env = sys.argv[1]
 	except IndexError:
@@ -193,6 +197,13 @@ print(distutils.sysconfig.get_python_lib())'])
 
 
 def add2virtualenv_cmd():
+	"""Add the specified directories to the Python path for the currently active virtualenv.
+
+This will be done by placing the directory names in a path file named
+"virtualenv_path_extensions.pth" inside the virtualenv's site-packages
+directory; if this file does not exists, it will be created first.
+
+"""
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-d', dest='remove', action='store_true')
 	parser.add_argument('dirs', nargs='+')
@@ -224,6 +235,7 @@ def sitepackages_dir_cmd():
 
 
 def lssitepackages_cmd():
+	"""Show the content of the site-packages directory of the current virtualenv."""
 	site = sitepackages_dir()
 	print(*os.listdir(site))
 	extra_paths = os.path.join(site, '_virtualenv_path_extensions.pth')
@@ -234,6 +246,7 @@ def lssitepackages_cmd():
 
 
 def toggleglobalsitepackages_cmd():
+	"""Toggle the current virtualenv between having and not having access to the global site-packages."""
 	quiet = args.get(1) == '-q'
 	site = sitepackages_dir()
 	ngsp_file = os.path.join(os.path.dirname(site), 'no-global-site-packages.txt')
@@ -248,6 +261,7 @@ def toggleglobalsitepackages_cmd():
 
 
 def cpvirtualenv_cmd():
+	"""Duplicate the named virtualenv to make a new one."""
 	if len(sys.argv) < 2:
 		sys.exit('Please provide a valid virtualenv to copy')
 	source_name = sys.argv[1]
@@ -279,6 +293,7 @@ def setvirtualenvproject(env, project):
 
 
 def setvirtualenvproject_cmd():
+	"""Given a virtualenv directory and a project directory, set the virtualenv up to be associated with the project."""
 	env = os.environ.get('VIRTUAL_ENV', args.get(1))
 	project = args.get(2, os.path.abspath('.'))
 	if not env:
@@ -287,6 +302,7 @@ def setvirtualenvproject_cmd():
 
 
 def mkproject_cmd():
+	"""Create a new project directory and its associated virtualenv."""
 	if '-l' in sys.argv or '--list' in sys.argv:
 		templates = [t.split(os.path.sep)[-1][9:] for t in
 					glob(os.path.join(workon_home, "template_*"))]
@@ -328,6 +344,7 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
 
 
 def mktmpenv_cmd():
+	"""Create a temporary virtualenv."""
 	parser = mkvirtualenv_argparser()
 	env = '.'
 	while os.path.exists(os.path.join(workon_home, env)):
@@ -344,6 +361,7 @@ def mktmpenv_cmd():
 
 
 def wipeenv_cmd():
+	"""Remove all installed packages from the current env."""
 	pkgs = map(lambda d: d.split("==")[0], shell(['pip', 'freeze']).split())
 	to_remove = [pkg for pkg in pkgs if pkg not in ('distribute', 'wsgiref')]
 	if to_remove:
@@ -354,6 +372,7 @@ def wipeenv_cmd():
 
 
 def allvirtualenv_cmd():
+	"""Run a command in each virtualenv."""
 	inves = glob(os.path.join(workon_home, '*', env_bin_dir, 'inve'))
 	for inve in inves:
 		print("\n%s:" % inve.split(os.path.sep)[-3])
