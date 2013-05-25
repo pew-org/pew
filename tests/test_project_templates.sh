@@ -12,7 +12,7 @@ oneTimeSetUp() {
     mkdir -p "$WORKON_HOME"
     rm -rf "$PROJECT_HOME"
     mkdir -p "$PROJECT_HOME"
-	ln -s $(realpath $test_dir/testtemplate/template.py) $WORKON_HOME/template_test
+	ln -s $(readlink -f $test_dir/testtemplate/template.py) $WORKON_HOME/template_test
 }
 
 oneTimeTearDown() {
