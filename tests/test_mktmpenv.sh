@@ -1,5 +1,4 @@
 #!/bin/sh
-# SKIP
 
 test_dir=$(cd $(dirname $0) && pwd)
 
@@ -33,14 +32,13 @@ test_mktmpenv_name() {
 }
 
 test_mktmpenv_virtualenv_args() {
-    echo "" | mktmpenv --no-site-packages >/dev/null 2>&1
-    ngsp_file="`virtualenvwrapper_get_site_packages_dir`/../no-global-site-packages.txt"
-    assertTrue "$ngsp_file does not exist" "[ -f \"$ngsp_file\" ]"
+    result=$(echo "test -f $(sitepackages_dir)/../no-global-site-packages.txt && echo ok" | mktmpenv --no-site-packages | tail -n2 | head -n1)""
+    assertTrue "tmpenv does not exist" "test $result"
 }
 
 test_deactivate() {
-    env_name=$(basename $(echo "echo \$VIRTUAL_ENV" | mktmpenv | tail -n1))
-    assertTrue "Environment was not created" "$env_name"
+    env_name=$(basename $(echo "echo \$VIRTUAL_ENV" | mktmpenv | tail -n2 | head -n1))
+    assertTrue "Environment was not created" "test $env_name"
     assertFalse "Environment still exists" "[ -d \"$WORKON_HOME/$env_name\" ]"
 }
 

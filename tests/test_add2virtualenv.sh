@@ -1,5 +1,4 @@
 #!/bin/sh
-# SKIP
 
 #set -x
 
@@ -25,7 +24,7 @@ test_add2virtualenv () {
     full_path=$(echo "pwd" | mkvirtualenv "pathtest" | tail -n1)
     echo "add2virtualenv $full_path" | workon "pathtest"
     # Check contents of path file
-    path_file=$(echo "sitepackages_dir" | workon "pathtest")"/_virtualenv_path_extensions.pth"
+    path_file=$(echo "sitepackages_dir" | workon "pathtest" | tail -n1)"/_virtualenv_path_extensions.pth"
     assertTrue "No $full_path in $(cat $path_file)" "grep -q $full_path $path_file"
     assertTrue "No path insert code in $(cat $path_file)" "grep -q sys.__egginsert $path_file"
     # Check the path we inserted is actually at the top
@@ -39,7 +38,7 @@ test_add2virtualenv () {
 }
 
 test_add2virtualenv_relative () {
-    full_path=$(echo "pwd" | mkvirtualenv "pathtest_relative")
+    full_path=$(echo "pwd" | mkvirtualenv "pathtest_relative" | tail -n1)
     parent_dir=$(dirname $full_path)
     base_dir=$(basename $full_path)
     echo "add2virtualenv ../$base_dir" | workon "pathtest_relative"
@@ -75,9 +74,9 @@ test_add2virtualenv_ampersand () {
 test_add2virtualenv_delete () {
     path_file="./_virtualenv_path_extensions.pth"
     
-    #cd sitepackages_dir
     # Make sure it was added
     echo "add2virtualenv /full/path" | mkvirtualenv "pathtest_delete" >/dev/null 2>&1
+	cd $(echo "sitepackages_dir" | workon "pathtest_delete")
     assertTrue "No /full/path in $(cat $path_file)" "grep -q /full/path $path_file"
     # Remove it and verify that change
     echo "add2virtualenv -d /full/path" | workon "pathtest_delete"
@@ -87,9 +86,9 @@ test_add2virtualenv_delete () {
 
 test_add2virtualenv_delete_space () {
     path_file="./_virtualenv_path_extensions.pth"
-    # cd sitepackages_dir   
     # Make sure it was added
     echo "add2virtualenv '/full/path with spaces'" | mkvirtualenv "pathtest_delete_space" >/dev/null 2>&1
+	cd $(echo "sitepackages_dir" | workon "pathtest_delete_space")
     assertTrue "No /full/path with spaces in $(cat $path_file)" "grep -q '/full/path with spaces' $path_file"
     # Remove it and verify that change
     echo "add2virtualenv -d '/full/path with spaces'" | workon "pathtest_delete_space"
@@ -99,9 +98,9 @@ test_add2virtualenv_delete_space () {
 
 test_add2virtualenv_delete_ampersand () {
     path_file="./_virtualenv_path_extensions.pth"
-    # cd sitepackages_dir
     # Make sure it was added
     echo "add2virtualenv '/full/path & dir'" | mkvirtualenv "pathtest_delete_ampersand" >/dev/null 2>&1
+	cd $(echo "sitepackages_dir" | workon "pathtest_delete_ampersand")
     assertTrue "No /full/path & dir in $(cat $path_file)" "grep -q '/full/path & dir' $path_file"
     # Remove it and verify that change
     echo "add2virtualenv -d '/full/path & dir'" | workon "pathtest_delete_ampersand"

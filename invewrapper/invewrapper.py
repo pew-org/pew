@@ -74,8 +74,8 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
 		os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
 		check_call(["virtualenv", envname] + rest)
 	
-	if project:
-		setvirtualenvproject(envname, project)
+		if project:
+			setvirtualenvproject(envname, project)
 	
 	inve = get_inve(envname)
 	deploy_inve(inve)
@@ -198,7 +198,7 @@ def add2virtualenv_cmd():
 	parser.add_argument('dirs', nargs='+')
 	args = parser.parse_args()
 	
-	extra_paths = os.path.join(sitepackages_dir(), '_virtualenv_path_extension.pth')
+	extra_paths = os.path.join(sitepackages_dir(), '_virtualenv_path_extensions.pth')
 	new_paths = [os.path.abspath(d) + "\n" for d in args.dirs]
 	if not os.path.exists(extra_paths):
 		with open(extra_paths, 'w') as extra:
@@ -226,9 +226,9 @@ def sitepackages_dir_cmd():
 def lssitepackages_cmd():
 	site = sitepackages_dir()
 	print(*os.listdir(site))
-	extra_paths = os.path.join(site, '_virtualenv_path_extension.pth')
+	extra_paths = os.path.join(site, '_virtualenv_path_extensions.pth')
 	if os.path.exists(extra_paths):
-		print('from _virtualenv_path_extension.pth:')
+		print('from _virtualenv_path_extensions.pth:')
 		with open(extra_paths) as extra:
 			print(''.join(extra.readlines()))
 

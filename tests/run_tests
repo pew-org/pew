@@ -28,6 +28,8 @@ fi
 #
 source "$envdir/bin/activate"
 
+SHELL=bash
+
 # Run the test scripts with a little formatting around them to make it
 # easier to find where each script output starts.
 for test_script in $scripts
