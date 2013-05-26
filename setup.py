@@ -16,7 +16,7 @@ https://github.com/berdario/invewrapper#usage'''
 
 setup(
 	name='invewrapper',
-	version='0.1.3',
+	version='0.1.4',
 	description='tools to manage multiple virtualenvs written in pure python, '
 		'a virtualenvwrapper rewrite',
 	long_description=long_desc,
