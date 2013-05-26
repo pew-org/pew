@@ -26,6 +26,8 @@ setup(
 	license='MIT License',
 	packages=['invewrapper'],
 	install_requires=['virtualenv', 'virtualenv-clone'],
+	dependency_links=
+		['https://github.com/berdario/virtualenv-clone/tarball/master#egg=virtualenv-clone'],
 	package_data={'': ['inve']},  # XXX
 	entry_points={
 		'console_scripts':
