@@ -4,8 +4,9 @@ Invewrapper
 [![PyPi version](https://pypip.in/v/invewrapper/badge.png)](https://crate.io/packages/invewrapper/)
 [![Build Status](https://travis-ci.org/berdario/invewrapper.png)](https://travis-ci.org/berdario/invewrapper)
 
-Invewrapper is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv).
-It is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea/alternative implementation of a better activate script.
+Invewrapper is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
+
+Invewrapper makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea/alternative implementation of a better activate script.
 
 The advantage is that invewrapper doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
 
