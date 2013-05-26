@@ -15,9 +15,9 @@ https://github.com/berdario/invewrapper#usage'''
 setup(
 	name='invewrapper',
 	version='0.1.3',
-	description='tools to manage multiple virtualenvs written in pure python',
+	description='tools to manage multiple virtualenvs written in pure python, '
+		'a virtualenvwrapper rewrite',
 	long_description=long_desc,
-	keywords='virtualenvwrapper',
 	author='Dario Bertini',
 	author_email='berdario+pypi@gmail.com',
 	url='https://github.com/berdario/invewrapper',
