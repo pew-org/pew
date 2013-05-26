@@ -3,16 +3,19 @@
 from setuptools import setup
 import invewrapper
 
-try:
-    with open('README.md') as readme:
-        long_desc = readme.read()
-except IOError:
-    long_desc = ''
+long_desc = '''Invewrapper is a set of tools to manage multiple virtual environments. It is written in pure python and leverages inve: the idea/alternative implementation of a better activate script.
+
+The advantage is that invewrapper doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
+
+It works on bash, zsh, fish, powershell, etc.
+
+For the documentation, you might want to read here:
+https://github.com/berdario/invewrapper#usage'''
 
 setup(
 	name='invewrapper',
 	version='0.1.3',
-	description='tools to manage multiple virtualenv written in pure python',
+	description='tools to manage multiple virtualenvs written in pure python',
 	long_description=long_desc,
 	keywords='virtualenvwrapper',
 	author='Dario Bertini',
