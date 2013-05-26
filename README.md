@@ -29,6 +29,8 @@ Installation
 
 `pip install invewrapper`
 
+See the [troubleshooting](#troubleshooting) section, if needed.
+
 Usage
 -----
 
@@ -201,6 +203,25 @@ Configuration
 
 You can customize invewrapper's virtualenvs directory location, with the `$XDG_DATA_HOME` or `$WORKON_HOME` environment variables, and the locations of new projects created with mkproject by setting `$PROJECT_HOME` (otherwise, the current directory will be selected)
 
+
+Troubleshooting
+---------------
+
+### The environment seems to not be activated ###
+
+If you've defined in your shell rc file, to export a PATH location that might shadow the executables needed by invewrapper (or your project), you might find that when getting into the environment, they will still be at the head of the PATH.
+
+There're multiple way to overcome this issue:
+
+* Move your export statements into the profile (`.bash_profile` and `.zprofile` for bash and zsh respectively, or in fish wrap your statements in a `if status --is-login` block ) and set up your terminal emulator to launch your shell as a login shell
+* Change your exports to put the new location at the tail, instead of the head of the PATH, e.g.: `export PATH=${PATH}:/usr/bin`
+* Change the files your OS provide to setup the base environment (it might come useful to look into /etc/paths.d /etc/profile and [environment.plist](http://stackoverflow.com/a/8421952/293735))
+
+
+### Other issues ###
+
+Congratulations! You found a bug, please [let me know](https://github.com/berdario/invewrapper/issues/new) :)
+
 Running Tests
 -------------
 
@@ -230,13 +251,31 @@ Differences from Virtualenvwrapper
 
 I don't think there's any shortcoming to workon on another environment without exiting from the previous, and I've done it myself some times while developing, you'll probably want to keep it in mind and remember to exit properly each time... After all you just need to press Ctrl+D.
 
-Another consequence is that the prompt won't be updated... but this can be easily fixed by using the `$VIRTUAL_ENV` variable, for example in `fish`:
+Another consequence is that the prompt won't be updated... but this can be easily fixed by using the `$VIRTUAL_ENV` variable.
+
+To get a blue-colored name at the start of your prompt:
+
+#### bash prompt ####
+
+`PS1="\[\033[01;34m\]\$(basename '$VIRTUAL_ENV')$PS1"`
+
+#### zsh prompt ####
+
+Add this at the beginning of your `PS1`
+
+`%{$fg_bold[blue]%}$(basename "$VIRTUAL_ENV")`
+
+#### fish prompt ####
 
 `set -g __fish_prompt_venv (set_color --bold -b blue white) (basename "$VIRTUAL_ENV") "$__fish_prompt_normal "`
 
-and then echoing `__fish_prompt_venv` in the `fish_prompt` function will let you get back this info in the prompt.
+and then echo `__fish_prompt_venv` in the `fish_prompt` function.
 
-Likewise, in bash and zsh you can change the `$PS1` variable.
+#### powershell prompt ####
+
+Add this to a prompt function:
+
+`Write-Host -NoNewLine -f blue ([System.IO.Path]::GetFileName($env:VIRTUAL_ENV))`
 
 ### there're no cd* commands ###
 
