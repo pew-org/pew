@@ -156,8 +156,8 @@ def showvirtualenv_cmd():
 
 
 def lsvirtualenv(verbose):
-	envs = [env.split(os.path.sep)[-3] for env in
-			glob(os.path.join(workon_home, '*', env_bin_dir, 'python'))]
+	envs = set(env.split(os.path.sep)[-3] for env in
+			glob(os.path.join(workon_home, '*', env_bin_dir, 'python*')))
 	for env in envs:
 		deploy_inve(get_inve(env))
 
