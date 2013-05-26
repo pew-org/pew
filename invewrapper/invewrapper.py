@@ -125,7 +125,7 @@ def rmvirtualenvs(envs):
 			env = os.path.join(workon_home, env)
 			if os.environ.get('VIRTUAL_ENV') == env:
 				print("ERROR: You cannot remove the active environment \
-	(%s)." % env, file=sys.stderr)
+(%s)." % env, file=sys.stderr)
 				break
 			try:
 				shutil.rmtree(env)
