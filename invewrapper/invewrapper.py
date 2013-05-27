@@ -17,6 +17,36 @@ args = dict(enumerate(sys.argv))
 locale.setlocale(locale.LC_ALL, '')
 
 
+def which_win(fn):
+	def _access_check(fn):
+		return (os.path.exists(fn) and os.access(fn, os.F_OK | os.X_OK)
+				and not os.path.isdir(fn))
+	pathext = os.environ.get("PATHEXT", "").split(os.pathsep)
+	files = [fn + ext.lower() for ext in pathext]
+	path = os.environ.get("PATH", os.defpath).split(os.pathsep)
+	seen = set()
+	for dir in map(os.path.normcase, path):
+		if dir not in seen:
+			seen.add(dir)
+			for name in map(lambda f: os.path.join(dir, f), files):
+				if _access_check(name):
+					return name
+
+
+def resolve_path(f):
+	if sys.platform != 'win32':
+		return f
+	else:
+		def call(cmd, *args):
+			ex = cmd[0]
+			ex = which_win(ex) or ex
+			return f([ex] + cmd[1:], *args)
+		return call
+
+check_output = resolve_path(check_output)
+check_call = resolve_path(check_call)
+
+
 def shell(*args):
 	return check_output(*args).decode(locale.getlocale()[1]).strip()
 
@@ -61,7 +91,7 @@ def invoke(inve, *args):
 	if sys.platform == 'win32' and not args:
 		check_call(['python', inve, 'powershell'])
 	else:
-		check_call(('python', inve) + args)
+		check_call(['python', inve] + list(args))
 
 
 def deploy_inve(target):
