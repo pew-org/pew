@@ -26,10 +26,10 @@ setUp () {
 }
 
 test_activate () {
-    echo "" | mkproject myproject >/dev/null 2>&1
+    echo "" | pew_mkproject myproject >/dev/null 2>&1
     cd $TMPDIR
     assertSame "" "$VIRTUAL_ENV"
-    venv=$(echo "echo \$VIRTUAL_ENV" | workon myproject | tail -n1)
+    venv=$(echo "echo \$VIRTUAL_ENV" | pew_workon myproject | tail -n1)
     assertSame "myproject" "$(basename $venv)"
 }
 
@@ -37,9 +37,9 @@ test_space_in_path () {
     old_project_home="$PROJECT_HOME"
     PROJECT_HOME="$PROJECT_HOME/with spaces"
     mkdir -p "$PROJECT_HOME"
-    echo "" | mkproject "myproject" >/dev/null 2>&1
+    echo "" | pew_mkproject "myproject" >/dev/null 2>&1
     cd $TMPDIR
-    venv=$(echo "echo \$VIRTUAL_ENV" | workon myproject | tail -n1)
+    venv=$(echo "echo \$VIRTUAL_ENV" | pew_workon myproject | tail -n1)
     assertSame "myproject" "$(basename $venv)"
     PROJECT_HOME="$old_project_home"
 }

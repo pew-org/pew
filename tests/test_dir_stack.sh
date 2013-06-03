@@ -33,12 +33,12 @@ tearDown() {
 }
 
 test_ticket_101 () {
-    echo "" | mkvirtualenv some_env >/dev/null 2>&1
+    echo "" | pew_new some_env >/dev/null 2>&1
     cd "$WORKON_HOME/start_here"
     pushd "$WORKON_HOME/on_the_stack"
-    rmvirtualenv some_env
-    echo "" | mkvirtualenv some_env >/dev/null 2>&1
-    #echo "After mkvirtualenv: `pwd`"
+    pew_rm some_env
+    echo "" | pew_new some_env >/dev/null 2>&1
+    #echo "After pew_new: `pwd`"
     #echo "After deactivate: `pwd`"
     popd
     #echo "After popd: `pwd`"

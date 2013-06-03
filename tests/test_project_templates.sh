@@ -26,12 +26,12 @@ setUp () {
 }
 
 test_list_templates () {
-    output=$(echo "" | mkproject -l 2>&1)
+    output=$(echo "" | pew_mkproject -l 2>&1)
     assertTrue "Did not find test template in \"$output\"" "echo \"$output\" | grep -q 'test'"
 }
 
 test_apply_template () {
-    echo "" | mkproject -t test proj1
+    echo "" | pew_mkproject -t test proj1
     assertTrue "Test file not created" "[ -f $PROJECT_HOME/proj1/TEST_FILE ]"
     assertTrue "project name not found" "grep -q proj1 $PROJECT_HOME/proj1/TEST_FILE"
 }
