@@ -51,7 +51,7 @@ def shell(*args):
 	return check_output(*args).decode(locale.getlocale()[1]).strip()
 
 env_bin_dir = 'bin'
-if sys.platform in ('win32', 'cygwin'):
+if sys.platform == 'win32':
 	env_bin_dir = 'Scripts'
 
 
