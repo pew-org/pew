@@ -12,7 +12,9 @@ setUp () {
     rm -rf "$WORKON_HOME"
     mkdir -p "$WORKON_HOME"
     rm -f "$test_dir/catch_output"
-    echo
+	if [ "True" = $(python -c "import sys; print('__pypy__' in sys.builtin_module_names)") ]; then
+		PYPY=True
+	fi
 }
 
 tearDown() {
@@ -23,7 +25,12 @@ tearDown() {
     rm -rf "$WORKON_HOME"
 }
 
+skip_if_pypy () {
+	[ $PYPY ] && startSkipping
+}
+
 test_new_env_activated () {
+	skip_if_pypy
 	cd tests/testpackage
     echo "python setup.py install" | pew-new source >/dev/null 2>&1
     echo "" | pew-cp "source" "destination"
@@ -36,6 +43,7 @@ test_new_env_activated () {
 }
 
 test_virtual_env_variable () {
+	skip_if_pypy
     echo "" | pew-new "source"
 	echo "" | pew-cp "source" "destination"
     envname=$(echo "echo \$VIRTUAL_ENV" | pew-workon destination | tail -n1)
@@ -44,6 +52,7 @@ test_virtual_env_variable () {
 }
 
 test_source_relocatable () {
+	skip_if_pypy
     cd tests/testpackage
     echo "python setup.py install" | pew-new source >/dev/null 2>&1
     assertTrue "virtualenv --relocatable \"$WORKON_HOME/source\""
@@ -55,6 +64,7 @@ test_source_relocatable () {
 }
 
 test_source_does_not_exist () {
+	skip_if_pypy
     out="$(pew-cp virtualenvthatdoesntexist foo 2>&1)"
     assertSame "$out" "Please provide a valid virtualenv to copy"
 }
@@ -62,6 +72,7 @@ test_source_does_not_exist () {
 
 test_no_site_packages () {
     # See issue #102
+	skip_if_pypy
     echo "" | pew-new "source" --no-site-packages >/dev/null 2>&1
 	echo "" | pew-cp "source" "destination"
     ngsp_file=$(echo "pew-sitepackages_dir" | pew-workon destination | tail -n1)"/../no-global-site-packages.txt"
