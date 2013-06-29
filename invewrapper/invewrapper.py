@@ -64,8 +64,14 @@ if sys.platform == 'win32':
 def expandpath(path):
 	return os.path.normpath(os.path.expanduser(os.path.expandvars(path)))
 
+
+def own(path):
+	while not os.path.exists(path):
+		path = os.path.dirname(path)
+	return os.stat(path).st_uid == os.getuid()
+
 workon_home = expandpath(os.environ.get('WORKON_HOME', '~/.virtualenvs'))
-if not os.path.exists(workon_home):
+if not os.path.exists(workon_home) and own(workon_home):
 	if os.name == 'posix' and 'WORKON_HOME' not in os.environ:
 		actual_workon = os.path.join(
 			expandpath(os.environ.get('XDG_DATA_HOME', '~/.local/share')),
