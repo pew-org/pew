@@ -13,9 +13,14 @@ import textwrap
 from subprocess import check_call, check_output
 from glob import glob
 
-args = dict(enumerate(sys.argv))
-
 locale.setlocale(locale.LC_ALL, '')
+
+
+def update_args_dict():
+	global args
+	args = dict(enumerate(sys.argv))
+
+update_args_dict()
 
 
 def which_win(fn):
@@ -417,18 +422,27 @@ def inall_cmd():
 		invoke(inve, *sys.argv[1:])
 
 def pew():
-	cmds = {'pew_' + cmd[:-4]: o.__doc__
-			for cmd, o in globals().items() if cmd.endswith('_cmd')}
-	longest = max(map(len, cmds)) + 2
+	cmds = {cmd[:-4]: fun
+			for cmd, fun in globals().items() if cmd.endswith('_cmd')}
+	if sys.argv[1:]:
+		try:
+			command = cmds[sys.argv[1]]
+			sys.argv = ['-'.join(sys.argv[:2])] + sys.argv[2:]
+			update_args_dict()
+			return command()
+		except KeyError:
+			print("ERROR: command %s does not exist." % sys.argv[1], file=sys.stderr)
+
+	longest = max(map(len, cmds)) + 3
 	columns = getattr(shutil, 'get_terminal_size', lambda: (80,24))()[0]
 
 	print('Available commands:\n')
-	for cmd,doc in cmds.items():
-		if doc:
+	for cmd, fun in cmds.items():
+		if fun.__doc__:
 			print(textwrap.fill(
-				doc.splitlines()[0],
+				fun.__doc__.splitlines()[0],
 				columns,
-				initial_indent=(cmd + ': ').ljust(longest),
+				initial_indent=(' {}: '.format(cmd)).ljust(longest),
 				subsequent_indent=longest * ' '))
 		else:
-			print(cmd)
+			print(' ' + cmd)

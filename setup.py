@@ -31,7 +31,7 @@ setup(
 	package_data={'': ['inve']},  # XXX
 	entry_points={
 		'console_scripts':
-			["pew_{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
+			["pew-{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
 			for cmd in dir(invewrapper.invewrapper) if cmd.endswith("_cmd")] +
 			['pew = invewrapper.invewrapper:pew']},
 	classifiers=[
