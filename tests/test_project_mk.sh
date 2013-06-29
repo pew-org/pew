@@ -29,14 +29,14 @@ tearDown () {
 }
 
 test_create_directories () {
-    echo "" | mkproject myproject1 >/dev/null 2>&1
+    echo "" | pew-mkproject myproject1 >/dev/null 2>&1
     assertTrue "env directory not created" "[ -d $WORKON_HOME/myproject1 ]"
     assertTrue "project directory not created" "[ -d $PROJECT_HOME/myproject1 ]"
 }
 
 test_create_virtualenv () {
-    echo "" | mkproject myproject2 >/dev/null 2>&1
-	venv=$(echo "echo \$VIRTUAL_ENV" | workon myproject2 | tail -n1)
+    echo "" | pew-mkproject myproject2 >/dev/null 2>&1
+	venv=$(echo "echo \$VIRTUAL_ENV" | pew-workon myproject2 | tail -n1)
     assertSame "myproject2" $(basename "$venv")
     assertSame "$PROJECT_HOME/myproject2" "$(cat $venv/.project)"
 }
@@ -44,21 +44,21 @@ test_create_virtualenv () {
 test_no_project_home () {
     old_home="$PROJECT_HOME"
     export PROJECT_HOME="$PROJECT_HOME/not_there"
-    output=`mkproject should_not_be_created 2>&1`
+    output=`pew-mkproject should_not_be_created 2>&1`
     assertTrue "Did not see expected message" "echo $output | grep 'does not exist'"
     PROJECT_HOME="$old_home"
 }
 
 test_project_exists () {
-    echo "" | mkproject myproject4 >/dev/null 2>&1
-    output=`mkproject myproject4 2>&1`
+    echo "" | pew-mkproject myproject4 >/dev/null 2>&1
+    output=`pew-mkproject myproject4 2>&1`
     assertTrue "Did not see expected message 'already exists' in: $output" "echo $output | grep 'already exists'"
 }
 
-test_same_workon_and_project_home () {
+test_same_pew-workon_and_project_home () {
     old_project_home="$PROJECT_HOME"
     export PROJECT_HOME="$WORKON_HOME"
-    echo "" | mkproject myproject5 >/dev/null 2>&1
+    echo "" | pew-mkproject myproject5 >/dev/null 2>&1
     assertTrue "env directory not created" "[ -d $WORKON_HOME/myproject1 ]"
     assertTrue "project directory was created" "[ -d $old_project_home/myproject1 ]"
     PROJECT_HOME="$old_project_home"

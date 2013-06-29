@@ -9,12 +9,18 @@ import shutil
 import contextlib
 import locale
 import random
+import textwrap
 from subprocess import check_call, check_output
 from glob import glob
 
-args = dict(enumerate(sys.argv))
-
 locale.setlocale(locale.LC_ALL, '')
+
+
+def update_args_dict():
+	global args
+	args = dict(enumerate(sys.argv))
+
+update_args_dict()
 
 
 def which_win(fn):
@@ -138,7 +144,7 @@ requirements file to install a base set of packages into the new environment.')
 	return parser
 
 
-def mkvirtualenv_cmd():
+def new_cmd():
 	"""Create a new environment, in $WORKON_HOME."""
 	parser = mkvirtualenv_argparser()
 	parser.add_argument('envname')
@@ -164,7 +170,7 @@ def rmvirtualenvs(envs):
 \n{}".format(env, e.strerror), file=sys.stderr)
 
 
-def rmvirtualenv_cmd():
+def rm_cmd():
 	"""Remove one or more environment, from $WORKON_HOME."""
 	if len(sys.argv) < 2:
 		sys.exit("Please specify an environment")
@@ -175,7 +181,7 @@ def showvirtualenv(env):
 	print(env)
 
 
-def showvirtualenv_cmd():
+def show_cmd():
 	try:
 		showvirtualenv(sys.argv[1])
 	except IndexError:
@@ -198,7 +204,7 @@ def lsvirtualenv(verbose):
 			showvirtualenv(env)
 
 
-def lsvirtualenv_cmd():
+def ls_cmd():
 	"""List available environments."""
 	parser = argparse.ArgumentParser()
 	p_group = parser.add_mutually_exclusive_group()
@@ -233,7 +239,7 @@ def sitepackages_dir():
 print(distutils.sysconfig.get_python_lib())'])
 
 
-def add2virtualenv_cmd():
+def add_cmd():
 	"""Add the specified directories to the Python path for the currently active virtualenv.
 
 This will be done by placing the directory names in a path file named
@@ -297,7 +303,7 @@ def toggleglobalsitepackages_cmd():
 				print('Disabled global site-packages')
 
 
-def cpvirtualenv_cmd():
+def cp_cmd():
 	"""Duplicate the named virtualenv to make a new one."""
 	if len(sys.argv) < 2:
 		sys.exit('Please provide a valid virtualenv to copy')
@@ -329,7 +335,7 @@ def setvirtualenvproject(env, project):
 		prj.write(project)
 
 
-def setvirtualenvproject_cmd():
+def setproject_cmd():
 	"""Given a virtualenv directory and a project directory, set the virtualenv up to be associated with the project."""
 	env = os.environ.get('VIRTUAL_ENV', args.get(1))
 	project = args.get(2, os.path.abspath('.'))
@@ -408,9 +414,35 @@ def wipeenv_cmd():
 		print("Nothing to remove")
 
 
-def allvirtualenv_cmd():
+def inall_cmd():
 	"""Run a command in each virtualenv."""
 	inves = glob(os.path.join(workon_home, '*', env_bin_dir, 'inve'))
 	for inve in inves:
 		print("\n%s:" % inve.split(os.path.sep)[-3])
 		invoke(inve, *sys.argv[1:])
+
+def pew():
+	cmds = {cmd[:-4]: fun
+			for cmd, fun in globals().items() if cmd.endswith('_cmd')}
+	if sys.argv[1:]:
+		try:
+			command = cmds[sys.argv[1]]
+			sys.argv = ['-'.join(sys.argv[:2])] + sys.argv[2:]
+			update_args_dict()
+			return command()
+		except KeyError:
+			print("ERROR: command %s does not exist." % sys.argv[1], file=sys.stderr)
+
+	longest = max(map(len, cmds)) + 3
+	columns = getattr(shutil, 'get_terminal_size', lambda: (80,24))()[0]
+
+	print('Available commands:\n')
+	for cmd, fun in cmds.items():
+		if fun.__doc__:
+			print(textwrap.fill(
+				fun.__doc__.splitlines()[0],
+				columns,
+				initial_indent=(' {}: '.format(cmd)).ljust(longest),
+				subsequent_indent=longest * ' '))
+		else:
+			print(' ' + cmd)

@@ -21,23 +21,23 @@ setUp () {
 }
 
 test_get_site_packages_dir () {
-    d=$(echo "sitepackages_dir" | mkvirtualenv "lssitepackagestest" | tail -n1 )
+    d=$(echo "pew-sitepackages_dir" | pew-new "pew-lssitepackagestest" | tail -n1 )
     echo "site-packages in $d"
     assertTrue "site-packages dir $d does not exist" "[ -d $d ]"
 }
 
-test_lssitepackages () {
-    contents=$(echo "lssitepackages" | mkvirtualenv "lssitepackagestest" | tail -n1)
+test_pew-lssitepackages () {
+    contents=$(echo "pew-lssitepackages" | pew-new "pew-lssitepackagestest" | tail -n1)
     actual=$(echo $contents | grep easy-install.pth)
     expected=$(echo $contents)
     assertSame "$expected" "$actual"
 }
 
-test_lssitepackages_add2virtualenv () {
-    full_path=$(echo "pwd" | mkvirtualenv "lssitepackagestest" | tail -n1)
+test_pew-lssitepackages_pew-add () {
+    full_path=$(echo "pwd" | pew-new "pew-lssitepackagestest" | tail -n1)
     parent_dir=$(dirname $full_path)
     base_dir=$(basename $full_path)
-    contents=$(echo "add2virtualenv '../$base_dir'; lssitepackages" | workon "lssitepackagestest" | tail -n1)
+    contents=$(echo "pew-add '../$base_dir'; pew-lssitepackages" | pew-workon "pew-lssitepackagestest" | tail -n1)
     actual=$(echo $contents | grep $base_dir)
     expected=$(echo $contents)
     assertSame "$expected" "$actual"

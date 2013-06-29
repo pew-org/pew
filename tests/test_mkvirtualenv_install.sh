@@ -22,13 +22,13 @@ setUp () {
 }
 
 test_single_package () {
-    installed=$(echo "pip freeze" | mkvirtualenv -i IPy "env4" )
+    installed=$(echo "pip freeze" | pew-new -i IPy "env4" )
     assertTrue "IPy not found in $installed" "echo $installed | grep IPy=="
 }
 
 test_multiple_packages () {
-	echo "" | mkvirtualenv -i IPy -i WebTest "env5" >/dev/null 
-    installed=$(echo "pip freeze" | workon env5 )
+	echo "" | pew-new -i IPy -i WebTest "env5" >/dev/null 
+    installed=$(echo "pip freeze" | pew-workon env5 )
     assertTrue "IPy not found in $installed" "echo $installed | grep IPy=="
     assertTrue "WebTest not found in $installed" "echo $installed | grep WebTest=="
 }

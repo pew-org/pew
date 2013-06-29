@@ -21,38 +21,38 @@ setUp () {
 }
 
 test_remove () {
-    echo "" | mkvirtualenv "deleteme" >/dev/null 2>&1
+    echo "" | pew-new "deleteme" >/dev/null 2>&1
     assertTrue "[ -d $WORKON_HOME/deleteme ]"
-    rmvirtualenv "deleteme"
+    pew-rm "deleteme"
     assertFalse "[ -d $WORKON_HOME/deleteme ]"
 }
 
 test_within_virtualenv () {
-    echo "" | mkvirtualenv "deleteme" >/dev/null 2>&1
+    echo "" | pew-new "deleteme" >/dev/null 2>&1
     assertTrue "[ -d $WORKON_HOME/deleteme ]"
     #cdvirtualenv
     #assertSame "$VIRTUAL_ENV" "$(pwd)"
-    rmvirtualenv "deleteme"
+    pew-rm "deleteme"
     #assertSame "$WORKON_HOME" "$(pwd)"
     assertFalse "[ -d $WORKON_HOME/deleteme ]"
 }
 
 test_rm_aliased () {
-    echo "" | mkvirtualenv "deleteme" >/dev/null 2>&1
+    echo "" | pew-new "deleteme" >/dev/null 2>&1
     alias rm='rm -i'
-    rmvirtualenv "deleteme"
+    pew-rm "deleteme"
     unalias rm
 }
 
 test_no_such_env () {
     assertFalse "[ -d $WORKON_HOME/deleteme ]"
-    assertTrue "rmvirtualenv deleteme"
+    assertTrue "pew-rm deleteme"
 }
 
-test_no_workon_home () {
+test_no_pew-workon_home () {
     old_home="$WORKON_HOME"
     export WORKON_HOME="$WORKON_HOME/not_there"
-    rmvirtualenv should_not_be_created >"$old_home/output" 2>&1
+    pew-rm should_not_be_created >"$old_home/output" 2>&1
     output=$(cat "$old_home/output")
     assertTrue "Did not see expected message" "echo $output | grep 'No such file'"
     WORKON_HOME="$old_home"

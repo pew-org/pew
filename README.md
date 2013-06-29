@@ -4,6 +4,8 @@ Invewrapper
 [![PyPi version](https://pypip.in/v/invewrapper/badge.png)](https://crate.io/packages/invewrapper/)
 [![Build Status](https://travis-ci.org/berdario/invewrapper.png)](https://travis-ci.org/berdario/invewrapper)
 
+**For new users coming from virtualenvwrapper and pre-0.1.6 users: after some users' suggestions, and after deeming not very useful to replicate 1to1 virtualenvwrapper's commands, now all the commands are subcommands of the pew (Python Env Wrapper) command, or can used by prefixing "pew-"**
+
 Invewrapper is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
 Invewrapper makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea/alternative implementation of a better activate script.
@@ -36,7 +38,7 @@ Usage
 
 You can create a new virtualenv, with a non-default python and specifying some packages to be installed in it, like this:
 
-    ~> mkvirtualenv --python=pypy -i django myproject
+    ~> pew new --python=pypy -i django myproject
     Running virtualenv with interpreter /home/dario/Applications/bin/pypy
     New pypy executable in myproject/bin/pypy
     Installing distribute..................................................................
@@ -60,7 +62,7 @@ Once inside, you can check the current python version, list the packages present
     myproject ~> python -V
     Python 2.7.3 (b9c3566aa017, May 09 2013, 09:09:14)
     [PyPy 2.0.0 with GCC 4.6.3]
-    myproject ~> lssitepackages 
+    myproject ~> pew lssitepackages 
     distribute-0.6.34-py2.7.egg Django-1.5.1-py2.7.egg-info setuptools.pth pip-1.3.1-py2.7.egg
     easy-install.pth django
     myproject ~> pip install pdbpp
@@ -82,7 +84,7 @@ Once inside, you can check the current python version, list the packages present
 
 You can also specify a requirements file, to be passed on to pip, and activate another virtualenv with workon:
 
-	~> mkvirtualenv -r ~/Projects/topaz/requirements.txt topaz
+	~> pew new -r ~/Projects/topaz/requirements.txt topaz
 	New python executable in topaz/bin/python
 	[SNIP]
 	Successfully installed rply pytest invoke requests py
@@ -90,18 +92,18 @@ You can also specify a requirements file, to be passed on to pip, and activate a
 	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
 	topaz ~> ^D
 	
-	~> workon myproject
+	~> pew workon myproject
 	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
 	myproject ~> 
 
 Command Reference
 -----------------
 
-### mkvirtualenv ###
+### new ###
 
 Create a new environment, in the WORKON_HOME.
 
-`usage: mkvirtualenv [-h] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] envname`
+`usage: pew-new [-h] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] envname`
 
 The new environment is automatically activated after being initialized.
 
@@ -115,7 +117,7 @@ The `-r` option can be used to specify a text file listing packages to be instal
 
 List or change working virtual environments.
 
-`usage: workon [environment_name]`
+`usage: pew-workon [environment_name]`
 
 If no `environment_name` is given the list of available environments is printed to stdout.
 
@@ -123,33 +125,33 @@ If no `environment_name` is given the list of available environments is printed 
 
 Create a temporary virtualenv.
 
-`usage: mktmpenv [-h] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS]`
+`usage: pew-mktmpenv [-h] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS]`
 
-### lsvirtualenv ###
+### ls ###
 
 List all of the environments.
 
-`usage: lsvirtualenv [-h] [-b | -l]`
+`usage: pew-ls [-h] [-b | -l]`
 
-### showvirtualenv ###
+### show ###
 
-`usage: showvirtualenv [env]`
+`usage: pew-show [env]`
 
-### rmvirtualenv ###
+### rm ###
 
 Remove one or more environments, from the WORKON_HOME.
 
-`usage: rmvirtualenv envs [envs ...]`
+`usage: pew-rm envs [envs ...]`
 
 You have to exit from the environment you want to remove.
 
-### cpvirtualenv ###
+### cp ###
 
 Duplicate an existing virtualenv environment. The source can be an environment managed by virtualenvwrapper or an external environment created elsewhere.
 
 Copying virtual environments is not well supported. Each virtualenv has path information hard-coded into it, and there may be cases where the copy code does not know to update a particular file. Use with caution.
 
-`usage: cpvirtualenv envname [targetenvname]`
+`usage: pew-cp envname [targetenvname]`
 
 Target environment name is required for WORKON_HOME duplications. However, target environment name can be ommited for importing external environments. If omitted, the new environment is given the same name as the original.
 
@@ -161,11 +163,11 @@ Returns the location of the currently active's site-packages
 
 Equivalent to `ls $(sitepackages_dir)`.
 
-### add2virtualenv ###
+### add ###
 
 Adds the specified directories to the Python path for the currently-active virtualenv.
 
-`usage: add2virtualenv [-h] [-d] dirs [dirs ...]`
+`usage: pew-add [-h] [-d] dirs [dirs ...]`
 
 Sometimes it is desirable to share installed packages that are not in the system `site-packages` directory and which should not be installed in each virtualenv. One possible solution is to symlink the source into the environment `site-packages` directory, but it is also easy to add extra directories to the PYTHONPATH by including them in a `.pth` file inside `site-packages` using `add2virtualenv`.
 
@@ -177,24 +179,24 @@ The directory names are added to a path file named `_virtualenv_path_extensions.
 
 Controls whether the active virtualenv will access the packages in the global Python `site-packages` directory.
 
-`usage: toggleglobalsitepackages [-q]`
+`usage: pew-toggleglobalsitepackages [-q]`
 
 
 ### mkproject ###
 
 Create a new virtualenv in the `WORKON_HOME` and project directory in `PROJECT_HOME`.
 
-`usage: mkproject [-h] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] [-t TEMPLATES] [-l] envname`
+`usage: pew-mkproject [-h] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] [-t TEMPLATES] [-l] envname`
 
-The template option may be repeated to have several templates used to create a new project. The templates are applied in the order named on the command line. All other options are passed to `mkvirtualenv` to create a virtual environment with the same name as the project.
+The template option may be repeated to have several templates used to create a new project. The templates are applied in the order named on the command line. All other options are passed to `pew-new` to create a virtual environment with the same name as the project.
 
 A template is simply an executable to be found in `WORKON_HOME`, it will be called with the name of the project, and the project directory as first and second argument, respectively. A `template_django` script is given as example inside the `invewrapper` package.
 
-### setvirtualenvproject ###
+### setproject ###
 
 Bind an existing virtualenv to an existing project.
 
-`usage: setvirtualenvproject [virtualenv_path] [project_path]`
+`usage: pew-setproject [virtualenv_path] [project_path]`
 
 When no arguments are given, the current virtualenv and current directory are assumed.
 
@@ -295,7 +297,7 @@ Just like in the inve idea, an invewrapper command that returns a string of comm
 
 If in doubt, for the commands that use argparse, just run them with the `--help` flag, e.g.:
 
-`mkvirtualenv --help`
+`pew new --help`
 
 ### no hooks (for now) ###
 
@@ -308,6 +310,10 @@ But to handle just the simple case, using the existing virtualenvwrapper's infra
 ### lots of VIRTUALENVWRAPPER* env variables aren't used ###
 
 Some of those, like VIRTUALENVWRAPPER_VIRTUALENV, just defaulted to virtualenv itself and never got any use inside virtualenvwrapper, and I couldn't find someone that made use for it in the wild... so, given that external commands can still be overridden (e.g. by changing the PATH) I chose to leave them out.
+
+### the commands don't have the same exact name ###
+
+Since `0.1.6`
 
 Thanks
 ------

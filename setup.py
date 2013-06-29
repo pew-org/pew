@@ -16,7 +16,7 @@ https://github.com/berdario/invewrapper#usage'''
 
 setup(
 	name='invewrapper',
-	version='0.1.5',
+	version='0.1.6',
 	description='tools to manage multiple virtualenvs written in pure python, '
 		'a virtualenvwrapper rewrite',
 	long_description=long_desc,
@@ -31,8 +31,9 @@ setup(
 	package_data={'': ['inve']},  # XXX
 	entry_points={
 		'console_scripts':
-			["{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
-			for cmd in dir(invewrapper.invewrapper) if cmd.endswith("_cmd")]},
+			["pew-{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
+			for cmd in dir(invewrapper.invewrapper) if cmd.endswith("_cmd")] +
+			['pew = invewrapper.invewrapper:pew']},
 	classifiers=[
 		'Programming Language :: Python :: 2',
 		'Programming Language :: Python :: 3',
