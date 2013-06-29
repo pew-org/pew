@@ -27,7 +27,7 @@ test_associate() {
     project="/dev/null"
     env="env1"
     ptrfile="$WORKON_HOME/$env/.project"
-    echo "" | pew_new -a "$project" "$env" >/dev/null
+    echo "" | pew-new -a "$project" "$env" >/dev/null
     assertTrue ".project not found" "[ -f $ptrfile ]"
     assertEquals "$ptrfile contains wrong content" "$project" "$(cat $ptrfile)"
 }

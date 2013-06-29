@@ -23,8 +23,8 @@ setUp () {
 
 test_requirements_file () {
     echo "IPy" > "$test_dir/requirements.txt"
-	echo "" | pew_new -r "$test_dir/requirements.txt" "env3" >/dev/null
-    installed=$(echo "pip freeze" | pew_workon env3  )
+	echo "" | pew-new -r "$test_dir/requirements.txt" "env3" >/dev/null
+    installed=$(echo "pip freeze" | pew-workon env3  )
     assertTrue "IPy not found in $installed" "echo $installed | grep IPy=="
 }
 

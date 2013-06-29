@@ -19,25 +19,25 @@ setUp () {
     rm -f "$test_dir/catch_output"
 }
 
-test_pew_mktmpenv_no_name() {
-    before=$(pew_ls -b)
-    after=$(echo "pew_ls -b" | pew_mktmpenv)
+test_pew-mktmpenv_no_name() {
+    before=$(pew-ls -b)
+    after=$(echo "pew-ls -b" | pew-mktmpenv)
     assertFalse "Environment was not created" "[ \"$before\" = \"$after\" ]"
 }
 
-test_pew_mktmpenv_name() {
-    echo "" | pew_mktmpenv name-given-by-user >/dev/null 2>&1
+test_pew-mktmpenv_name() {
+    echo "" | pew-mktmpenv name-given-by-user >/dev/null 2>&1
     RC=$?
     assertTrue "Error was not detected" "[ $RC -ne 0 ]"
 }
 
-test_pew_mktmpenv_virtualenv_args() {
-    result=$(echo "test -f $(pew_sitepackages_dir)/../no-global-site-packages.txt && echo ok" | pew_mktmpenv --no-site-packages | tail -n2 | head -n1)""
+test_pew-mktmpenv_virtualenv_args() {
+    result=$(echo "test -f $(pew-sitepackages_dir)/../no-global-site-packages.txt && echo ok" | pew-mktmpenv --no-site-packages | tail -n2 | head -n1)""
     assertTrue "tmpenv does not exist" "test $result"
 }
 
 test_deactivate() {
-    env_name=$(basename $(echo "echo \$VIRTUAL_ENV" | pew_mktmpenv | tail -n2 | head -n1))
+    env_name=$(basename $(echo "echo \$VIRTUAL_ENV" | pew-mktmpenv | tail -n2 | head -n1))
     assertTrue "Environment was not created" "test $env_name"
     assertFalse "Environment still exists" "[ -d \"$WORKON_HOME/$env_name\" ]"
 }

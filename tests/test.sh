@@ -26,7 +26,7 @@ test_virtualenvwrapper_space_in_workon_home() {
     export WORKON_HOME="$WORKON_HOME/this has spaces"
  	expected="$WORKON_HOME"
     mkdir -p "$expected"
-    pew_ls
+    pew-ls
     RC=$?
     assertSame "$expected" "$WORKON_HOME"
     assertSame "0" "$RC"
