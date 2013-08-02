@@ -3,7 +3,7 @@
 from setuptools import setup
 import invewrapper
 
-long_desc = '''Invewrapper is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
+long_desc = '''Python Env Wrapper (also called Invewrapper) is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
 Invewrapper makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages inve: the idea/alternative implementation of a better activate script.
 
@@ -15,7 +15,7 @@ For the documentation, you might want to read here:
 https://github.com/berdario/invewrapper#usage'''
 
 setup(
-	name='invewrapper',
+	name='pew',
 	version='0.1.6',
 	description='tools to manage multiple virtualenvs written in pure python, '
 		'a virtualenvwrapper rewrite',

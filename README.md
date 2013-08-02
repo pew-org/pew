@@ -1,12 +1,12 @@
-Invewrapper
-===========
+PEW - Python Env Wrapper (née Invewrapper)
+==========================================
 
-[![PyPi version](https://pypip.in/v/invewrapper/badge.png)](https://crate.io/packages/invewrapper/)
+[![PyPi version](https://pypip.in/v/pew/badge.png)](https://crate.io/packages/pew/)
 [![Build Status](https://travis-ci.org/berdario/invewrapper.png)](https://travis-ci.org/berdario/invewrapper)
 
-**For new users coming from virtualenvwrapper and pre-0.1.6 users: after some users' suggestions, and after deeming not very useful to replicate 1to1 virtualenvwrapper's commands, now all the commands are subcommands of the pew (Python Env Wrapper) command, or can used by prefixing "pew-"**
+**For new users coming from virtualenvwrapper and pre-0.1.6 users: after some users' suggestions, and after deeming not very useful to replicate 1to1 virtualenvwrapper's commands, now all the commands are subcommands of the pew command, or can used by prefixing "pew-"**
 
-Invewrapper is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
+Python Env Wrapper (also called Invewrapper) is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
 Invewrapper makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea/alternative implementation of a better activate script.
 
@@ -29,7 +29,7 @@ Another side effect is that its code is much shorter and (hopefully) easier to u
 Installation
 ------------
 
-`pip install invewrapper`
+`pip install pew`
 
 See the [troubleshooting](#troubleshooting) section, if needed.
 
