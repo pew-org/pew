@@ -231,7 +231,7 @@ def workon_cmd():
 	env_path = os.path.join(workon_home, env)
 	if not os.path.exists(env_path):
 		sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
-'mkvirtualenv {0}'.".format(env))
+'pew-new {0}'.".format(env))
 	else:
 		inve = get_inve(env)
 		invoke(inve)
