@@ -194,7 +194,7 @@ def show_cmd():
 		if 'VIRTUAL_ENV' in os.environ:
 			showvirtualenv(os.path.basename(os.environ['VIRTUAL_ENV']))
 		else:
-			sys.exit('showvirtualenv [env]')
+			sys.exit('pew-show [env]')
 
 
 def lsvirtualenv(verbose):
@@ -346,7 +346,7 @@ def setproject_cmd():
 	env = os.environ.get('VIRTUAL_ENV', args.get(1))
 	project = args.get(2, os.path.abspath('.'))
 	if not env:
-		sys.exit('setvirtualenvproject [env] [project]')
+		sys.exit('pew-setproject [virtualenv_path] [project_path]')
 	setvirtualenvproject(env, project)
 
 
