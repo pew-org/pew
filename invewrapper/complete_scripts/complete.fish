@@ -38,7 +38,7 @@ complete -f -c $pew -n '__pew_using_command new' -s r -d 'Pip requirements file'
 
 #### workon
 complete -f -c $pew -n '__pew_needs_command' -a workon -d 'Actives an existing virtual environment'
-complete -f -c $pew -n '__pew_using_command workon' -a '(list_envs)' -d 'Virtual env'
+complete -f -c $pew -n '__pew_using_command workon' -a '(__pew_list_envs)' -d 'Virtual env'
 
 #### mktmpenv
 complete -f -c $pew -n '__pew_needs_command' -a mktmpenv -d 'Create a temporary virtualenv'
@@ -55,11 +55,11 @@ complete -f -c $pew -n '__pew_using_command ls' -s b -l brief -d 'One line ls'
 
 #### show
 complete -f -c $pew -n '__pew_needs_command' -a show -d 'Show'
-complete -f -c $pew -n '__pew_using_command show' -a '(list_envs)' -d 'Virtual env'
+complete -f -c $pew -n '__pew_using_command show' -a '(__pew_list_envs)' -d 'Virtual env'
 
 #### rm
 complete -f -c $pew -n '__pew_needs_command' -a rm -d 'Remove one or more environments'
-complete -f -c $pew -n '__pew_using_command rm' -a '(list_envs)' -d 'Node env'
+complete -f -c $pew -n '__pew_using_command rm' -a '(__pew_list_envs)' -d 'Node env'
 
 #### cp
 complete -f -c $pew -n '__pew_needs_command' -a cp -d 'Duplicate an existing virtualenv environment'
