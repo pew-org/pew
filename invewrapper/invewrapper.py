@@ -66,6 +66,10 @@ def expandpath(path):
 
 
 def own(path):
+	if sys.platform == 'win32':
+		# Even if run by an administrator, the permissions will be set 
+		# correctly on Windows, no need to check
+		return True
 	while not os.path.exists(path):
 		path = os.path.dirname(path)
 	return os.stat(path).st_uid == os.getuid()
