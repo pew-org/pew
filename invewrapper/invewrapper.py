@@ -66,20 +66,31 @@ def expandpath(path):
 
 
 def own(path):
+	if sys.platform == 'win32':
+		# Even if run by an administrator, the permissions will be set 
+		# correctly on Windows, no need to check
+		return True
 	while not os.path.exists(path):
 		path = os.path.dirname(path)
 	return os.stat(path).st_uid == os.getuid()
 
 workon_home = expandpath(os.environ.get('WORKON_HOME', '~/.virtualenvs'))
-if not os.path.exists(workon_home) and own(workon_home):
-	if os.name == 'posix' and 'WORKON_HOME' not in os.environ:
-		actual_workon = os.path.join(
-			expandpath(os.environ.get('XDG_DATA_HOME', '~/.local/share')),
-			'virtualenvs')
-		os.makedirs(actual_workon)
-		os.symlink(actual_workon, workon_home)
-	else:
-		os.makedirs(workon_home)
+
+
+def makedirs_and_symlink_if_needed(workon_home):
+	if not os.path.exists(workon_home) and own(workon_home):
+		if os.name == 'posix' and 'WORKON_HOME' not in os.environ:
+			actual_workon = os.path.join(
+				expandpath(os.environ.get('XDG_DATA_HOME', '~/.local/share')),
+				'virtualenvs')
+			os.makedirs(actual_workon)
+			os.symlink(actual_workon, workon_home)
+			return actual_workon
+		else:
+			os.makedirs(workon_home)
+	return os.path.realpath(workon_home)
+
+workon_home = makedirs_and_symlink_if_needed(workon_home)
 
 
 @contextlib.contextmanager

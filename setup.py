@@ -16,7 +16,7 @@ https://github.com/berdario/invewrapper#usage'''
 
 setup(
 	name='pew',
-	version='0.1.6',
+	version='0.1.7',
 	description='tools to manage multiple virtualenvs written in pure python, '
 		'a virtualenvwrapper rewrite',
 	long_description=long_desc,
@@ -27,7 +27,7 @@ setup(
 	packages=['invewrapper'],
 	install_requires=['virtualenv', 'virtualenv-clone'],
 	dependency_links=
-		['https://github.com/berdario/virtualenv-clone/tarball/master#egg=virtualenv-clone'],
+		['https://github.com/berdario/virtualenv-clone/tarball/c302ca84e524cb22f88c834cccb23dd410cced97#egg=virtualenv-clone'],
 	package_data={'': ['inve']},  # XXX
 	entry_points={
 		'console_scripts':
