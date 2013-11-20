@@ -110,6 +110,16 @@ def get_inve(env):
 	return os.path.join(workon_home, env, env_bin_dir, 'inve')
 
 
+def get_project_dir(env):
+	project_dir = None
+	project_file = os.path.join(workon_home, env, '.project')
+	if os.path.exists(project_file):
+		with open(project_file, 'r') as f:
+			project_dir = f.readline()
+
+	return project_dir
+
+
 def invoke(inve, *args):
 	if sys.platform == 'win32' and not args:
 		check_call(['python', inve, 'powershell'])
@@ -244,8 +254,13 @@ def workon_cmd():
 		sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
 'pew-new {0}'.".format(env))
 	else:
-		inve = get_inve(env)
-		invoke(inve)
+
+		# Check if the virtualenv has an associated project directory and in
+		# this case, use it as the current working directory.
+		project_dir = get_project_dir(env) or os.getcwd()
+		with chdir(project_dir):
+			inve = get_inve(env)
+			invoke(inve)
 
 
 def sitepackages_dir():
