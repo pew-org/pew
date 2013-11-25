@@ -74,7 +74,6 @@ case $state in
             ;;
             (inall)
                 _arguments \
-                    '1:virtual env:_pew_list_venvs' \
                     '*:command'
             ;;
 
