@@ -103,9 +103,20 @@ def chdir(dirname):
 		os.chdir(curdir)
 
 
-source_inve = os.path.join(os.path.dirname(__file__), 'inve')
+inve_site = os.path.dirname(__file__)
+source_inve = os.path.join(inve_site, 'inve')
 
 
+def deploy_completions():
+	completions = {'complete.bash': '/etc/bash_completion.d/pew',
+					'complete.zsh': '/usr/local/share/zsh/site-functions/_pew',
+					'complete.fish': '/etc/fish/completions/pew.fish'}
+	for comp, dest in completions.items():
+		if not os.path.exists(os.path.dirname(dest)):
+			os.makedirs(os.path.dirname(dest))
+		shutil.copy(os.path.join(inve_site, 'complete_scripts', comp), dest)
+
+    
 def get_inve(env):
 	return os.path.join(workon_home, env, env_bin_dir, 'inve')
 

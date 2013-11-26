@@ -28,7 +28,7 @@ setup(
 	install_requires=['virtualenv', 'virtualenv-clone'],
 	dependency_links=
 		['https://github.com/berdario/virtualenv-clone/tarball/c302ca84e524cb22f88c834cccb23dd410cced97#egg=virtualenv-clone'],
-	package_data={'': ['inve']},  # XXX
+	package_data={'invewrapper': ['inve', 'complete_scripts/complete*']},
 	entry_points={
 		'console_scripts':
 			["pew-{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
