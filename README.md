@@ -49,7 +49,7 @@ You can create a new virtualenv, with a non-default python and specifying some p
     Downloading Django-1.5.1.tar.gz (8.0MB):
     8.0MB downloaded
     Running setup.py egg_info for package django
-    
+
     warning: no previously-included files matching '__pycache__' found under directory '*'
     warning: no previously-included files matching '*.py[co]' found under directory '*'
     Installing collected packages: django
@@ -62,7 +62,7 @@ Once inside, you can check the current python version, list the packages present
     myproject ~> python -V
     Python 2.7.3 (b9c3566aa017, May 09 2013, 09:09:14)
     [PyPy 2.0.0 with GCC 4.6.3]
-    myproject ~> pew lssitepackages 
+    myproject ~> pew lssitepackages
     distribute-0.6.34-py2.7.egg Django-1.5.1-py2.7.egg-info setuptools.pth pip-1.3.1-py2.7.egg
     easy-install.pth django
     myproject ~> pip install pdbpp
@@ -91,10 +91,10 @@ You can also specify a requirements file, to be passed on to pip, and activate a
 	Cleaning up...
 	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
 	topaz ~> ^D
-	
+
 	~> pew workon myproject
 	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
-	myproject ~> 
+	myproject ~>
 
 Command Reference
 -----------------
@@ -136,6 +136,18 @@ List all of the environments.
 ### show ###
 
 `usage: pew-show [env]`
+
+### inall ###
+
+Run a command in each virtualenv.
+
+`usage: pew-inall [command]`
+
+### in ###
+
+Run a command in the given virtualenv.
+
+`usage: pew-in [env] [command]`
 
 ### rm ###
 
