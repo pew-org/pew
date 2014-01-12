@@ -67,7 +67,7 @@ def expandpath(path):
 
 def own(path):
 	if sys.platform == 'win32':
-		# Even if run by an administrator, the permissions will be set 
+		# Even if run by an administrator, the permissions will be set
 		# correctly on Windows, no need to check
 		return True
 	while not os.path.exists(path):
@@ -116,7 +116,7 @@ def deploy_completions():
 			os.makedirs(os.path.dirname(dest))
 		shutil.copy(os.path.join(inve_site, 'complete_scripts', comp), dest)
 
-    
+
 def get_inve(env):
 	return os.path.join(workon_home, env, env_bin_dir, 'inve')
 
@@ -147,26 +147,26 @@ def deploy_inve(target):
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
 		requirements=None, rest=[]):
-	
+
 	if python:
 		rest = ["--python=%s" % python] + rest
-	
+
 	with chdir(workon_home):
 		os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
 		check_call(["virtualenv", envname] + rest)
-	
+
 		if project:
 			setvirtualenvproject(envname, project)
-	
+
 	inve = get_inve(envname)
 	deploy_inve(inve)
-	
+
 	if requirements:
 		invoke(inve, 'pip', 'install', '-r', expandpath(requirements))
-	
+
 	if packages:
 		invoke(inve, 'pip', 'install', *packages)
-	
+
 	return inve
 
 
@@ -179,6 +179,8 @@ package after the environment is created. This option may be repeated.')
 project directory to associate with the new environment.')
 	parser.add_argument('-r', dest='requirements', help='Provide a pip \
 requirements file to install a base set of packages into the new environment.')
+	parser.add_argument('-d', '--dont-activate', action='store_true', default=False, dest='dont_activate', help='After \
+creation, continue with the existing shell (don\'t activate the new environment).')
 	return parser
 
 
@@ -190,7 +192,9 @@ def new_cmd():
 
 	inve = mkvirtualenv(args.envname, args.python, args.packages, args.project,
 		args.requirements, rest)
-	invoke(inve)
+
+	if not args.dont_activate:
+		invoke(inve)
 
 
 def rmvirtualenvs(envs):
@@ -259,7 +263,7 @@ def workon_cmd():
 	except IndexError:
 		lsvirtualenv(False)
 		return
-	
+
 	env_path = os.path.join(workon_home, env)
 	if not os.path.exists(env_path):
 		sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
@@ -294,7 +298,7 @@ directory; if this file does not exists, it will be created first.
 	parser.add_argument('-d', dest='remove', action='store_true')
 	parser.add_argument('dirs', nargs='+')
 	args = parser.parse_args()
-	
+
 	extra_paths = os.path.join(sitepackages_dir(), '_virtualenv_path_extensions.pth')
 	new_paths = [os.path.abspath(d) + "\n" for d in args.dirs]
 	if not os.path.exists(extra_paths):
@@ -361,7 +365,7 @@ def cp_cmd():
 	target_name = args.get(2, source_name)
 
 	target = os.path.join(workon_home, target_name)
-	
+
 	if os.path.exists(target):
 		sys.exit('%s virtualenv already exists.' % target_name)
 
@@ -394,7 +398,7 @@ def mkproject_cmd():
 					glob(os.path.join(workon_home, "template_*"))]
 		print("Available project templates:\n%s" % "\n".join(templates))
 		sys.exit()
-	
+
 	parser = mkvirtualenv_argparser()
 	parser.add_argument('envname')
 	parser.add_argument(
@@ -405,7 +409,7 @@ command line.')
 		'-l', '--list', action='store_true', help='List available templates.')
 
 	args, rest = parser.parse_known_args()
-	
+
 	projects_home = os.environ.get('PROJECT_HOME', '.')
 	if not os.path.exists(projects_home):
 		sys.exit('ERROR: Projects directory %s does not exist. \
