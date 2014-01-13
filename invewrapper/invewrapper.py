@@ -179,6 +179,8 @@ package after the environment is created. This option may be repeated.')
 project directory to associate with the new environment.')
 	parser.add_argument('-r', dest='requirements', help='Provide a pip \
 requirements file to install a base set of packages into the new environment.')
+	parser.add_argument('-d', '--dont-activate', action='store_true', default=False, dest='dont_activate', help='After \
+creation, continue with the existing shell (don\'t activate the new environment).')
 	return parser
 
 
@@ -190,7 +192,9 @@ def new_cmd():
 
 	inve = mkvirtualenv(args.envname, args.python, args.packages, args.project,
 		args.requirements, rest)
-	invoke(inve)
+
+	if not args.dont_activate:
+		invoke(inve)
 
 
 def rmvirtualenvs(envs):
