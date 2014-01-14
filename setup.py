@@ -18,7 +18,7 @@ setup(
     name='pew',
     version='0.1.7',
     description='tools to manage multiple virtualenvs written in pure python, '
-        'a virtualenvwrapper rewrite',
+    'a virtualenvwrapper rewrite',
     long_description=long_desc,
     author='Dario Bertini',
     author_email='berdario+pypi@gmail.com',
@@ -31,9 +31,9 @@ setup(
     package_data={'invewrapper': ['inve', 'complete_scripts/complete*']},
     entry_points={
         'console_scripts':
-            ["pew-{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
-            for cmd in dir(invewrapper.invewrapper) if cmd.endswith("_cmd")] +
-            ['pew = invewrapper.invewrapper:pew']},
+        ["pew-{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
+         for cmd in dir(invewrapper.invewrapper) if cmd.endswith("_cmd")] +
+        ['pew = invewrapper.invewrapper:pew']},
     classifiers=[
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',

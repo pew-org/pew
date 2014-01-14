@@ -109,8 +109,8 @@ source_inve = os.path.join(inve_site, 'inve')
 
 def deploy_completions():
     completions = {'complete.bash': '/etc/bash_completion.d/pew',
-                    'complete.zsh': '/usr/local/share/zsh/site-functions/_pew',
-                    'complete.fish': '/etc/fish/completions/pew.fish'}
+                   'complete.zsh': '/usr/local/share/zsh/site-functions/_pew',
+                   'complete.fish': '/etc/fish/completions/pew.fish'}
     for comp, dest in completions.items():
         if not os.path.exists(os.path.dirname(dest)):
             os.makedirs(os.path.dirname(dest))
@@ -146,7 +146,7 @@ def deploy_inve(target):
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
-        requirements=None, rest=[]):
+                 requirements=None, rest=[]):
 
     if python:
         rest = ["--python=%s" % python] + rest
@@ -173,8 +173,8 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
 def mkvirtualenv_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--python')
-    parser.add_argument('-i', action='append', dest='packages', help='Install a \
-package after the environment is created. This option may be repeated.')
+    parser.add_argument('-i', action='append', dest='packages', help='Install \
+a package after the environment is created. This option may be repeated.')
     parser.add_argument('-a', dest='project', help='Provide a full path to a \
 project directory to associate with the new environment.')
     parser.add_argument('-r', dest='requirements', help='Provide a pip \
@@ -189,7 +189,7 @@ def new_cmd():
     args, rest = parser.parse_known_args()
 
     inve = mkvirtualenv(args.envname, args.python, args.packages, args.project,
-        args.requirements, rest)
+                        args.requirements, rest)
     invoke(inve)
 
 
@@ -231,7 +231,7 @@ def show_cmd():
 
 def lsvirtualenv(verbose):
     envs = set(env.split(os.path.sep)[-3] for env in
-            glob(os.path.join(workon_home, '*', env_bin_dir, 'python*')))
+               glob(os.path.join(workon_home, '*', env_bin_dir, 'python*')))
     for env in envs:
         deploy_inve(get_inve(env))
 
@@ -311,7 +311,7 @@ import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,
             extra.writelines(to_write)
 
     if args.remove:
-        rewrite(lambda lines: [line for line in lines if line not in new_paths])
+        rewrite(lambda ls: [line for line in ls if line not in new_paths])
     else:
         rewrite(lambda lines: lines[0:1] + new_paths + lines[1:])
 
@@ -335,7 +335,8 @@ def toggleglobalsitepackages_cmd():
     """Toggle the current virtualenv between having and not having access to the global site-packages."""
     quiet = args.get(1) == '-q'
     site = sitepackages_dir()
-    ngsp_file = os.path.join(os.path.dirname(site), 'no-global-site-packages.txt')
+    ngsp_file = os.path.join(os.path.dirname(site),
+                             'no-global-site-packages.txt')
     if os.path.exists(ngsp_file):
         os.remove(ngsp_file)
         if not quiet:
@@ -373,7 +374,8 @@ def cp_cmd():
 
 
 def setvirtualenvproject(env, project):
-    print('Setting project for {} to {}'.format(os.path.basename(env), project))
+    print('Setting project for {} to {}'.format(os.path.basename(env),
+                                                project))
     with open(os.path.join(env, '.project'), 'w') as prj:
         prj.write(project)
 
@@ -391,7 +393,7 @@ def mkproject_cmd():
     """Create a new project directory and its associated virtualenv."""
     if '-l' in sys.argv or '--list' in sys.argv:
         templates = [t.split(os.path.sep)[-1][9:] for t in
-                    glob(os.path.join(workon_home, "template_*"))]
+                     glob(os.path.join(workon_home, "template_*"))]
         print("Available project templates:\n%s" % "\n".join(templates))
         sys.exit()
 
@@ -416,7 +418,7 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
         sys.exit('Project %s already exists.' % args.envname)
 
     inve = mkvirtualenv(args.envname, args.python, args.packages, args.project,
-        args.requirements, rest)
+                        args.requirements, rest)
 
     os.mkdir(project)
 
@@ -439,7 +441,7 @@ def mktmpenv_cmd():
     args, rest = parser.parse_known_args()
 
     inve = mkvirtualenv(env, args.python, args.packages, args.project,
-        args.requirements, rest)
+                        args.requirements, rest)
     print('This is a temporary environment. It will be deleted when you exit')
     invoke(inve)
 
@@ -464,6 +466,7 @@ def inall_cmd():
         print("\n%s:" % inve.split(os.path.sep)[-3])
         invoke(inve, *sys.argv[1:])
 
+
 def pew():
     cmds = {cmd[:-4]: fun
             for cmd, fun in globals().items() if cmd.endswith('_cmd')}
@@ -474,10 +477,11 @@ def pew():
             update_args_dict()
             return command()
         except KeyError:
-            print("ERROR: command %s does not exist." % sys.argv[1], file=sys.stderr)
+            print("ERROR: command %s does not exist." % sys.argv[1],
+                  file=sys.stderr)
 
     longest = max(map(len, cmds)) + 3
-    columns = getattr(shutil, 'get_terminal_size', lambda: (80,24))()[0]
+    columns = getattr(shutil, 'get_terminal_size', lambda: (80, 24))()[0]
 
     print('Available commands:\n')
     for cmd, fun in cmds.items():
