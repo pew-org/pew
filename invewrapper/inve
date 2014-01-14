@@ -6,33 +6,33 @@ from subprocess import call
 parent = os.path.dirname
 os.environ['VIRTUAL_ENV'] = parent(parent(__file__))
 os.environ['PATH'] = os.pathsep.join([
-		parent(__file__),
-		os.environ['PATH'],
-	])
+        parent(__file__),
+        os.environ['PATH'],
+    ])
 try:
-	del os.environ['PYTHONHOME']
+    del os.environ['PYTHONHOME']
 except KeyError:
-	pass
+    pass
 
 shellout = sys.platform == 'win32'
 # need to have shell=True on windows, otherwise the PYTHONPATH
 # won't inherit the PATH
 
 def exe(args, shell=False):
-	try:
-		call(args, shell=shell)
-	except OSError as e:
-		if e.errno == 2:
-			sys.stderr.write("Unable to find %s\n" % args[0])
-		else:
-			raise
+    try:
+        call(args, shell=shell)
+    except OSError as e:
+        if e.errno == 2:
+            sys.stderr.write("Unable to find %s\n" % args[0])
+        else:
+            raise
 
 args = sys.argv[1:]
 
 if args:
-	exe(args, shell=shellout)
+    exe(args, shell=shellout)
 else:
-	sys.stderr.write("Launching subshell in virtual environment. Type 'exit' \
+    sys.stderr.write("Launching subshell in virtual environment. Type 'exit' \
 or 'Ctrl+D' to return.\n")
-	exe([os.environ['SHELL']], shell=shellout)
+    exe([os.environ['SHELL']], shell=shellout)
 

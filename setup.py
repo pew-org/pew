@@ -15,28 +15,28 @@ For the documentation, you might want to read here:
 https://github.com/berdario/invewrapper#usage'''
 
 setup(
-	name='pew',
-	version='0.1.7',
-	description='tools to manage multiple virtualenvs written in pure python, '
-		'a virtualenvwrapper rewrite',
-	long_description=long_desc,
-	author='Dario Bertini',
-	author_email='berdario+pypi@gmail.com',
-	url='https://github.com/berdario/invewrapper',
-	license='MIT License',
-	packages=['invewrapper'],
-	install_requires=['virtualenv', 'virtualenv-clone'],
-	dependency_links=
-		['https://github.com/berdario/virtualenv-clone/tarball/c302ca84e524cb22f88c834cccb23dd410cced97#egg=virtualenv-clone'],
-	package_data={'invewrapper': ['inve', 'complete_scripts/complete*']},
-	entry_points={
-		'console_scripts':
-			["pew-{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
-			for cmd in dir(invewrapper.invewrapper) if cmd.endswith("_cmd")] +
-			['pew = invewrapper.invewrapper:pew']},
-	classifiers=[
-		'Programming Language :: Python :: 2',
-		'Programming Language :: Python :: 3',
-		'Intended Audience :: Developers',
-		'Environment :: Console']
+    name='pew',
+    version='0.1.7',
+    description='tools to manage multiple virtualenvs written in pure python, '
+        'a virtualenvwrapper rewrite',
+    long_description=long_desc,
+    author='Dario Bertini',
+    author_email='berdario+pypi@gmail.com',
+    url='https://github.com/berdario/invewrapper',
+    license='MIT License',
+    packages=['invewrapper'],
+    install_requires=['virtualenv', 'virtualenv-clone'],
+    dependency_links=
+        ['https://github.com/berdario/virtualenv-clone/tarball/c302ca84e524cb22f88c834cccb23dd410cced97#egg=virtualenv-clone'],
+    package_data={'invewrapper': ['inve', 'complete_scripts/complete*']},
+    entry_points={
+        'console_scripts':
+            ["pew-{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
+            for cmd in dir(invewrapper.invewrapper) if cmd.endswith("_cmd")] +
+            ['pew = invewrapper.invewrapper:pew']},
+    classifiers=[
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+        'Intended Audience :: Developers',
+        'Environment :: Console']
 )

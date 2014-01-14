@@ -1,4 +1,4 @@
 #! /usr/bin/env python
 from invewrapper.invewrapper import deploy_completions
 if __name__ == '__main__':
-	deploy_completions()
+    deploy_completions()
