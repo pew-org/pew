@@ -179,6 +179,10 @@ package after the environment is created. This option may be repeated.')
 project directory to associate with the new environment.')
     parser.add_argument('-r', dest='requirements', help='Provide a pip \
 requirements file to install a base set of packages into the new environment.')
+    parser.add_argument('-d', '--dont-activate', action='store_false',
+                        default=True, dest='activate', help="After \
+                        creation, continue with the existing shell (don't \
+                        activate the new environment).")
     return parser
 
 
@@ -190,7 +194,8 @@ def new_cmd():
 
     inve = mkvirtualenv(args.envname, args.python, args.packages, args.project,
         args.requirements, rest)
-    invoke(inve)
+    if args.activate:
+        invoke(inve)
 
 
 def rmvirtualenvs(envs):
@@ -426,7 +431,8 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
         for template_name in args.templates:
             template = os.path.join(workon_home, "template_" + template_name)
             invoke(inve, template, args.envname, project)
-        invoke(inve)
+        if args.activate:
+            invoke(inve)
 
 
 def mktmpenv_cmd():
@@ -463,6 +469,22 @@ def inall_cmd():
     for inve in inves:
         print("\n%s:" % inve.split(os.path.sep)[-3])
         invoke(inve, *sys.argv[1:])
+
+
+def in_cmd():
+    """Run a command in the given virtualenv."""
+
+    if len(sys.argv) < 2:
+        sys.exit('You must provide a valid virtualenv to target')
+
+    env = sys.argv[1]
+    inve = get_inve(env)
+    if os.path.exists(inve):
+        print("%s:" % env)
+        invoke(inve, *sys.argv[2:])
+    else:
+        sys.exit('environment %s not found' % env)
+
 
 def pew():
     cmds = {cmd[:-4]: fun
