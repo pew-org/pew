@@ -25,7 +25,7 @@ setup(
     url='https://github.com/berdario/invewrapper',
     license='MIT License',
     packages=['invewrapper'],
-    install_requires=['virtualenv', 'virtualenv-clone'],
+    install_requires=['argparse', 'subprocess32', 'virtualenv', 'virtualenv-clone'],
     dependency_links=
         ['https://github.com/berdario/virtualenv-clone/tarball/c302ca84e524cb22f88c834cccb23dd410cced97#egg=virtualenv-clone'],
     package_data={'invewrapper': ['inve', 'complete_scripts/complete*']},
