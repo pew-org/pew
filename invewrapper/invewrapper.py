@@ -10,7 +10,10 @@ import contextlib
 import locale
 import random
 import textwrap
-from subprocess import check_call, check_output
+try:
+    from subprocess32 import check_call, check_output
+except ImportError:
+    from subprocess import check_call, check_output
 from glob import glob
 
 locale.setlocale(locale.LC_ALL, '')
@@ -209,8 +212,8 @@ def rmvirtualenvs(envs):
             try:
                 shutil.rmtree(env)
             except OSError as e:
-                print("Error while trying to remove the {} env: \
-\n{}".format(env, e.strerror), file=sys.stderr)
+                print("Error while trying to remove the {0} env: \
+\n{1}".format(env, e.strerror), file=sys.stderr)
 
 
 def rm_cmd():
@@ -379,7 +382,7 @@ def cp_cmd():
 
 
 def setvirtualenvproject(env, project):
-    print('Setting project for {} to {}'.format(os.path.basename(env),
+    print('Setting project for {0} to {1}'.format(os.path.basename(env),
                                                 project))
     with open(os.path.join(env, '.project'), 'w') as prj:
         prj.write(project)
@@ -489,8 +492,8 @@ def in_cmd():
 
 
 def pew():
-    cmds = {cmd[:-4]: fun
-            for cmd, fun in globals().items() if cmd.endswith('_cmd')}
+    cmds = dict((cmd[:-4], fun)
+                for cmd, fun in globals().items() if cmd.endswith('_cmd'))
     if sys.argv[1:]:
         try:
             command = cmds[sys.argv[1]]
@@ -510,7 +513,7 @@ def pew():
             print(textwrap.fill(
                 fun.__doc__.splitlines()[0],
                 columns,
-                initial_indent=(' {}: '.format(cmd)).ljust(longest),
+                initial_indent=(' {0}: '.format(cmd)).ljust(longest),
                 subsequent_indent=longest * ' '))
         else:
             print(' ' + cmd)
