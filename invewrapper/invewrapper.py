@@ -11,9 +11,10 @@ import locale
 import random
 import textwrap
 try:
-    from subprocess32 import check_call, check_output
-except ImportError:
     from subprocess import check_call, check_output
+except ImportError:
+    from subprocess import check_call, Popen, PIPE # py2.6 compatibility
+    check_output = lambda *args: Popen(*args, stdout=PIPE).communicate()[0]
 from glob import glob
 
 locale.setlocale(locale.LC_ALL, '')
