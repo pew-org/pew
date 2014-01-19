@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from setuptools import setup
+import sys
 import invewrapper
 
 long_desc = '''Python Env Wrapper (also called Invewrapper) is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
@@ -14,6 +15,8 @@ It works on bash, zsh, fish, powershell, etc.
 For the documentation, you might want to read here:
 https://github.com/berdario/invewrapper#usage'''
 
+backports = ['argparse'] if sys.version_info[:2] == (2, 6) else []
+
 setup(
     name='pew',
     version='0.1.8',
@@ -25,7 +28,7 @@ setup(
     url='https://github.com/berdario/invewrapper',
     license='MIT License',
     packages=['invewrapper'],
-    install_requires=['argparse', 'subprocess32', 'virtualenv', 'virtualenv-clone'],
+    install_requires=['virtualenv', 'virtualenv-clone'] + backports,
     dependency_links=
         ['https://github.com/berdario/virtualenv-clone/tarball/c302ca84e524cb22f88c834cccb23dd410cced97#egg=virtualenv-clone'],
     package_data={'invewrapper': ['inve', 'complete_scripts/complete*']},

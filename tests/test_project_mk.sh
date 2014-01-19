@@ -45,14 +45,14 @@ test_no_project_home () {
     old_home="$PROJECT_HOME"
     export PROJECT_HOME="$PROJECT_HOME/not_there"
     output=`pew-mkproject should_not_be_created 2>&1`
-    assertTrue "Did not see expected message" "echo $output | grep 'does not exist'"
+    assertTrue "Did not see expected message" "echo \"$output\" | grep 'does not exist'"
     PROJECT_HOME="$old_home"
 }
 
 test_project_exists () {
     echo "" | pew-mkproject myproject4 >/dev/null 2>&1
     output=`pew-mkproject myproject4 2>&1`
-    assertTrue "Did not see expected message 'already exists' in: $output" "echo $output | grep 'already exists'"
+    assertTrue "Did not see expected message 'already exists' in: $output" "echo \"$output\" | grep 'already exists'"
 }
 
 test_same_pew-workon_and_project_home () {
