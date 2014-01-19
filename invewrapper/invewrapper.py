@@ -13,8 +13,16 @@ import textwrap
 try:
     from subprocess import check_call, check_output
 except ImportError:
-    from subprocess import check_call, Popen, PIPE # py2.6 compatibility
-    check_output = lambda *args: Popen(*args, stdout=PIPE).communicate()[0]
+    from subprocess import check_call, Popen, PIPE  # py2.6 compatibility
+
+    def check_output(cmd, *args, **kwargs):
+        popen = Popen(cmd, *args, stdout=PIPE, **kwargs)
+        output = popen.communicate()[0]
+        return_code = popen.poll()
+        if return_code != 0:
+            raise Exception('Command %r failed with return code %r' % (
+                cmd, return_code))
+        return output
 from glob import glob
 
 locale.setlocale(locale.LC_ALL, '')
