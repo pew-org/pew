@@ -1,23 +1,16 @@
 #! /usr/bin/env python
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
 import os
 import sys
 import argparse
 import shutil
-import contextlib
-import locale
 import random
 import textwrap
-try:
-    from subprocess import check_call, check_output
-except ImportError:
-    from subprocess import check_call, Popen, PIPE # py2.6 compatibility
-    check_output = lambda *args: Popen(*args, stdout=PIPE).communicate()[0]
 from glob import glob
 
-locale.setlocale(locale.LC_ALL, '')
+from invewrapper._compat import check_call, shell, chdir, expandpath, own, env_bin_dir
 
 
 def update_args_dict():
@@ -25,58 +18,6 @@ def update_args_dict():
     args = dict(enumerate(sys.argv))
 
 update_args_dict()
-
-
-def which_win(fn):
-    def _access_check(fn):
-        return (os.path.exists(fn) and os.access(fn, os.F_OK | os.X_OK)
-                and not os.path.isdir(fn))
-    pathext = os.environ.get("PATHEXT", "").split(os.pathsep)
-    files = [fn + ext.lower() for ext in pathext]
-    path = os.environ.get("PATH", os.defpath).split(os.pathsep)
-    seen = set()
-    for dir in map(os.path.normcase, path):
-        if dir not in seen:
-            seen.add(dir)
-            for name in map(lambda f: os.path.join(dir, f), files):
-                if _access_check(name):
-                    return name
-
-
-def resolve_path(f):
-    if sys.platform != 'win32':
-        return f
-    else:
-        def call(cmd, *args):
-            ex = cmd[0]
-            ex = which_win(ex) or ex
-            return f([ex] + cmd[1:], *args)
-        return call
-
-check_output = resolve_path(check_output)
-check_call = resolve_path(check_call)
-
-
-def shell(*args):
-    return check_output(*args).decode(locale.getlocale()[1]).strip()
-
-env_bin_dir = 'bin'
-if sys.platform == 'win32':
-    env_bin_dir = 'Scripts'
-
-
-def expandpath(path):
-    return os.path.normpath(os.path.expanduser(os.path.expandvars(path)))
-
-
-def own(path):
-    if sys.platform == 'win32':
-        # Even if run by an administrator, the permissions will be set
-        # correctly on Windows, no need to check
-        return True
-    while not os.path.exists(path):
-        path = os.path.dirname(path)
-    return os.stat(path).st_uid == os.getuid()
 
 workon_home = expandpath(os.environ.get('WORKON_HOME', '~/.virtualenvs'))
 
@@ -95,16 +36,6 @@ def makedirs_and_symlink_if_needed(workon_home):
     return os.path.realpath(workon_home)
 
 workon_home = makedirs_and_symlink_if_needed(workon_home)
-
-
-@contextlib.contextmanager
-def chdir(dirname):
-    curdir = os.getcwd()
-    try:
-        os.chdir(dirname)
-        yield
-    finally:
-        os.chdir(curdir)
 
 
 inve_site = os.path.dirname(__file__)
@@ -384,7 +315,7 @@ def cp_cmd():
 
 def setvirtualenvproject(env, project):
     print('Setting project for {0} to {1}'.format(os.path.basename(env),
-                                                project))
+                                                  project))
     with open(os.path.join(env, '.project'), 'w') as prj:
         prj.write(project)
 
