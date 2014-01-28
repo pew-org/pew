@@ -271,7 +271,7 @@ To get a blue-colored name at the start of your prompt:
 
 #### bash prompt ####
 
-`PS1="\[\033[01;34m\]\$(basename '$VIRTUAL_ENV')$PS1"`
+`PS1="\[\033[01;34m\]\$(basename '$VIRTUAL_ENV')\e[0m$PS1"`
 
 #### zsh prompt ####
 
