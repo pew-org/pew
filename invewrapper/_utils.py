@@ -21,7 +21,15 @@ except ImportError:
 locale.setlocale(locale.LC_ALL, '')
 
 
-def which_win(fn):
+def which(fn):
+    """Simplified version of shutil.which for internal usage.
+
+Doesn't look up commands ending in '.exe' (we don't use them),
+nor does it avoid looking up commands that already have their directory
+specified (we don't use them either) and it doesn't check the current directory,
+just like on *nix systems.
+"""
+
     def _access_check(fn):
         return (os.path.exists(fn) and os.access(fn, os.F_OK | os.X_OK)
                 and not os.path.isdir(fn))
@@ -37,13 +45,18 @@ def which_win(fn):
                     return name
 
 
+def check_path():
+    parent = os.path.dirname
+    return parent(parent(which('python'))) == os.environ['VIRTUAL_ENV']
+
+
 def resolve_path(f):
     if sys.platform != 'win32':
         return f
     else:
         def call(cmd, *args):
             ex = cmd[0]
-            ex = which_win(ex) or ex
+            ex = which(ex) or ex
             return f([ex] + cmd[1:], *args)
         return call
 

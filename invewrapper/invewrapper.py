@@ -10,7 +10,7 @@ import random
 import textwrap
 from glob import glob
 
-from invewrapper._utils import check_call, shell, chdir, expandpath, own, env_bin_dir
+from invewrapper._utils import check_call, shell, chdir, expandpath, own, env_bin_dir, check_path
 
 
 def update_args_dict():
@@ -423,7 +423,16 @@ def in_cmd():
         sys.exit('environment %s not found' % env)
 
 
+def prevent_path_errors():
+    if 'VIRTUAL_ENV' in os.environ and not check_path():
+        sys.exit('''ERROR: The virtualenv hasn't been activated correctly.
+Check the contents of your $PATH and if you are adding new directories to it
+from inside your shell's configuration file.
+For further details, please see: https://github.com/berdario/invewrapper#the-environment-seems-to-not-be-activated''')
+
+
 def pew():
+    prevent_path_errors()
     cmds = dict((cmd[:-4], fun)
                 for cmd, fun in globals().items() if cmd.endswith('_cmd'))
     if sys.argv[1:]:
