@@ -10,7 +10,7 @@ import random
 import textwrap
 from glob import glob
 
-from invewrapper._compat import check_call, shell, chdir, expandpath, own, env_bin_dir
+from invewrapper._utils import check_call, shell, chdir, expandpath, own, env_bin_dir
 
 
 def update_args_dict():
