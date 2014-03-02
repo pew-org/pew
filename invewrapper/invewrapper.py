@@ -102,10 +102,10 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
     deploy_inve(inve)
 
     if requirements:
-        invoke(inve, 'pip', 'install', '-r', expandpath(requirements))
+        invoke(inve, 'pip', 'install', '--allow-all-external', '-r', expandpath(requirements))
 
     if packages:
-        invoke(inve, 'pip', 'install', *packages)
+        invoke(inve, 'pip', 'install', '--allow-all-external', *packages)
 
     return inve
 
