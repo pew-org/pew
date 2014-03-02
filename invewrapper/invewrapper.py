@@ -10,6 +10,11 @@ import random
 import textwrap
 from glob import glob
 
+try:
+    from clonevirtualenv import clone_virtualenv
+except ImportError:
+    pass # setup.py needs to import this before the dependencies are installed
+
 from invewrapper._utils import check_call, shell, chdir, expandpath, own, env_bin_dir, check_path
 
 
@@ -289,28 +294,36 @@ def toggleglobalsitepackages_cmd():
 
 def cp_cmd():
     """Duplicate the named virtualenv to make a new one."""
-    if len(sys.argv) < 2:
-        sys.exit('Please provide a valid virtualenv to copy')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('source')
+    parser.add_argument('target', nargs='?')
+    parser.add_argument('-d', '--dont-activate', action='store_false',
+                        default=True, dest='activate', help="After \
+                        creation, continue with the existing shell (don't \
+                        activate the new environment).")
+
+    args = parser.parse_args()
     source_name = sys.argv[1]
-    if not os.path.exists(os.path.join(workon_home, source_name)):
-        source = expandpath(source_name)
+    if os.path.exists(args.source):
+        source = expandpath(args.source)
+    else:
+        source = expandpath(os.path.join(workon_home, args.source))
         if not os.path.exists(source):
             sys.exit('Please provide a valid virtualenv to copy')
-    else:
-        source = os.path.join(workon_home, source_name)
 
-    target_name = args.get(2, source_name)
+    target_name = args.target or os.path.basename(source)
 
     target = os.path.join(workon_home, target_name)
 
     if os.path.exists(target):
-        sys.exit('%s virtualenv already exists.' % target_name)
+        sys.exit('%s virtualenv already exists in %s.' % (target_name, workon_home))
 
-    print('Copying {0} as {1}'.format(source_name, target_name))
-    check_call(['virtualenv-clone', source, target])
+    print('Copying {0} in {1}'.format(source, target_name))
+    clone_virtualenv(source, target)
     inve = get_inve(target_name)
     deploy_inve(inve)
-    invoke(inve)
+    if args.activate:
+        invoke(inve)
 
 
 def setvirtualenvproject(env, project):
