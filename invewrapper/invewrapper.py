@@ -66,7 +66,7 @@ def get_project_dir(env):
     project_file = os.path.join(workon_home, env, '.project')
     if os.path.exists(project_file):
         with open(project_file, 'r') as f:
-            project_dir = f.readline()
+            project_dir = f.readline().strip()
 
     return project_dir
 
