@@ -1,0 +1,2 @@
+recursive-include invewrapper/complete_scripts *
+recursive-exclude invewrapper *~
