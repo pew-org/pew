@@ -33,6 +33,10 @@ Installation
 
 See the [troubleshooting](#troubleshooting) section, if needed.
 
+There are packages for some linux distributions:
+
+- Archlinux: [AUR package](https://aur.archlinux.org/packages/python-pew/)
+
 Usage
 -----
 
