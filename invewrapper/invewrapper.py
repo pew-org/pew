@@ -428,12 +428,13 @@ def in_cmd():
         sys.exit('You must provide a valid virtualenv to target')
 
     env = sys.argv[1]
+    env_path = os.path.join(workon_home, env)
+    if not os.path.exists(env_path):
+        sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
+'pew-new {0}'.".format(env))
+
     inve = get_inve(env)
-    if os.path.exists(inve):
-        print("%s:" % env)
-        invoke(inve, *sys.argv[2:])
-    else:
-        sys.exit('environment %s not found' % env)
+    invoke(inve, *sys.argv[2:])
 
 
 def prevent_path_errors():
