@@ -216,6 +216,7 @@ def workon_cmd():
         project_dir = get_project_dir(env) or os.getcwd()
         with chdir(project_dir):
             inve = get_inve(env)
+            deploy_inve(inve)
             invoke(inve)
 
 
@@ -434,6 +435,7 @@ def in_cmd():
 'pew-new {0}'.".format(env))
 
     inve = get_inve(env)
+    deploy_inve(inve)
     invoke(inve, *sys.argv[2:])
 
 
