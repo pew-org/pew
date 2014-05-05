@@ -303,7 +303,7 @@ They can be simply implemented like:
 
 `cd $VIRTUAL_ENV` for `cdvirtualenv`
 
-`cd $(sitepackages_dir)` for `cdsitepackages`
+`cd $(pew sitepackages_dir)` for `cdsitepackages`
 
 `cd $(cat $VIRTUAL_ENV/.project)` for `cdproject`
 
