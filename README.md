@@ -1,22 +1,22 @@
-PEW - Python Env Wrapper (née Invewrapper)
-==========================================
+Pew - Python Env Wrapper
+========================
 
 [![PyPi version](https://pypip.in/v/pew/badge.png)](https://crate.io/packages/pew/)
-[![Build Status](https://travis-ci.org/berdario/invewrapper.png)](https://travis-ci.org/berdario/invewrapper)
+[![Build Status](https://travis-ci.org/berdario/pew.png)](https://travis-ci.org/berdario/pew)
 
 **For new users coming from virtualenvwrapper and pre-0.1.6 users: after some users' suggestions, and after deeming not very useful to replicate 1to1 virtualenvwrapper's commands, now all the commands are subcommands of the pew command, or can used by prefixing "pew-"**
 
-Python Env Wrapper (also called Invewrapper) is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
+Python Env Wrapper is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
-Invewrapper makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea/alternative implementation of a better activate script.
+Pew makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea/alternative implementation of a better activate script.
 
-The advantage is that invewrapper doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
+The advantage is that pew doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
 
 It works on bash, zsh, fish, powershell, etc.
 
 Another side effect is that its code is much shorter and (hopefully) easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s (the project upon which this is based). How many Python programmers know at a glance what does `"${out_args[@]-}"` do? or `eval "envname=\$$#"`?
 
-* Part of the conciseness of invewrapper is thanks to inve itself: "shelling out" let us avoid to keep track of the previous environment variable values, and to create a deactivate script.
+* Part of the conciseness of pew is thanks to inve itself: "shelling out" let us avoid to keep track of the previous environment variable values, and to create a deactivate script.
 
 * Part is thanks to Python libraries, like argparse.
 
@@ -202,7 +202,7 @@ Create a new virtualenv in the `WORKON_HOME` and project directory in `PROJECT_H
 
 The template option may be repeated to have several templates used to create a new project. The templates are applied in the order named on the command line. All other options are passed to `pew-new` to create a virtual environment with the same name as the project.
 
-A template is simply an executable to be found in `WORKON_HOME`, it will be called with the name of the project, and the project directory as first and second argument, respectively. A `template_django` script is given as example inside the `invewrapper` package.
+A template is simply an executable to be found in `WORKON_HOME`, it will be called with the name of the project, and the project directory as first and second argument, respectively. A `template_django` script is given as example inside the `pew` package.
 
 ### setproject ###
 
@@ -215,7 +215,7 @@ When no arguments are given, the current virtualenv and current directory are as
 Configuration
 -------------
 
-You can customize invewrapper's virtualenvs directory location, with the `$XDG_DATA_HOME` or `$WORKON_HOME` environment variables, and the locations of new projects created with mkproject by setting `$PROJECT_HOME` (otherwise, the current directory will be selected)
+You can customize pew's virtualenvs directory location, with the `$XDG_DATA_HOME` or `$WORKON_HOME` environment variables, and the locations of new projects created with mkproject by setting `$PROJECT_HOME` (otherwise, the current directory will be selected)
 
 
 Troubleshooting
@@ -223,7 +223,7 @@ Troubleshooting
 
 ### The environment seems to not be activated ###
 
-If you've defined in your shell rc file, to export a PATH location that might shadow the executables needed by invewrapper (or your project), you might find that when getting into the environment, they will still be at the head of the PATH.
+If you've defined in your shell rc file, to export a PATH location that might shadow the executables needed by pew (or your project), you might find that when getting into the environment, they will still be at the head of the PATH.
 
 There're multiple way to overcome this issue:
 
@@ -234,14 +234,14 @@ There're multiple way to overcome this issue:
 
 ### Other issues ###
 
-Congratulations! You found a bug, please [let me know](https://github.com/berdario/invewrapper/issues/new) :)
+Congratulations! You found a bug, please [let me know](https://github.com/berdario/pew/issues/new) :)
 
 Running Tests
 -------------
 
-invewrapper's test suite is a straight port of virtualenvwrapper's, dropping test related to things absent in invewrapper and converting the scripts to use commands "echoed inside the workon commands" (almost surely there was a better approach, but I wasn't sure how to integrate it with shunit asserts, and I didn't want to rewrite all the tests as well); This means that they're slightly uglier and they spew out more unimportant output when running.
+pew's test suite is a straight port of virtualenvwrapper's, dropping test related to things absent in pew and converting the scripts to use commands "echoed inside the workon commands" (almost surely there was a better approach, but I wasn't sure how to integrate it with shunit asserts, and I didn't want to rewrite all the tests as well); This means that they're slightly uglier and they spew out more unimportant output when running.
 
-The test suite for invewrapper uses [shunit2](http://shunit2.googlecode.com/) and [tox](http://codespeak.net/tox). The shunit2 source is included in the `tests` directory, but tox must be installed separately (`pip install tox`).
+The test suite for pew uses [shunit2](http://shunit2.googlecode.com/) and [tox](http://codespeak.net/tox). The shunit2 source is included in the `tests` directory, but tox must be installed separately (`pip install tox`).
 
 To run individual test scripts, run from the top level directory of the repository a command like:
 
@@ -303,7 +303,7 @@ They can be simply implemented like:
 
 `cd $(cat $VIRTUAL_ENV/.project)` for `cdproject`
 
-Just like in the inve idea, an invewrapper command that returns a string of commands to be sourced could be created, and by putting it in your .bashrc/.zshrc/config.fish these aliases/command creations could be automated.
+Just like in the inve idea, a pew command that returns a string of commands to be sourced could be created, and by putting it in your .bashrc/.zshrc/config.fish these aliases/command creations could be automated.
 
 ### due to argparse, not every argument order is supported ###
 
