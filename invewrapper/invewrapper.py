@@ -9,6 +9,7 @@ import shutil
 import random
 import textwrap
 from glob import glob
+from subprocess import CalledProcessError
 
 try:
     from clonevirtualenv import clone_virtualenv
@@ -101,23 +102,27 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
     if python:
         rest = ["--python=%s" % python] + rest
 
-    with chdir(workon_home):
-        os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
-        check_call(["virtualenv", envname] + rest)
+    try:
+        with chdir(workon_home):
+            os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
+            check_call(["virtualenv", envname] + rest)
 
-        if project:
-            setvirtualenvproject(envname, project)
+            if project:
+                setvirtualenvproject(envname, project)
 
-    inve = get_inve(envname)
-    deploy_inve(inve)
+        inve = get_inve(envname)
+        deploy_inve(inve)
 
-    if requirements:
-        invoke(inve, 'pip', 'install', '--allow-all-external', '-r', expandpath(requirements))
+        if requirements:
+            invoke(inve, 'pip', 'install', '--allow-all-external', '-r', expandpath(requirements))
 
-    if packages:
-        invoke(inve, 'pip', 'install', '--allow-all-external', *packages)
+        if packages:
+            invoke(inve, 'pip', 'install', '--allow-all-external', *packages)
 
-    return inve
+        return inve
+    except CalledProcessError:
+        rmvirtualenvs([envname])
+        raise
 
 
 def mkvirtualenv_argparser():
@@ -185,8 +190,8 @@ def show_cmd():
 
 
 def lsvirtualenv(verbose):
-    envs = set(env.split(os.path.sep)[-3] for env in
-               glob(os.path.join(workon_home, '*', env_bin_dir, 'python*')))
+    envs = sorted(set(env.split(os.path.sep)[-3] for env in
+                      glob(os.path.join(workon_home, '*', env_bin_dir, 'python*'))))
     for env in envs:
         deploy_inve(get_inve(env))
 
@@ -359,7 +364,7 @@ def mkproject_cmd():
         templates = [t.split(os.path.sep)[-1][9:] for t in
                      glob(os.path.join(workon_home, "template_*"))]
         print("Available project templates:\n%s" % "\n".join(templates))
-        sys.exit()
+        return
 
     parser = mkvirtualenv_argparser()
     parser.add_argument('envname')
@@ -408,9 +413,10 @@ def mktmpenv_cmd():
     inve = mkvirtualenv(env, args.python, args.packages, args.project,
                         args.requirements, rest)
     print('This is a temporary environment. It will be deleted when you exit')
-    invoke(inve)
-
-    rmvirtualenvs([env])
+    try:
+        invoke(inve)
+    finally:
+        rmvirtualenvs([env])
 
 
 def wipeenv_cmd():
@@ -464,7 +470,10 @@ def pew():
             command = cmds[sys.argv[1]]
             sys.argv = ['-'.join(sys.argv[:2])] + sys.argv[2:]
             update_args_dict()
-            return command()
+            try:
+                return command()
+            except CalledProcessError as e:
+                return e.returncode
         except KeyError:
             print("ERROR: command %s does not exist." % sys.argv[1],
                   file=sys.stderr)
