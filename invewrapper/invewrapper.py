@@ -15,7 +15,7 @@ try:
 except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
-from invewrapper._utils import check_call, shell, chdir, expandpath, own, env_bin_dir, check_path
+from invewrapper._utils import call, check_call, shell, chdir, expandpath, own, env_bin_dir, check_path
 
 
 def update_args_dict():
@@ -72,17 +72,27 @@ def get_project_dir(env):
 
 
 def invoke(inve, *args):
-    if sys.platform == 'win32' and not args:
-        check_call(['python', inve, 'powershell'])
-    else:
-        check_call(['python', inve] + list(args))
+    windows = sys.platform == 'win32'
+    if not args:
+        args = ['powershell' if windows else os.environ['SHELL']]
+        if not windows:
+            # On Windows the PATH is usually set with System Utility
+            # so we won't worry about trying to check mistakes there
+            shell_check = ['python -c "from invewrapper.invewrapper import '
+                           'prevent_path_errors; prevent_path_errors()"']
+            if call(['python', inve, args[0], '-c'] + shell_check) != 0:
+                return
+        or_ctrld = '' if windows else "or 'Ctrl+D' "
+        sys.stderr.write("Launching subshell in virtual environment. Type "
+                         "'exit' %sto return.\n" % or_ctrld)
+
+    check_call(['python', inve] + list(args))
 
 
 def deploy_inve(target):
     # temporary workaround: I plan to remove it when virtualenv's PR #247
     # will be completed
-    if not os.path.exists(target):
-        shutil.copy(source_inve, target)
+    shutil.copy(source_inve, target)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
@@ -442,13 +452,11 @@ def in_cmd():
 def prevent_path_errors():
     if 'VIRTUAL_ENV' in os.environ and not check_path():
         sys.exit('''ERROR: The virtualenv hasn't been activated correctly.
-Check the contents of your $PATH and if you are adding new directories to it
+Check the contents of your $PATH. You might be adding new directories to it
 from inside your shell's configuration file.
 For further details, please see: https://github.com/berdario/invewrapper#the-environment-seems-to-not-be-activated''')
 
-
 def pew():
-    prevent_path_errors()
     cmds = dict((cmd[:-4], fun)
                 for cmd, fun in globals().items() if cmd.endswith('_cmd'))
     if sys.argv[1:]:

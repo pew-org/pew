@@ -2,11 +2,12 @@ import os
 import sys
 import locale
 import contextlib
+from subprocess import check_call, call
 
 try:
-    from subprocess import check_call, check_output
+    from subprocess import check_output
 except ImportError:
-    from subprocess import check_call, Popen, PIPE  # py2.6 compatibility
+    from subprocess import Popen, PIPE  # py2.6 compatibility
 
     def check_output(cmd, *args, **kwargs):
         popen = Popen(cmd, *args, stdout=PIPE, **kwargs)
@@ -62,6 +63,7 @@ def resolve_path(f):
 
 check_output = resolve_path(check_output)
 check_call = resolve_path(check_call)
+call = resolve_path(call)
 
 
 def shell(*args):

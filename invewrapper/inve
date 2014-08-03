@@ -21,18 +21,14 @@ shellout = sys.platform == 'win32'
 
 def exe(args, shell=False):
     try:
-        call(args, shell=shell)
+        return call(args, shell=shell)
     except OSError as e:
         if e.errno == 2:
             sys.stderr.write("Unable to find %s\n" % args[0])
         else:
             raise
 
-args = sys.argv[1:]
-
-if args:
-    exe(args, shell=shellout)
-else:
-    sys.stderr.write("Launching subshell in virtual environment. Type 'exit' \
-or 'Ctrl+D' to return.\n")
-    exe([os.environ['SHELL']], shell=shellout)
+try:
+    sys.exit(exe(sys.argv[1:], shell=shellout))
+except IndexError:
+    sys.exit("Command not specified")
