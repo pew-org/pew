@@ -2,18 +2,18 @@
 
 from setuptools import setup
 import sys
-import invewrapper
+import pew
 
-long_desc = '''Python Env Wrapper (also called Invewrapper) is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
+long_desc = '''Python Env Wrapper is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
-Invewrapper makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages inve: the idea/alternative implementation of a better activate script.
+Pew makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages inve: the idea/alternative implementation of a better activate script.
 
-The advantage is that invewrapper doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
+The advantage is that pew doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
 
 It works on bash, zsh, fish, powershell, etc.
 
 For the documentation, you might want to read here:
-https://github.com/berdario/invewrapper#usage'''
+https://github.com/berdario/pew#usage'''
 
 backports = ['argparse'] if sys.version_info[:2] == (2, 6) else []
 
@@ -25,19 +25,19 @@ setup(
     long_description=long_desc,
     author='Dario Bertini',
     author_email='berdario+pypi@gmail.com',
-    url='https://github.com/berdario/invewrapper',
+    url='https://github.com/berdario/pew',
     license='MIT License',
-    packages=['invewrapper'],
-    install_requires=['virtualenv', 'virtualenv-clone', 'setuptools>=0.7'] + backports,
+    packages=['pew'],
+    install_requires=['virtualenv>=1.11', 'virtualenv-clone', 'setuptools>=0.7'] + backports,
     dependency_links=
         ['https://github.com/berdario/virtualenv-clone/tarball/c302ca84e524cb22f88c834cccb23dd410cced97#egg=virtualenv-clone'],
     include_package_data=True,
     zip_safe=False,
     entry_points={
         'console_scripts':
-        ["pew-{0} = invewrapper.invewrapper:{0}_cmd".format(cmd[:-4])
-         for cmd in dir(invewrapper.invewrapper) if cmd.endswith("_cmd")] +
-        ['pew = invewrapper.invewrapper:pew']},
+        ["pew-{0} = pew.pew:{0}_cmd".format(cmd[:-4])
+         for cmd in dir(pew.pew) if cmd.endswith("_cmd")] +
+        ['pew = pew.pew:pew']},
     classifiers=[
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
