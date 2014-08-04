@@ -28,9 +28,7 @@ setup(
     url='https://github.com/berdario/pew',
     license='MIT License',
     packages=['pew'],
-    install_requires=['virtualenv>=1.11', 'virtualenv-clone', 'setuptools>=0.7'] + backports,
-    dependency_links=
-        ['https://github.com/berdario/virtualenv-clone/tarball/c302ca84e524cb22f88c834cccb23dd410cced97#egg=virtualenv-clone'],
+    install_requires=['virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=0.7'] + backports,
     include_package_data=True,
     zip_safe=False,
     entry_points={
