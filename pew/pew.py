@@ -17,7 +17,7 @@ except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
 from pew._utils import (call, check_call, shell, chdir, expandpath, own,
-                               env_bin_dir, check_path, which)
+                        env_bin_dir, check_path, which)
 
 
 def update_args_dict():
@@ -26,23 +26,20 @@ def update_args_dict():
 
 update_args_dict()
 
-workon_home = expandpath(os.environ.get('WORKON_HOME', '~/.virtualenvs'))
-
+workon_home = expandpath(
+    os.environ.get('WORKON_HOME',
+                   os.path.join(os.environ.get('XDG_DATA_HOME',
+                                               '~/.local/share'),
+                                'virtualenvs')))
 
 def makedirs_and_symlink_if_needed(workon_home):
     if not os.path.exists(workon_home) and own(workon_home):
-        if os.name == 'posix' and 'WORKON_HOME' not in os.environ:
-            actual_workon = os.path.join(
-                expandpath(os.environ.get('XDG_DATA_HOME', '~/.local/share')),
-                'virtualenvs')
-            os.makedirs(actual_workon)
-            os.symlink(actual_workon, workon_home)
-            return actual_workon
-        else:
-            os.makedirs(workon_home)
-    return os.path.realpath(workon_home)
+        os.makedirs(workon_home)
+        if os.name == 'posix' and 'WORKON_HOME' not in os.environ and \
+           'XDG_DATA_HOME' not in os.environ:
+            os.symlink(workon_home, '~/.virtualenvs')
 
-workon_home = makedirs_and_symlink_if_needed(workon_home)
+makedirs_and_symlink_if_needed(workon_home)
 
 
 inve_site = os.path.dirname(__file__)
