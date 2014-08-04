@@ -16,7 +16,8 @@ try:
 except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
-from invewrapper._utils import call, check_call, shell, chdir, expandpath, own, env_bin_dir, check_path
+from invewrapper._utils import (call, check_call, shell, chdir, expandpath, own,
+                               env_bin_dir, check_path, which)
 
 
 def update_args_dict():
@@ -79,7 +80,8 @@ def invoke(inve, *args):
         if not windows:
             # On Windows the PATH is usually set with System Utility
             # so we won't worry about trying to check mistakes there
-            shell_check = ['python -c "from invewrapper.invewrapper import '
+            py = which('python' + str(sys.version_info.major)) # external python
+            shell_check = [py + ' -c "from invewrapper.invewrapper import '
                            'prevent_path_errors; prevent_path_errors()"']
             if call(['python', inve, args[0], '-c'] + shell_check) != 0:
                 return
