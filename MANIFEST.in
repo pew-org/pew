@@ -1,3 +1,3 @@
-include invewrapper/inve
-recursive-include invewrapper/complete_scripts *
-recursive-exclude invewrapper *~
+include pew/inve
+recursive-include pew/complete_scripts *
+recursive-exclude pew *~

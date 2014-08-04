@@ -221,7 +221,7 @@ You can customize pew's virtualenvs directory location, with the `$XDG_DATA_HOME
 Troubleshooting
 ---------------
 
-### The environment seems to not be activated ###
+### The environment doesn't seem to be activated ###
 
 If you've defined in your shell rc file, to export a PATH location that might shadow the executables needed by pew (or your project), you might find that when getting into the environment, they will still be at the head of the PATH.
 

@@ -15,7 +15,7 @@ try:
 except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
-from invewrapper._utils import check_call, shell, chdir, expandpath, own, env_bin_dir, check_path
+from pew._utils import check_call, shell, chdir, expandpath, own, env_bin_dir, check_path
 
 
 def update_args_dict():
@@ -441,7 +441,7 @@ def prevent_path_errors():
         sys.exit('''ERROR: The virtualenv hasn't been activated correctly.
 Check the contents of your $PATH and if you are adding new directories to it
 from inside your shell's configuration file.
-For further details, please see: https://github.com/berdario/invewrapper#the-environment-seems-to-not-be-activated''')
+For further details, please see: https://github.com/berdario/pew#the-environment-doesnt-seem-to-be-activated''')
 
 
 def pew():
