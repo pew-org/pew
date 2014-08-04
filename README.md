@@ -236,6 +236,16 @@ There're multiple way to overcome this issue:
 * Change the files your OS provide to setup the base environment (it might come useful to look into /etc/paths.d /etc/profile and [environment.plist](http://stackoverflow.com/a/8421952/293735))
 
 
+### pkg_resources.DistributionNotFound: virtualenv ###
+
+This might happen after a Python update, especially on MacOSX, upgrading setuptools might fix that (you should need superuser permissions to do it)
+
+`easy_install -U setuptools`
+
+or
+
+`pip install --upgrade setuptools`
+
 ### Other issues ###
 
 Congratulations! You found a bug, please [let me know](https://github.com/berdario/pew/issues/new) :)
