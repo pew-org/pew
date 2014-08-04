@@ -9,10 +9,9 @@ os.environ['PATH'] = os.pathsep.join([
     parent(__file__),
     os.environ['PATH'],
 ])
-try:
-    del os.environ['PYTHONHOME']
-except KeyError:
-    pass
+
+os.unsetenv('PYTHONHOME')
+os.unsetenv('__PYVENV_LAUNCHER__')
 
 shellout = sys.platform == 'win32'
 # need to have shell=True on windows, otherwise the PYTHONPATH
