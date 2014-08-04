@@ -80,7 +80,7 @@ def invoke(inve, *args):
         if not windows:
             # On Windows the PATH is usually set with System Utility
             # so we won't worry about trying to check mistakes there
-            py = which('python' + str(sys.version_info.major)) # external python
+            py = which('python' + str(sys.version_info[0])) # external python
             shell_check = [py + ' -c "from pew.pew import '
                            'prevent_path_errors; prevent_path_errors()"']
             if call(['python', inve, args[0], '-c'] + shell_check) != 0:
