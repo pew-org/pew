@@ -1,7 +1,7 @@
 import os
 import sys
 import locale
-import contextlib
+from contextlib import contextmanager
 from subprocess import check_call, call
 
 try:
@@ -63,8 +63,6 @@ def resolve_path(f):
 
 check_output = resolve_path(check_output)
 check_call = resolve_path(check_call)
-call = resolve_path(call)
-
 
 def shell(*args):
     return check_output(*args).decode(locale.getlocale()[1]).strip()
@@ -88,7 +86,7 @@ def own(path):
     return os.stat(path).st_uid == os.getuid()
 
 
-@contextlib.contextmanager
+@contextmanager
 def chdir(dirname):
     curdir = os.getcwd()
     try:
@@ -96,3 +94,12 @@ def chdir(dirname):
         yield
     finally:
         os.chdir(curdir)
+
+@contextmanager
+def temp_environ():
+    environ = dict(os.environ)
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(environ)
