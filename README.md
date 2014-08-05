@@ -216,6 +216,13 @@ Bind an existing virtualenv to an existing project.
 
 When no arguments are given, the current virtualenv and current directory are assumed.
 
+### restore ###
+
+Try to restore a broken virtualenv by reinstalling the same python
+version on top of it
+
+`usage: pew-restore env`
+
 Configuration
 -------------
 

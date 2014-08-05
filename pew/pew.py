@@ -103,7 +103,6 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
 
     try:
         with chdir(workon_home):
-            os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
             check_call(["virtualenv", envname] + rest)
 
             if project:
@@ -453,13 +452,29 @@ def in_cmd():
     deploy_inve(inve)
     invoke(inve, *sys.argv[2:])
 
+def restore_cmd():
+    """Try to restore a broken virtualenv by reinstalling the same python
+version on top of it"""
+
+    if len(sys.argv) < 2:
+        sys.exit('You must provide a valid virtualenv to target')
+
+    env = sys.argv[1]
+    py = os.path.join(workon_home, env, env_bin_dir, 'python')
+    exact_py = os.path.basename(os.readlink(py))
+
+    with chdir(workon_home):
+        check_call(["virtualenv", env, "--python=%s" % exact_py])
+
 
 def prevent_path_errors():
     if 'VIRTUAL_ENV' in os.environ and not check_path():
         sys.exit('''ERROR: The virtualenv hasn't been activated correctly.
-Check the contents of your $PATH. You might be adding new directories to it
+Either the env is corrupted (try running `pew restore env`),
+Or an upgrade of your Python version broke your env,
+Or check the contents of your $PATH. You might be adding new directories to it
 from inside your shell's configuration file.
-For further details, please see: https://github.com/berdario/pew#the-environment-doesnt-seem-to-be-activated''')
+In this case, for further details please see: https://github.com/berdario/pew#the-environment-doesnt-seem-to-be-activated''')
 
 def pew():
     cmds = dict((cmd[:-4], fun)
