@@ -11,6 +11,8 @@ import textwrap
 from glob import glob
 from subprocess import CalledProcessError
 
+from pew import __version__
+
 try:
     from clonevirtualenv import clone_virtualenv
 except ImportError:
@@ -465,6 +467,9 @@ version on top of it"""
     with chdir(workon_home):
         check_call(["virtualenv", env, "--python=%s" % exact_py])
 
+def version_cmd():
+    """Prints current pew version"""
+    print(__version__)
 
 def prevent_path_errors():
     if 'VIRTUAL_ENV' in os.environ and not check_path():
