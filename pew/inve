@@ -2,6 +2,8 @@
 
 import os, sys
 from subprocess import call
+from configparser import RawConfigParser
+from string import Template
 
 parent = os.path.dirname
 os.environ['VIRTUAL_ENV'] = parent(parent(__file__))
@@ -17,6 +19,22 @@ shellout = sys.platform == 'win32'
 # need to have shell=True on windows, otherwise the PYTHONPATH
 # won't inherit the PATH
 
+class InveParser(RawConfigParser):
+    # stop lowercasing keys
+    @staticmethod
+    def optionxform(option):
+        return option
+
+    def section_items(self, section, variables):
+        if section not in self:
+            return []
+
+        for k in self[section]:
+            yield (k, Template(self.get(section, k)).safe_substitute(variables))
+
+parser = InveParser()
+parser.read(os.path.join(os.environ['VIRTUAL_ENV'], '.inve.ini'))
+os.environ.update(parser.section_items('env', os.environ))
 
 def exe(args, shell=False):
     try:
