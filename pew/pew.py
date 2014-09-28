@@ -16,7 +16,7 @@ try:
 except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
-from pew._utils import (check_call, shell, chdir, expandpath, own,
+from pew._utils import (check_call, invoke, chdir, expandpath, own,
                         env_bin_dir, check_path, which, temp_environ)
 
 windows = sys.platform == 'win32'
@@ -67,6 +67,9 @@ def get_project_dir(env):
 
 
 def inve(env, *args):
+    assert args
+    # we don't strictly need to restore the environment, since pew runs in
+    # its own process, but it feels like the right thing to do
     with temp_environ():
         envdir = os.path.join(workon_home, env)
         os.environ['VIRTUAL_ENV'] = envdir
@@ -89,24 +92,23 @@ def inve(env, *args):
                 raise
 
 
-def invoke_or_shell(env, *args):
-    if not args:
-        args = ['powershell' if windows else os.environ['SHELL']]
-        if not windows:
-            # On Windows the PATH is usually set with System Utility
-            # so we won't worry about trying to check mistakes there
-            py = which('python' + str(sys.version_info[0])) # external python
-            shell_check = (py + ' -c "from pew.pew import '
-                           'prevent_path_errors; prevent_path_errors()"')
-            try:
-                inve(env, args[0], '-c', shell_check)
-            except CalledProcessError:
-                return
-        or_ctrld = '' if windows else "or 'Ctrl+D' "
-        sys.stderr.write("Launching subshell in virtual environment. Type "
-                         "'exit' %sto return.\n" % or_ctrld)
+def shell(env):
+    shell = 'powershell' if windows else os.environ['SHELL']
+    if not windows:
+        # On Windows the PATH is usually set with System Utility
+        # so we won't worry about trying to check mistakes there
+        py = which('python' + str(sys.version_info[0])) # external python
+        shell_check = (py + ' -c "from pew.pew import '
+                       'prevent_path_errors; prevent_path_errors()"')
+        try:
+            inve(env, shell, '-c', shell_check)
+        except CalledProcessError:
+            return
+    or_ctrld = '' if windows else "or 'Ctrl+D' "
+    sys.stderr.write("Launching subshell in virtual environment. Type "
+                     "'exit' %sto return.\n" % or_ctrld)
 
-    inve(env, *args)
+    inve(env, shell)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
@@ -124,10 +126,10 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
                 setvirtualenvproject(envname, project)
 
         if requirements:
-            invoke_or_shell(envname, 'pip', 'install', '--allow-all-external', '-r', expandpath(requirements))
+            inve(envname, 'pip', 'install', '--allow-all-external', '-r', expandpath(requirements))
 
         if packages:
-            invoke_or_shell(envname, 'pip', 'install', '--allow-all-external', *packages)
+            inve(envname, 'pip', 'install', '--allow-all-external', *packages)
 
     except CalledProcessError:
         rmvirtualenvs([envname])
@@ -159,7 +161,7 @@ def new_cmd():
     mkvirtualenv(args.envname, args.python, args.packages, args.project,
                  args.requirements, rest)
     if args.activate:
-        invoke_or_shell(args.envname)
+        shell(args.envname)
 
 
 def rmvirtualenvs(envs):
@@ -241,15 +243,15 @@ def workon_cmd():
         # this case, use it as the current working directory.
         project_dir = get_project_dir(env) or os.getcwd()
         with chdir(project_dir):
-            invoke_or_shell(env)
+            shell(env)
 
 
 def sitepackages_dir():
     if 'VIRTUAL_ENV' not in os.environ:
         sys.exit('ERROR: no virtualenv active')
     else:
-        return shell(['python', '-c', 'import distutils; \
-print(distutils.sysconfig.get_python_lib())'])
+        return invoke('python', '-c', 'import distutils; \
+print(distutils.sysconfig.get_python_lib())').out
 
 
 def add_cmd():
@@ -345,7 +347,7 @@ def cp_cmd():
     print('Copying {0} in {1}'.format(source, target_name))
     clone_virtualenv(source, target)
     if args.activate:
-        invoke_or_shell(target_name)
+        shell(target_name)
 
 
 def setvirtualenvproject(env, project):
@@ -402,9 +404,9 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
     with chdir(project):
         for template_name in args.templates:
             template = os.path.join(workon_home, "template_" + template_name)
-            invoke_or_shell(args.envname, template, args.envname, project)
+            inve(args.envname, template, args.envname, project)
         if args.activate:
-            invoke_or_shell(args.envname)
+            shell(args.envname)
 
 
 def mktmpenv_cmd():
@@ -420,14 +422,14 @@ def mktmpenv_cmd():
                         args.requirements, rest)
     print('This is a temporary environment. It will be deleted when you exit')
     try:
-        invoke_or_shell(env)
+        shell(env)
     finally:
         rmvirtualenvs([env])
 
 
 def wipeenv_cmd():
     """Remove all installed packages from the current env."""
-    pkgs = map(lambda d: d.split("==")[0], shell(['pip', 'freeze']).split())
+    pkgs = map(lambda d: d.split("==")[0], invoke('pip', 'freeze').out.split())
     to_remove = [pkg for pkg in pkgs if pkg not in ('distribute', 'wsgiref')]
     if to_remove:
         print("Uninstalling packages:\n%s" % "\n".join(to_remove))
@@ -441,7 +443,7 @@ def inall_cmd():
     envs = lsenvs()
     for env in envs:
         print("\n%s:" % env)
-        invoke_or_shell(env, *sys.argv[1:])
+        inve(env, *sys.argv[1:])
 
 
 def in_cmd():
@@ -456,7 +458,7 @@ def in_cmd():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
 'pew-new {0}'.".format(env))
 
-    invoke_or_shell(env, *sys.argv[2:])
+    inve(env, *sys.argv[2:])
 
 
 def prevent_path_errors():
