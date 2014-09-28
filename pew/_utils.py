@@ -78,15 +78,6 @@ def own(path):
 
 
 @contextmanager
-def chdir(dirname):
-    curdir = os.getcwd()
-    try:
-        os.chdir(dirname)
-        yield
-    finally:
-        os.chdir(curdir)
-
-@contextmanager
 def temp_environ():
     environ = dict(os.environ)
     try:

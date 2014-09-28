@@ -16,7 +16,7 @@ try:
 except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
-from pew._utils import (check_call, invoke, chdir, expandpath, own,
+from pew._utils import (check_call, invoke, expandpath, own,
                         env_bin_dir, check_path, which, temp_environ)
 
 windows = sys.platform == 'win32'
@@ -66,7 +66,7 @@ def get_project_dir(env):
     return project_dir
 
 
-def inve(env, *args):
+def inve(env, *args, **kwargs):
     assert args
     # we don't strictly need to restore the environment, since pew runs in
     # its own process, but it feels like the right thing to do
@@ -82,7 +82,7 @@ def inve(env, *args):
         os.unsetenv('__PYVENV_LAUNCHER__')
 
         try:
-            return check_call(args, shell=windows)
+            return check_call(args, shell=windows, **kwargs)
             # need to have shell=True on windows, otherwise the PYTHONPATH
             # won't inherit the PATH
         except OSError as e:
@@ -92,7 +92,7 @@ def inve(env, *args):
                 raise
 
 
-def shell(env):
+def shell(env, cwd=None):
     shell = 'powershell' if windows else os.environ['SHELL']
     if not windows:
         # On Windows the PATH is usually set with System Utility
@@ -108,7 +108,7 @@ def shell(env):
     sys.stderr.write("Launching subshell in virtual environment. Type "
                      "'exit' %sto return.\n" % or_ctrld)
 
-    inve(env, shell)
+    inve(env, shell, cwd=cwd)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
@@ -118,12 +118,11 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
         rest = ["--python=%s" % python] + rest
 
     try:
-        with chdir(workon_home):
-            os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
-            check_call(["virtualenv", envname] + rest)
+        os.environ['VIRTUALENV_DISTRIBUTE'] = 'true'
+        check_call(["virtualenv", envname] + rest, cwd=workon_home)
 
-            if project:
-                setvirtualenvproject(envname, project)
+        if project:
+            setvirtualenvproject(envname, project)
 
         if requirements:
             inve(envname, 'pip', 'install', '--allow-all-external', '-r', expandpath(requirements))
@@ -165,17 +164,16 @@ def new_cmd():
 
 
 def rmvirtualenvs(envs):
-    with chdir(workon_home):
-        for env in envs:
-            env = os.path.join(workon_home, env)
-            if os.environ.get('VIRTUAL_ENV') == env:
-                print("ERROR: You cannot remove the active environment \
+    for env in envs:
+        env = os.path.join(workon_home, env)
+        if os.environ.get('VIRTUAL_ENV') == env:
+            print("ERROR: You cannot remove the active environment \
 (%s)." % env, file=sys.stderr)
-                break
-            try:
-                shutil.rmtree(env)
-            except OSError as e:
-                print("Error while trying to remove the {0} env: \
+            break
+        try:
+            shutil.rmtree(env)
+        except OSError as e:
+            print("Error while trying to remove the {0} env: \
 \n{1}".format(env, e.strerror), file=sys.stderr)
 
 
@@ -242,8 +240,7 @@ def workon_cmd():
         # Check if the virtualenv has an associated project directory and in
         # this case, use it as the current working directory.
         project_dir = get_project_dir(env) or os.getcwd()
-        with chdir(project_dir):
-            shell(env)
+        shell(env, cwd=project_dir)
 
 
 def sitepackages_dir():
@@ -353,7 +350,7 @@ def cp_cmd():
 def setvirtualenvproject(env, project):
     print('Setting project for {0} to {1}'.format(os.path.basename(env),
                                                   project))
-    with open(os.path.join(env, '.project'), 'w') as prj:
+    with open(os.path.join(workon_home, env, '.project'), 'w') as prj:
         prj.write(project)
 
 
@@ -401,12 +398,11 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
 
     setvirtualenvproject(os.path.join(workon_home, args.envname), project)
 
-    with chdir(project):
-        for template_name in args.templates:
-            template = os.path.join(workon_home, "template_" + template_name)
-            inve(args.envname, template, args.envname, project)
-        if args.activate:
-            shell(args.envname)
+    for template_name in args.templates:
+        template = os.path.join(workon_home, "template_" + template_name)
+        inve(args.envname, template, args.envname, project)
+    if args.activate:
+        shell(args.envname, cwd=project)
 
 
 def mktmpenv_cmd():
