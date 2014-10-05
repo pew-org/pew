@@ -5,6 +5,7 @@ from pew._utils import invoke_pew as invoke
 
 import pytest
 
+
 @pytest.yield_fixture()
 def copied_env(workon_home, env1):
     invoke('cp', 'env1', 'destination', '-d')
@@ -20,9 +21,11 @@ def test_new_env_activated(workon_home, testpackageenv):
         assert str(workon_home / 'destination') in f.read()
     invoke('rm', 'destination')
 
+
 def test_virtualenv_variable(copied_env):
     envname = invoke('workon', copied_env.name, inp='echo $VIRTUAL_ENV').out.strip()
     assert str(copied_env) == envname
+
 
 @pytest.mark.xfail
 def test_source_relocatable(workon_home, testpackageenv):
@@ -33,6 +36,7 @@ def test_source_relocatable(workon_home, testpackageenv):
     with open(testscript) as f:
         assert str(workon_home / 'destination') in f.read()
     invoke('rm', 'destination')
+
 
 def test_source_does_not_exists(workon_home):
     err = invoke('cp', 'virtualenvthatdoesntexist', 'foo').err.strip()

@@ -6,6 +6,7 @@ import pytest
 
 from pew._utils import invoke_pew as invoke
 
+
 @pytest.yield_fixture(scope='session')
 def workon_home():
     tmpdir = os.environ.get('TMPDIR', '/tmp')
@@ -17,11 +18,13 @@ def workon_home():
     yield workon
     rmtree(str(workon))
 
+
 @pytest.yield_fixture()
 def env1(workon_home):
     invoke('new', 'env1', '-d')
     yield
     invoke('rm', 'env1')
+
 
 @pytest.yield_fixture()
 def env2(workon_home):
@@ -29,12 +32,14 @@ def env2(workon_home):
     yield
     invoke('rm', 'env2')
 
+
 @pytest.yield_fixture()
 def testpackageenv(workon_home):
     testpackage = str(Path(__file__).parent / 'testpackage')
     invoke('new', 'source', inp='python setup.py install', cwd=testpackage)
     yield
     invoke('rm', 'source')
+
 
 @pytest.yield_fixture()
 def testtemplate(workon_home):

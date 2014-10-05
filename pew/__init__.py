@@ -1,4 +1,4 @@
 from __future__ import absolute_import
 
-from . import pew, _utils
+from . import pew
 __all__ = ['pew']

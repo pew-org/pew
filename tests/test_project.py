@@ -7,6 +7,7 @@ import pytest
 
 from pew._utils import temp_environ, invoke_pew as invoke
 
+
 @pytest.yield_fixture(scope='session')
 def project_home():
     tmpdir = os.environ.get('TMPDIR', '/tmp')
@@ -17,6 +18,7 @@ def project_home():
     project.mkdir(parents=True)
     yield project
     rmtree(str(project))
+
 
 @pytest.yield_fixture()
 def project(workon_home, project_home):
@@ -31,11 +33,13 @@ def test_create_directories(workon_home, project_home, project):
     assert (workon_home / project).exists()
     assert (project_home / project).exists()
 
-def test_create_virtualenv (project_home, project):
+
+def test_create_virtualenv(project_home, project):
     env = Path(invoke('workon', project, inp='echo $VIRTUAL_ENV').out)
     assert project == env.name
     with (env / '.project').open() as f:
         assert str(project_home / project) == f.read().strip()
+
 
 def test_no_project_home(project_home):
     with temp_environ():
@@ -43,9 +47,11 @@ def test_no_project_home(project_home):
         with pytest.raises(CalledProcessError):
             check_call('pew mkproject whatever -d'.split())
 
+
 def test_project_exists(project):
     with pytest.raises(CalledProcessError):
         check_call('pew mkproject {0} -d'.format(project).split())
+
 
 @pytest.mark.xfail
 def test_same_workon_and_project_home(workon_home, project_home):
@@ -57,8 +63,10 @@ def test_same_workon_and_project_home(workon_home, project_home):
         assert not (workon_home / envname).exists()
         assert not (project_home / envname).exists()
 
+
 def test_list_templates(testtemplate):
     assert 'test' in invoke('mkproject', '-l').out
+
 
 def test_apply_template(project_home, testtemplate):
     projname = 'project1'
@@ -69,4 +77,3 @@ def test_apply_template(project_home, testtemplate):
         assert projname in f.read()
     invoke('rm', projname)
     rmtree(str(project_home / projname))
-

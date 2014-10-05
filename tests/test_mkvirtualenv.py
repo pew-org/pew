@@ -12,6 +12,7 @@ import pytest
 
 from pew._utils import invoke_pew as invoke
 
+
 def are_we_connected():
     try:
         urlopen('http://google.com')
@@ -19,14 +20,17 @@ def are_we_connected():
     except URLError:
         return False
 
+
 connection_required = pytest.mark.skipif(not are_we_connected(),
                                          reason="An internet connection is required")
+
 
 def test_create(workon_home):
     envs = set(invoke('ls').out.split())
     envs2 = set(invoke('new', 'env', inp='pew ls').out.split())
     invoke('rm', 'env')
     assert envs < envs2
+
 
 def test_no_args(workon_home):
     with pytest.raises(CalledProcessError):
@@ -38,6 +42,7 @@ def test_gsp(workon_home):
     assert not (Path(site).parent / 'no-global-site-packages.txt').exists()
     invoke('rm', 'env')
 
+
 def test_associate(workon_home):
     project = '/dev/null'
     invoke('new', 'env', '-a', project)
@@ -47,11 +52,13 @@ def test_associate(workon_home):
         assert f.read() == project
     invoke('rm', 'env')
 
+
 @connection_required
 def test_install_pkg(workon_home):
     freeze = invoke('new', 'env', '-i', 'IPy', inp='pip freeze').out
     assert 'IPy' in freeze
     invoke('rm', 'env')
+
 
 @connection_required
 def test_install_2pkgs(workon_home):
@@ -59,6 +66,7 @@ def test_install_2pkgs(workon_home):
     assert 'IPy' in freeze
     assert 'WebTest' in freeze
     invoke('rm', 'env')
+
 
 @connection_required
 def test_requirements_file(workon_home):
