@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from subprocess import check_call, Popen, PIPE
 from collections import namedtuple
 from functools import partial
+from pathlib import Path
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -67,7 +68,7 @@ env_bin_dir = 'bin' if sys.platform != 'win32' else 'Scripts'
 
 
 def expandpath(path):
-    return os.path.normpath(os.path.expanduser(os.path.expandvars(path)))
+    return Path(os.path.expanduser(os.path.expandvars(path)))
 
 
 def own(path):
@@ -75,9 +76,9 @@ def own(path):
         # Even if run by an administrator, the permissions will be set
         # correctly on Windows, no need to check
         return True
-    while not os.path.exists(path):
-        path = os.path.dirname(path)
-    return os.stat(path).st_uid == os.getuid()
+    while not path.exists():
+        path = path.parent
+    return path.stat().st_uid == os.getuid()
 
 
 @contextmanager

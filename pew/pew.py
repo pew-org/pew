@@ -10,6 +10,7 @@ import random
 import textwrap
 from glob import glob
 from subprocess import CalledProcessError
+from pathlib import Path
 
 try:
     from clonevirtualenv import clone_virtualenv
@@ -35,33 +36,33 @@ workon_home = expandpath(
                                 'virtualenvs')))
 
 def makedirs_and_symlink_if_needed(workon_home):
-    if not os.path.exists(workon_home) and own(workon_home):
-        os.makedirs(workon_home)
+    if not workon_home.exists() and own(workon_home):
+        workon_home.mkdir(parents=True)
         if os.name == 'posix' and 'WORKON_HOME' not in os.environ and \
            'XDG_DATA_HOME' not in os.environ:
-            os.symlink(workon_home, expandpath('~/.virtualenvs'))
+            workon_home.symlink_to(str(expandpath('~/.virtualenvs')))
 
 makedirs_and_symlink_if_needed(workon_home)
 
 
-inve_site = os.path.dirname(__file__)
+inve_site = Path(__file__).parent
 
 
 def deploy_completions():
-    completions = {'complete.bash': '/etc/bash_completion.d/pew',
-                   'complete.zsh': '/usr/local/share/zsh/site-functions/_pew',
-                   'complete.fish': '/etc/fish/completions/pew.fish'}
+    completions = {'complete.bash': Path('/etc/bash_completion.d/pew'),
+                   'complete.zsh': Path('/usr/local/share/zsh/site-functions/_pew'),
+                   'complete.fish': Path('/etc/fish/completions/pew.fish')}
     for comp, dest in completions.items():
-        if not os.path.exists(os.path.dirname(dest)):
-            os.makedirs(os.path.dirname(dest))
-        shutil.copy(os.path.join(inve_site, 'complete_scripts', comp), dest)
+        if not dest.parent.exists():
+            dest.parent.mkdir(parents=True)
+        shutil.copy(str(inve_site / 'complete_scripts' / comp), str(dest))
 
 
 def get_project_dir(env):
     project_dir = None
-    project_file = os.path.join(workon_home, env, '.project')
-    if os.path.exists(project_file):
-        with open(project_file, 'r') as f:
+    project_file = workon_home / env / '.project'
+    if project_file.exists():
+        with project_file.open() as f:
             project_dir = f.readline().strip()
 
     return project_dir
@@ -72,10 +73,10 @@ def inve(env, *args, **kwargs):
     # we don't strictly need to restore the environment, since pew runs in
     # its own process, but it feels like the right thing to do
     with temp_environ():
-        envdir = os.path.join(workon_home, env)
-        os.environ['VIRTUAL_ENV'] = envdir
+        envdir = workon_home / env
+        os.environ['VIRTUAL_ENV'] = str(envdir)
         os.environ['PATH'] = os.pathsep.join([
-            os.path.join(envdir, env_bin_dir),
+            str(envdir / env_bin_dir),
             os.environ['PATH'],
         ])
 
@@ -88,6 +89,7 @@ def inve(env, *args, **kwargs):
             # won't inherit the PATH
         except OSError as e:
             if e.errno == 2:
+                print(kwargs)
                 sys.stderr.write("Unable to find %s\n" % args[0])
             else:
                 raise
@@ -102,14 +104,14 @@ def shell(env, cwd=None):
         shell_check = (py + ' -c "from pew.pew import '
                        'prevent_path_errors; prevent_path_errors()"')
         try:
-            inve(env, shell, '-c', shell_check)
+            inve(str(env), shell, '-c', shell_check)
         except CalledProcessError:
             return
     or_ctrld = '' if windows else "or 'Ctrl+D' "
     sys.stderr.write("Launching subshell in virtual environment. Type "
                      "'exit' %sto return.\n" % or_ctrld)
 
-    inve(env, shell, cwd=cwd)
+    inve(str(env), shell, cwd=cwd)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
@@ -119,13 +121,13 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
         rest = ["--python=%s" % python] + rest
 
     try:
-        check_call(["virtualenv", envname] + rest, cwd=workon_home)
+        check_call(["virtualenv", envname] + rest, cwd=str(workon_home))
 
         if project:
-            setvirtualenvproject(envname, project)
+            setvirtualenvproject(envname, project.absolute())
 
         if requirements:
-            inve(envname, 'pip', 'install', '--allow-all-external', '-r', expandpath(requirements))
+            inve(envname, 'pip', 'install', '--allow-all-external', '-r', str(expandpath(requirements)))
 
         if packages:
             inve(envname, 'pip', 'install', '--allow-all-external', *packages)
@@ -140,8 +142,6 @@ def mkvirtualenv_argparser():
     parser.add_argument('-p', '--python')
     parser.add_argument('-i', action='append', dest='packages', help='Install \
 a package after the environment is created. This option may be repeated.')
-    parser.add_argument('-a', dest='project', help='Provide a full path to a \
-project directory to associate with the new environment.')
     parser.add_argument('-r', dest='requirements', help='Provide a pip \
 requirements file to install a base set of packages into the new environment.')
     parser.add_argument('-d', '--dont-activate', action='store_false',
@@ -154,10 +154,14 @@ requirements file to install a base set of packages into the new environment.')
 def new_cmd():
     """Create a new environment, in $WORKON_HOME."""
     parser = mkvirtualenv_argparser()
+    parser.add_argument('-a', dest='project', help='Provide a full path to a \
+project directory to associate with the new environment.')
+
     parser.add_argument('envname')
     args, rest = parser.parse_known_args()
+    project = expandpath(args.project) if args.project else None
 
-    mkvirtualenv(args.envname, args.python, args.packages, args.project,
+    mkvirtualenv(args.envname, args.python, args.packages, project,
                  args.requirements, rest)
     if args.activate:
         shell(args.envname)
@@ -165,13 +169,13 @@ def new_cmd():
 
 def rmvirtualenvs(envs):
     for env in envs:
-        env = os.path.join(workon_home, env)
-        if os.environ.get('VIRTUAL_ENV') == env:
+        env = workon_home / env
+        if os.environ.get('VIRTUAL_ENV') == str(env):
             print("ERROR: You cannot remove the active environment \
 (%s)." % env, file=sys.stderr)
             break
         try:
-            shutil.rmtree(env)
+            shutil.rmtree(str(env))
         except OSError as e:
             print("Error while trying to remove the {0} env: \
 \n{1}".format(env, e.strerror), file=sys.stderr)
@@ -193,21 +197,21 @@ def show_cmd():
         showvirtualenv(sys.argv[1])
     except IndexError:
         if 'VIRTUAL_ENV' in os.environ:
-            showvirtualenv(os.path.basename(os.environ['VIRTUAL_ENV']))
+            showvirtualenv(Path(os.environ['VIRTUAL_ENV']).name)
         else:
             sys.exit('pew-show [env]')
 
 
 def lsenvs():
-    return sorted(set(env.split(os.path.sep)[-3] for env in
-                      glob(os.path.join(workon_home, '*', env_bin_dir, 'python*'))))
+    return sorted(set(env.parts[-3] for env in
+                      workon_home.glob(os.path.join('*', env_bin_dir, 'python*'))))
 
 
 def lsvirtualenv(verbose):
     envs = lsenvs()
 
     if not verbose:
-        print(' '.join(envs))
+        print(*envs, sep=' ')
     else:
         for env in envs:
             showvirtualenv(env)
@@ -231,8 +235,8 @@ def workon_cmd():
         lsvirtualenv(False)
         return
 
-    env_path = os.path.join(workon_home, env)
-    if not os.path.exists(env_path):
+    env_path = workon_home / env
+    if not env_path.exists():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
 'pew-new {0}'.".format(env))
     else:
@@ -247,8 +251,8 @@ def sitepackages_dir():
     if 'VIRTUAL_ENV' not in os.environ:
         sys.exit('ERROR: no virtualenv active')
     else:
-        return invoke('python', '-c', 'import distutils; \
-print(distutils.sysconfig.get_python_lib())').out
+        return Path(invoke('python', '-c', 'import distutils; \
+print(distutils.sysconfig.get_python_lib())').out)
 
 
 def add_cmd():
@@ -264,16 +268,16 @@ directory; if this file does not exists, it will be created first.
     parser.add_argument('dirs', nargs='+')
     args = parser.parse_args()
 
-    extra_paths = os.path.join(sitepackages_dir(), '_virtualenv_path_extensions.pth')
-    new_paths = [os.path.abspath(d) + "\n" for d in args.dirs]
-    if not os.path.exists(extra_paths):
-        with open(extra_paths, 'w') as extra:
-            extra.write('''import sys; sys.__plen = len(sys.path)
+    extra_paths = sitepackages_dir() / '_virtualenv_path_extensions.pth'
+    new_paths = [os.path.abspath(d) + u"\n" for d in args.dirs]
+    if not extra_paths.exists():
+        with extra_paths.open('w') as extra:
+            extra.write(u'''import sys; sys.__plen = len(sys.path)
 import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)
-''')
+            ''')
 
     def rewrite(f):
-        with open(extra_paths, 'r+') as extra:
+        with extra_paths.open('r+') as extra:
             to_write = f(extra.readlines())
             extra.seek(0)
             extra.truncate()
@@ -292,11 +296,11 @@ def sitepackages_dir_cmd():
 def lssitepackages_cmd():
     """Show the content of the site-packages directory of the current virtualenv."""
     site = sitepackages_dir()
-    print(*os.listdir(site))
-    extra_paths = os.path.join(site, '_virtualenv_path_extensions.pth')
-    if os.path.exists(extra_paths):
+    print(*site.iterdir())
+    extra_paths = site / '_virtualenv_path_extensions.pth'
+    if extra_paths.exists():
         print('from _virtualenv_path_extensions.pth:')
-        with open(extra_paths) as extra:
+        with extra_paths.open() as extra:
             print(''.join(extra.readlines()))
 
 
@@ -304,14 +308,13 @@ def toggleglobalsitepackages_cmd():
     """Toggle the current virtualenv between having and not having access to the global site-packages."""
     quiet = args.get(1) == '-q'
     site = sitepackages_dir()
-    ngsp_file = os.path.join(os.path.dirname(site),
-                             'no-global-site-packages.txt')
-    if os.path.exists(ngsp_file):
-        os.remove(ngsp_file)
+    ngsp_file = site.parent / 'no-global-site-packages.txt'
+    if ngsp_file.exists():
+        ngsp_file.unlink()
         if not quiet:
             print('Enabled global site-packages')
     else:
-        with open(ngsp_file, 'w'):
+        with ngsp_file.open('w'):
             if not quiet:
                 print('Disabled global site-packages')
 
@@ -327,31 +330,29 @@ def cp_cmd():
                         activate the new environment).")
 
     args = parser.parse_args()
-    if os.path.exists(args.source):
-        source = expandpath(args.source)
-    else:
-        source = expandpath(os.path.join(workon_home, args.source))
-        if not os.path.exists(source):
+    source = expandpath(args.source)
+    if not source.exists():
+        source = workon_home / args.source
+        if not source.exists():
             sys.exit('Please provide a valid virtualenv to copy')
 
-    target_name = args.target or os.path.basename(source)
+    target_name = args.target or source.name
 
-    target = os.path.join(workon_home, target_name)
+    target = workon_home / target_name
 
-    if os.path.exists(target):
+    if target.exists():
         sys.exit('%s virtualenv already exists in %s.' % (target_name, workon_home))
 
     print('Copying {0} in {1}'.format(source, target_name))
-    clone_virtualenv(source, target)
+    clone_virtualenv(str(source), str(target))
     if args.activate:
         shell(target_name)
 
 
 def setvirtualenvproject(env, project):
-    print('Setting project for {0} to {1}'.format(os.path.basename(env),
-                                                  project))
-    with open(os.path.join(workon_home, env, '.project'), 'w') as prj:
-        prj.write(project)
+    print('Setting project for {0} to {1}'.format(env, project))
+    with (workon_home / env / '.project').open('wb') as prj:
+        prj.write(str(project).encode())
 
 
 def setproject_cmd():
@@ -366,9 +367,8 @@ def setproject_cmd():
 def mkproject_cmd():
     """Create a new project directory and its associated virtualenv."""
     if '-l' in sys.argv or '--list' in sys.argv:
-        templates = [t.split(os.path.sep)[-1][9:] for t in
-                     glob(os.path.join(workon_home, "template_*"))]
-        print("Available project templates:\n%s" % "\n".join(templates))
+        templates = [t.name[9:] for t in workon_home.glob("template_*")]
+        print("Available project templates:", *templates, sep='\n')
         return
 
     parser = mkvirtualenv_argparser()
@@ -382,40 +382,38 @@ command line.')
 
     args, rest = parser.parse_known_args()
 
-    projects_home = os.environ.get('PROJECT_HOME', '.')
-    if not os.path.exists(projects_home):
+    projects_home = Path(os.environ.get('PROJECT_HOME', '.'))
+    if not projects_home.exists():
         sys.exit('ERROR: Projects directory %s does not exist. \
 Create it or set PROJECT_HOME to an existing directory.' % projects_home)
 
-    project = os.path.abspath(os.path.join(projects_home, args.envname))
-    if os.path.exists(project):
+    project = (projects_home / args.envname).absolute()
+    if project.exists():
         sys.exit('Project %s already exists.' % args.envname)
 
-    mkvirtualenv(args.envname, args.python, args.packages, args.project,
+    mkvirtualenv(args.envname, args.python, args.packages, project.absolute(),
                         args.requirements, rest)
 
-    os.mkdir(project)
-
-    setvirtualenvproject(os.path.join(workon_home, args.envname), project)
+    project.mkdir()
 
     for template_name in args.templates:
-        template = os.path.join(workon_home, "template_" + template_name)
-        inve(args.envname, template, args.envname, project)
+        template = workon_home / ("template_" + template_name)
+        inve(args.envname, str(template), args.envname, str(project))
     if args.activate:
-        shell(args.envname, cwd=project)
+        shell(args.envname, cwd=str(project))
 
 
 def mktmpenv_cmd():
     """Create a temporary virtualenv."""
     parser = mkvirtualenv_argparser()
     env = '.'
-    while os.path.exists(os.path.join(workon_home, env)):
+    while (workon_home / env).exists():
         env = hex(random.getrandbits(64))[2:-1]
 
     args, rest = parser.parse_known_args()
 
-    mkvirtualenv(env, args.python, args.packages, args.project,
-                        args.requirements, rest)
+    mkvirtualenv(env, args.python, args.packages, requirements=args.requirements,
+                 rest=rest)
     print('This is a temporary environment. It will be deleted when you exit')
     try:
         shell(env)
@@ -449,8 +447,8 @@ def in_cmd():
         sys.exit('You must provide a valid virtualenv to target')
 
     env = sys.argv[1]
-    env_path = os.path.join(workon_home, env)
-    if not os.path.exists(env_path):
+    env_path = workon_home / env
+    if not env_path.exists():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
 'pew-new {0}'.".format(env))
 
@@ -464,14 +462,16 @@ def restore_cmd():
         sys.exit('You must provide a valid virtualenv to target')
 
     env = sys.argv[1]
-    py = os.path.join(workon_home, env, env_bin_dir, 'python')
-    exact_py = os.path.basename(os.path.realpath(py))
+    py = workon_home / env / env_bin_dir / 'python'
+    exact_py = py.resolve().name
 
-    check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=workon_home)
+    check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=str(workon_home))
+
 
 def version_cmd():
     """Prints current pew version"""
     print(__version__)
+
 
 def prevent_path_errors():
     if 'VIRTUAL_ENV' in os.environ and not check_path():
