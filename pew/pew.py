@@ -465,7 +465,7 @@ def restore_cmd():
 
     env = sys.argv[1]
     py = os.path.join(workon_home, env, env_bin_dir, 'python')
-    exact_py = os.path.basename(os.readlink(py))
+    exact_py = os.path.basename(os.path.realpath(py))
 
     check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=workon_home)
 
