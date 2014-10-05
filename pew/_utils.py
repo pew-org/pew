@@ -55,9 +55,9 @@ Result = namedtuple('Result', 'out err')
 
 def invoke(*args, **kwargs):
     encoding = locale.getlocale()[1]
-    inp = kwargs.get('inp', '').encode(encoding)
-    popen = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    return Result(*[o.decode(encoding) for o in popen.communicate(inp)])
+    inp = kwargs.pop('inp', '').encode(encoding)
+    popen = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE, **kwargs)
+    return Result(*[o.strip().decode(encoding) for o in popen.communicate(inp)])
 
 invoke_pew = partial(invoke, 'pew')
 
