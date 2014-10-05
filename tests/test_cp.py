@@ -1,0 +1,45 @@
+from subprocess import check_call
+from pathlib import Path
+
+from pew._utils import invoke_pew as invoke
+
+import pytest
+
+@pytest.yield_fixture()
+def copied_env(workon_home, env1):
+    invoke('cp', 'env1', 'destination', '-d')
+    yield workon_home / 'destination'
+    invoke('rm', 'destination')
+
+
+def test_new_env_activated(workon_home, testpackageenv):
+    invoke('cp', 'source', 'destination', '-d')
+    testscript = invoke('workon', 'destination', inp='which testscript.py').out.strip()
+    assert 'destination/bin/testscript.py' in testscript
+    with open(testscript) as f:
+        assert str(workon_home / 'destination') in f.read()
+    invoke('rm', 'destination')
+
+def test_virtualenv_variable(copied_env):
+    envname = invoke('workon', copied_env.name, inp='echo $VIRTUAL_ENV').out.strip()
+    assert str(copied_env) == envname
+
+@pytest.mark.xfail
+def test_source_relocatable(workon_home, testpackageenv):
+    check_call(['virtualenv', '--relocatable', str(workon_home / 'source')])
+    invoke('cp', 'source', 'destination', '-d')
+    testscript = invoke('workon', 'destination', inp='which testscript.py').out.strip()
+    assert 'destination/bin/testscript.py' in testscript
+    with open(testscript) as f:
+        assert str(workon_home / 'destination') in f.read()
+    invoke('rm', 'destination')
+
+def test_source_does_not_exists(workon_home):
+    err = invoke('cp', 'virtualenvthatdoesntexist', 'foo').err.strip()
+    assert 'Please provide a valid virtualenv to copy' == err
+    invoke('rm', 'destination')
+
+
+def test_no_global_site_packages(copied_env):
+    site = Path(invoke('workon', copied_env.name, inp='pew sitepackages_dir').out)
+    assert (site.parent / 'no-global-site-packages.txt').exists

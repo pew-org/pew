@@ -16,6 +16,8 @@ For the documentation, you might want to read here:
 https://github.com/berdario/pew#usage'''
 
 backports = ['argparse'] if sys.version_info[:2] == (2, 6) else []
+if sys.version_info[:2] < (3, 4):
+    backports += ['pathlib>=1.0.1']
 
 setup(
     name='pew',

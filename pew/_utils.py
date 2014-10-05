@@ -1,23 +1,10 @@
 import os
 import sys
 import locale
-import contextlib
-from subprocess import check_call, call
-
-try:
-    from subprocess import check_output
-except ImportError:
-    from subprocess import Popen, PIPE  # py2.6 compatibility
-
-    def check_output(cmd, *args, **kwargs):
-        popen = Popen(cmd, *args, stdout=PIPE, **kwargs)
-        output = popen.communicate()[0]
-        return_code = popen.poll()
-        if return_code:
-            raise Exception('Command %r failed with return code %r' % (
-                cmd, return_code))
-        return output
-
+from contextlib import contextmanager
+from subprocess import check_call, Popen, PIPE
+from collections import namedtuple
+from functools import partial
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -55,24 +42,26 @@ def resolve_path(f):
     if sys.platform != 'win32':
         return f
     else:
-        def call(cmd, *args):
+        def call(cmd, **kwargs):
             ex = cmd[0]
             ex = which(ex) or ex
-            return f([ex] + cmd[1:], *args)
+            return f([ex] + list(cmd[1:]), **kwargs)
         return call
 
-check_output = resolve_path(check_output)
 check_call = resolve_path(check_call)
-call = resolve_path(call)
+Popen = resolve_path(Popen)
 
+Result = namedtuple('Result', 'out err')
 
-def shell(*args):
-    return check_output(*args).decode(locale.getlocale()[1]).strip()
+def invoke(*args, **kwargs):
+    encoding = locale.getlocale()[1]
+    inp = kwargs.pop('inp', '').encode(encoding)
+    popen = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE, **kwargs)
+    return Result(*[o.strip().decode(encoding) for o in popen.communicate(inp)])
 
-env_bin_dir = 'bin'
-if sys.platform == 'win32':
-    env_bin_dir = 'Scripts'
+invoke_pew = partial(invoke, 'pew')
 
+env_bin_dir = 'bin' if sys.platform != 'win32' else 'Scripts'
 
 def expandpath(path):
     return os.path.normpath(os.path.expanduser(os.path.expandvars(path)))
@@ -88,11 +77,11 @@ def own(path):
     return os.stat(path).st_uid == os.getuid()
 
 
-@contextlib.contextmanager
-def chdir(dirname):
-    curdir = os.getcwd()
+@contextmanager
+def temp_environ():
+    environ = dict(os.environ)
     try:
-        os.chdir(dirname)
         yield
     finally:
-        os.chdir(curdir)
+        os.environ.clear()
+        os.environ.update(environ)

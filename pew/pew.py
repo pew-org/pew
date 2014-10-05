@@ -16,9 +16,10 @@ try:
 except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
-from pew._utils import (call, check_call, shell, chdir, expandpath, own,
-                        env_bin_dir, check_path)
+from pew._utils import (check_call, invoke, expandpath, own,
+                        env_bin_dir, check_path, which, temp_environ)
 
+windows = sys.platform == 'win32'
 
 def update_args_dict():
     global args
@@ -43,7 +44,6 @@ makedirs_and_symlink_if_needed(workon_home)
 
 
 inve_site = os.path.dirname(__file__)
-source_inve = os.path.join(inve_site, 'inve')
 
 
 def deploy_completions():
@@ -56,10 +56,6 @@ def deploy_completions():
         shutil.copy(os.path.join(inve_site, 'complete_scripts', comp), dest)
 
 
-def get_inve(env):
-    return os.path.join(workon_home, env, env_bin_dir, 'inve')
-
-
 def get_project_dir(env):
     project_dir = None
     project_file = os.path.join(workon_home, env, '.project')
@@ -70,28 +66,49 @@ def get_project_dir(env):
     return project_dir
 
 
-def invoke(inve, *args):
-    windows = sys.platform == 'win32'
-    if not args:
-        args = ['powershell' if windows else os.environ['SHELL']]
-        if not windows:
-            # On Windows the PATH is usually set with System Utility
-            # so we won't worry about trying to check mistakes there
-            shell_check = [sys.executable + ' -c "from pew.pew import '
-                           'prevent_path_errors; prevent_path_errors()"']
-            if call(['python', inve, args[0], '-c'] + shell_check) != 0:
-                return
-        or_ctrld = '' if windows else "or 'Ctrl+D' "
-        sys.stderr.write("Launching subshell in virtual environment. Type "
-                         "'exit' %sto return.\n" % or_ctrld)
+def inve(env, *args, **kwargs):
+    assert args
+    # we don't strictly need to restore the environment, since pew runs in
+    # its own process, but it feels like the right thing to do
+    with temp_environ():
+        envdir = os.path.join(workon_home, env)
+        os.environ['VIRTUAL_ENV'] = envdir
+        os.environ['PATH'] = os.pathsep.join([
+            os.path.join(envdir, env_bin_dir),
+            os.environ['PATH'],
+        ])
 
-    check_call(['python', inve] + list(args))
+        os.unsetenv('PYTHONHOME')
+        os.unsetenv('__PYVENV_LAUNCHER__')
+
+        try:
+            return check_call(args, shell=windows, **kwargs)
+            # need to have shell=True on windows, otherwise the PYTHONPATH
+            # won't inherit the PATH
+        except OSError as e:
+            if e.errno == 2:
+                sys.stderr.write("Unable to find %s\n" % args[0])
+            else:
+                raise
 
 
-def deploy_inve(target):
-    # temporary workaround: I plan to remove it when virtualenv's PR #247
-    # will be completed
-    shutil.copy(source_inve, target)
+def shell(env, cwd=None):
+    shell = 'powershell' if windows else os.environ['SHELL']
+    if not windows:
+        # On Windows the PATH is usually set with System Utility
+        # so we won't worry about trying to check mistakes there
+        py = which('python' + str(sys.version_info[0])) # external python
+        shell_check = (py + ' -c "from pew.pew import '
+                       'prevent_path_errors; prevent_path_errors()"')
+        try:
+            inve(env, shell, '-c', shell_check)
+        except CalledProcessError:
+            return
+    or_ctrld = '' if windows else "or 'Ctrl+D' "
+    sys.stderr.write("Launching subshell in virtual environment. Type "
+                     "'exit' %sto return.\n" % or_ctrld)
+
+    inve(env, shell, cwd=cwd)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
@@ -101,22 +118,17 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
         rest = ["--python=%s" % python] + rest
 
     try:
-        with chdir(workon_home):
-            check_call(["virtualenv", envname] + rest)
+        check_call(["virtualenv", envname] + rest, cwd=workon_home)
 
-            if project:
-                setvirtualenvproject(envname, project)
-
-        inve = get_inve(envname)
-        deploy_inve(inve)
+        if project:
+            setvirtualenvproject(envname, project)
 
         if requirements:
-            invoke(inve, 'pip', 'install', '--allow-all-external', '-r', expandpath(requirements))
+            inve(envname, 'pip', 'install', '--allow-all-external', '-r', expandpath(requirements))
 
         if packages:
-            invoke(inve, 'pip', 'install', '--allow-all-external', *packages)
+            inve(envname, 'pip', 'install', '--allow-all-external', *packages)
 
-        return inve
     except CalledProcessError:
         rmvirtualenvs([envname])
         raise
@@ -144,24 +156,23 @@ def new_cmd():
     parser.add_argument('envname')
     args, rest = parser.parse_known_args()
 
-    inve = mkvirtualenv(args.envname, args.python, args.packages, args.project,
-                        args.requirements, rest)
+    mkvirtualenv(args.envname, args.python, args.packages, args.project,
+                 args.requirements, rest)
     if args.activate:
-        invoke(inve)
+        shell(args.envname)
 
 
 def rmvirtualenvs(envs):
-    with chdir(workon_home):
-        for env in envs:
-            env = os.path.join(workon_home, env)
-            if os.environ.get('VIRTUAL_ENV') == env:
-                print("ERROR: You cannot remove the active environment \
+    for env in envs:
+        env = os.path.join(workon_home, env)
+        if os.environ.get('VIRTUAL_ENV') == env:
+            print("ERROR: You cannot remove the active environment \
 (%s)." % env, file=sys.stderr)
-                break
-            try:
-                shutil.rmtree(env)
-            except OSError as e:
-                print("Error while trying to remove the {0} env: \
+            break
+        try:
+            shutil.rmtree(env)
+        except OSError as e:
+            print("Error while trying to remove the {0} env: \
 \n{1}".format(env, e.strerror), file=sys.stderr)
 
 
@@ -186,11 +197,13 @@ def show_cmd():
             sys.exit('pew-show [env]')
 
 
-def lsvirtualenv(verbose):
-    envs = sorted(set(env.split(os.path.sep)[-3] for env in
+def lsenvs():
+    return sorted(set(env.split(os.path.sep)[-3] for env in
                       glob(os.path.join(workon_home, '*', env_bin_dir, 'python*'))))
-    for env in envs:
-        deploy_inve(get_inve(env))
+
+
+def lsvirtualenv(verbose):
+    envs = lsenvs()
 
     if not verbose:
         print(' '.join(envs))
@@ -226,18 +239,15 @@ def workon_cmd():
         # Check if the virtualenv has an associated project directory and in
         # this case, use it as the current working directory.
         project_dir = get_project_dir(env) or os.getcwd()
-        with chdir(project_dir):
-            inve = get_inve(env)
-            deploy_inve(inve)
-            invoke(inve)
+        shell(env, cwd=project_dir)
 
 
 def sitepackages_dir():
     if 'VIRTUAL_ENV' not in os.environ:
         sys.exit('ERROR: no virtualenv active')
     else:
-        return shell(['python', '-c', 'import distutils; \
-print(distutils.sysconfig.get_python_lib())'])
+        return invoke('python', '-c', 'import distutils; \
+print(distutils.sysconfig.get_python_lib())').out
 
 
 def add_cmd():
@@ -316,7 +326,6 @@ def cp_cmd():
                         activate the new environment).")
 
     args = parser.parse_args()
-    source_name = sys.argv[1]
     if os.path.exists(args.source):
         source = expandpath(args.source)
     else:
@@ -333,16 +342,14 @@ def cp_cmd():
 
     print('Copying {0} in {1}'.format(source, target_name))
     clone_virtualenv(source, target)
-    inve = get_inve(target_name)
-    deploy_inve(inve)
     if args.activate:
-        invoke(inve)
+        shell(target_name)
 
 
 def setvirtualenvproject(env, project):
     print('Setting project for {0} to {1}'.format(os.path.basename(env),
                                                   project))
-    with open(os.path.join(env, '.project'), 'w') as prj:
+    with open(os.path.join(workon_home, env, '.project'), 'w') as prj:
         prj.write(project)
 
 
@@ -383,19 +390,18 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
     if os.path.exists(project):
         sys.exit('Project %s already exists.' % args.envname)
 
-    inve = mkvirtualenv(args.envname, args.python, args.packages, args.project,
+    mkvirtualenv(args.envname, args.python, args.packages, args.project,
                         args.requirements, rest)
 
     os.mkdir(project)
 
     setvirtualenvproject(os.path.join(workon_home, args.envname), project)
 
-    with chdir(project):
-        for template_name in args.templates:
-            template = os.path.join(workon_home, "template_" + template_name)
-            invoke(inve, template, args.envname, project)
-        if args.activate:
-            invoke(inve)
+    for template_name in args.templates:
+        template = os.path.join(workon_home, "template_" + template_name)
+        inve(args.envname, template, args.envname, project)
+    if args.activate:
+        shell(args.envname, cwd=project)
 
 
 def mktmpenv_cmd():
@@ -407,18 +413,18 @@ def mktmpenv_cmd():
 
     args, rest = parser.parse_known_args()
 
-    inve = mkvirtualenv(env, args.python, args.packages, args.project,
+    mkvirtualenv(env, args.python, args.packages, args.project,
                         args.requirements, rest)
     print('This is a temporary environment. It will be deleted when you exit')
     try:
-        invoke(inve)
+        shell(env)
     finally:
         rmvirtualenvs([env])
 
 
 def wipeenv_cmd():
     """Remove all installed packages from the current env."""
-    pkgs = map(lambda d: d.split("==")[0], shell(['pip', 'freeze']).split())
+    pkgs = map(lambda d: d.split("==")[0], invoke('pip', 'freeze').out.split())
     to_remove = [pkg for pkg in pkgs if pkg not in ('distribute', 'wsgiref')]
     if to_remove:
         print("Uninstalling packages:\n%s" % "\n".join(to_remove))
@@ -429,10 +435,10 @@ def wipeenv_cmd():
 
 def inall_cmd():
     """Run a command in each virtualenv."""
-    inves = glob(os.path.join(workon_home, '*', env_bin_dir, 'inve'))
-    for inve in inves:
-        print("\n%s:" % inve.split(os.path.sep)[-3])
-        invoke(inve, *sys.argv[1:])
+    envs = lsenvs()
+    for env in envs:
+        print("\n%s:" % env)
+        inve(env, *sys.argv[1:])
 
 
 def in_cmd():
@@ -447,9 +453,7 @@ def in_cmd():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
 'pew-new {0}'.".format(env))
 
-    inve = get_inve(env)
-    deploy_inve(inve)
-    invoke(inve, *sys.argv[2:])
+    inve(env, *sys.argv[2:])
 
 def restore_cmd():
     """Try to restore a broken virtualenv by reinstalling the same python
