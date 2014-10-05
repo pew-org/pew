@@ -18,12 +18,12 @@ end
 
 function __pew_using_command
     set cmd (commandline -opc)
-	if test (count $cmd) -gt 1
-	    if test $argv[1] = $cmd[2]
-		    return 0
-		end
-	end
-	return 1
+    if test (count $cmd) -gt 1
+        if test $argv[1] = $cmd[2]
+            return 0
+        end
+    end
+    return 1
 end
 
 
@@ -93,3 +93,5 @@ complete -f -c $pew -n '__pew_using_command mkproject' -s l -l list -d 'List ava
 #### setproject
 complete -f -c $pew -n '__pew_needs_command' -a setproject -d 'Bind an existing virtualenv to an existing project'
 
+#### version
+complete -f -c $pew -n '__pew_needs_command' -a version -d 'Prints current version'

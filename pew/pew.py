@@ -16,6 +16,7 @@ try:
 except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
+from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own,
                         env_bin_dir, check_path, which, temp_environ)
 
@@ -468,6 +469,9 @@ def restore_cmd():
 
     check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=workon_home)
 
+def version_cmd():
+    """Prints current pew version"""
+    print(__version__)
 
 def prevent_path_errors():
     if 'VIRTUAL_ENV' in os.environ and not check_path():
