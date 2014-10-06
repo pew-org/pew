@@ -8,7 +8,6 @@ import argparse
 import shutil
 import random
 import textwrap
-from glob import glob
 from subprocess import CalledProcessError
 from pathlib import Path
 
@@ -23,6 +22,7 @@ from pew._utils import (check_call, invoke, expandpath, own,
 
 windows = sys.platform == 'win32'
 
+
 def update_args_dict():
     global args
     args = dict(enumerate(sys.argv))
@@ -35,12 +35,20 @@ workon_home = expandpath(
                                                '~/.local/share'),
                                 'virtualenvs')))
 
+
 def makedirs_and_symlink_if_needed(workon_home):
     if not workon_home.exists() and own(workon_home):
         workon_home.mkdir(parents=True)
+        link = expandpath('~/.virtualenvs')
         if os.name == 'posix' and 'WORKON_HOME' not in os.environ and \
-           'XDG_DATA_HOME' not in os.environ:
-            workon_home.symlink_to(str(expandpath('~/.virtualenvs')))
+           'XDG_DATA_HOME' not in os.environ and not link.exists():
+            try:
+                workon_home.symlink_to(str(link))
+            except OSError as e:
+                # FIXME on TravisCI, even if I check with `link.exists()`, this
+                # exception can be raised and needs to be catched, maybe it's a race condition?
+                if e.errno != 17:
+                    raise
 
 makedirs_and_symlink_if_needed(workon_home)
 
