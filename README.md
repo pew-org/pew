@@ -3,6 +3,7 @@ Pew - Python Env Wrapper
 
 [![PyPi version](https://pypip.in/v/pew/badge.png)](https://crate.io/packages/pew/)
 [![Build Status](https://travis-ci.org/berdario/pew.png)](https://travis-ci.org/berdario/pew)
+[![Build status](https://ci.appveyor.com/api/projects/status/xxe096txh1fuqfag/branch/master?svg=true)](https://ci.appveyor.com/project/berdario/pew/branch/master)
 
 **For new users coming from virtualenvwrapper and pre-0.1.6 users: after some users' suggestions, and after deeming not very useful to replicate 1to1 virtualenvwrapper's commands, now all the commands are subcommands of the pew command, or can used by prefixing "pew-"**
 
@@ -36,6 +37,10 @@ See the [troubleshooting](#troubleshooting) section, if needed.
 There are packages for some linux distributions:
 
 - Archlinux: [AUR package](https://aur.archlinux.org/packages/python-pew/)
+
+On Windows, you can install pew with [Chocolatey](http://chocolatey.org) by running the following in an elevated permission console:
+
+    choco python pew
 
 Usage
 -----
