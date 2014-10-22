@@ -1,3 +1,4 @@
+from os import unlink
 from subprocess import check_call, CalledProcessError
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -27,7 +28,8 @@ connection_required = pytest.mark.skipif(not are_we_connected(),
 
 def test_create(workon_home):
     envs = set(invoke('ls').out.split())
-    envs2 = set(invoke('new', 'env', inp='pew ls').out.split())
+    invoke('new', 'env', '-d')
+    envs2 = set(invoke('in', 'env', 'pew', 'ls').out.split())
     invoke('rm', 'env')
     assert envs < envs2
 
@@ -38,31 +40,34 @@ def test_no_args(workon_home):
 
 
 def test_gsp(workon_home):
-    site = invoke('new', 'env', '--system-site-packages', inp='pew sitepackages_dir').out
+    invoke('new', 'env', '--system-site-packages', '-d')
+    site = invoke('in', 'env', 'pew', 'sitepackages_dir').out
     assert not (Path(site).parent / 'no-global-site-packages.txt').exists()
     invoke('rm', 'env')
 
 
 def test_associate(workon_home):
-    project = '/dev/null'
-    invoke('new', 'env', '-a', project)
+    project = Path('/dev/null')
+    invoke('new', 'env', '-a', str(project), '-d')
     dotproject = workon_home / 'env' / '.project'
     assert dotproject.exists()
     with dotproject.open() as f:
-        assert f.read() == project
+        assert f.read() == str(project.absolute())
     invoke('rm', 'env')
 
 
 @connection_required
 def test_install_pkg(workon_home):
-    freeze = invoke('new', 'env', '-i', 'IPy', inp='pip freeze').out
+    invoke('new', 'env', '-i', 'IPy', '-d')
+    freeze = invoke('in', 'env', 'pip', 'freeze').out
     assert 'IPy' in freeze
     invoke('rm', 'env')
 
 
 @connection_required
 def test_install_2pkgs(workon_home):
-    freeze = invoke('new', 'env', '-i', 'IPy', '-i', 'WebTest', inp='pip freeze').out
+    invoke('new', 'env', '-i', 'IPy', '-i', 'WebTest', '-d')
+    freeze = invoke('in', 'env', 'pip', 'freeze').out
     assert 'IPy' in freeze
     assert 'WebTest' in freeze
     invoke('rm', 'env')
@@ -70,9 +75,11 @@ def test_install_2pkgs(workon_home):
 
 @connection_required
 def test_requirements_file(workon_home):
-    with NamedTemporaryFile() as temp:
+    with NamedTemporaryFile(delete=False) as temp:
         temp.write(b'IPy')
-        temp.flush()
-        freeze = invoke('new', 'env', '-r', temp.name, inp='pip freeze').out
+        temp.close()
+        invoke('new', 'env', '-r', temp.name, '-d')
+        freeze = invoke('in', 'env', 'pip', 'freeze').out
         assert 'IPy' in freeze
         invoke('rm', 'env')
+        unlink(temp.name)

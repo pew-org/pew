@@ -1,5 +1,6 @@
 import os
-from shutil import rmtree
+from shutil import rmtree, copy
+from tempfile import gettempdir
 from pathlib import Path
 
 import pytest
@@ -9,7 +10,7 @@ from pew._utils import invoke_pew as invoke
 
 @pytest.yield_fixture(scope='session')
 def workon_home():
-    tmpdir = os.environ.get('TMPDIR', '/tmp')
+    tmpdir = os.environ.get('TMPDIR', gettempdir())
     os.environ['WORKON_HOME'] = str(Path(tmpdir) / 'WORKON_HOME')
 
     workon = Path(os.environ['WORKON_HOME'])
@@ -36,7 +37,8 @@ def env2(workon_home):
 @pytest.yield_fixture()
 def testpackageenv(workon_home):
     testpackage = str(Path(__file__).parent / 'testpackage')
-    invoke('new', 'source', inp='python setup.py install', cwd=testpackage)
+    invoke('new', 'source', '-d')
+    invoke('in', 'source', 'python', 'setup.py', 'install', cwd=testpackage)
     yield
     invoke('rm', 'source')
 
@@ -45,7 +47,7 @@ def testpackageenv(workon_home):
 def testtemplate(workon_home):
     sourcetemplate = Path(__file__).parent / 'template_test'
     testtemplatefile = workon_home / 'template_test'
-    testtemplatefile.symlink_to(sourcetemplate)
+    copy(str(sourcetemplate), str(testtemplatefile))
     testtemplatefile.chmod(0o700)
     yield testtemplatefile
     testtemplatefile.unlink()

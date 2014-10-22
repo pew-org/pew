@@ -1,7 +1,9 @@
 import os
+import sys
 from subprocess import check_call, CalledProcessError
 from pathlib import Path
 from shutil import rmtree
+from tempfile import gettempdir
 
 import pytest
 
@@ -10,7 +12,7 @@ from pew._utils import temp_environ, invoke_pew as invoke
 
 @pytest.yield_fixture(scope='session')
 def project_home():
-    tmpdir = os.environ.get('TMPDIR', '/tmp')
+    tmpdir = os.environ.get('TMPDIR', gettempdir())
     project = Path(tmpdir) / 'PROJECT_HOME'
     os.environ['PROJECT_HOME'] = str(project)
 
@@ -23,7 +25,7 @@ def project_home():
 @pytest.yield_fixture()
 def project(workon_home, project_home):
     projname = 'project1'
-    invoke('mkproject', projname)
+    invoke('mkproject', projname, '-d')
     yield projname
     invoke('rm', projname)
     rmtree(str(project_home / projname))
@@ -33,12 +35,14 @@ def test_create_directories(workon_home, project_home, project):
     assert (workon_home / project).exists()
     assert (project_home / project).exists()
 
+check_env = [sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"]
+
 
 def test_create_virtualenv(project_home, project):
-    env = Path(invoke('workon', project, inp='echo $VIRTUAL_ENV').out)
+    env = Path(invoke('in', project, *check_env).out)
     assert project == env.name
     with (env / '.project').open() as f:
-        assert str(project_home / project) == f.read().strip()
+        assert str(project_home.absolute() / project) == f.read().strip()
 
 
 def test_no_project_home(project_home):
@@ -67,10 +71,10 @@ def test_same_workon_and_project_home(workon_home, project_home):
 def test_list_templates(testtemplate):
     assert 'test' in invoke('mkproject', '-l').out
 
-
+@pytest.mark.skipif(sys.platform == 'win32', reason='cannot scripts written in an arbitrary language on windows by relying on the shebang')
 def test_apply_template(project_home, testtemplate):
     projname = 'project1'
-    invoke('mkproject', '-t', 'test', projname)
+    r = invoke('mkproject', '-t', 'test', projname, '-d')
     testfile = project_home / projname / 'TEST_FILE'
     assert testfile.exists()
     with testfile.open() as f:

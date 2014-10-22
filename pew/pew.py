@@ -76,6 +76,10 @@ def get_project_dir(env):
     return project_dir
 
 
+def unsetenv(key):
+    if key in os.environ:
+        del os.environ[key]
+
 def inve(env, *args, **kwargs):
     assert args
     # we don't strictly need to restore the environment, since pew runs in
@@ -88,8 +92,8 @@ def inve(env, *args, **kwargs):
             os.environ['PATH'],
         ])
 
-        os.unsetenv('PYTHONHOME')
-        os.unsetenv('__PYVENV_LAUNCHER__')
+        unsetenv('PYTHONHOME')
+        unsetenv('__PYVENV_LAUNCHER__')
 
         try:
             return check_call(args, shell=windows, **kwargs)
@@ -424,7 +428,9 @@ def mktmpenv_cmd():
                  rest=rest)
     print('This is a temporary environment. It will be deleted when you exit')
     try:
-        shell(env)
+        if args.activate:
+            # only used for testing on windows
+            shell(env)
     finally:
         rmvirtualenvs([env])
 
@@ -470,7 +476,7 @@ def restore_cmd():
         sys.exit('You must provide a valid virtualenv to target')
 
     env = sys.argv[1]
-    py = workon_home / env / env_bin_dir / 'python'
+    py = workon_home / env / env_bin_dir / 'python.exe' if windows else 'python'
     exact_py = py.resolve().name
 
     check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=str(workon_home))

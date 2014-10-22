@@ -1,3 +1,4 @@
+from sys import platform
 from subprocess import check_call
 from pathlib import Path
 
@@ -5,6 +6,9 @@ from pew._utils import invoke_pew as invoke
 
 import pytest
 
+which_cmd = 'where' if platform == 'win32' else 'which'
+
+pytestmark = pytest.mark.skipif(platform == 'win32', reason='temporarily disable tests, due to issues with the virtualenv-clone executable, maybe this bug? http://bugs.python.org/issue20614')
 
 @pytest.yield_fixture()
 def copied_env(workon_home, env1):
@@ -15,9 +19,9 @@ def copied_env(workon_home, env1):
 
 def test_new_env_activated(workon_home, testpackageenv):
     invoke('cp', 'source', 'destination', '-d')
-    testscript = invoke('workon', 'destination', inp='which testscript.py').out.strip()
-    assert 'destination/bin/testscript.py' in testscript
-    with open(testscript) as f:
+    testscript = Path(invoke('in', 'destination', which_cmd, 'testscript.py').out.strip())
+    assert ('destination', 'testscript.py') == (testscript.parts[-3], testscript.parts[-1])
+    with testscript.open() as f:
         assert str(workon_home / 'destination') in f.read()
     invoke('rm', 'destination')
 
