@@ -54,7 +54,8 @@ Popen = resolve_path(Popen)
 
 Result = namedtuple('Result', 'out err')
 
-
+# TODO: it's better to fail early, and thus I'd need to check the exit code, but it'll
+# need a refactoring of a couple of tests
 def invoke(*args, **kwargs):
     encoding = locale.getlocale()[1]
     inp = kwargs.pop('inp', '').encode(encoding)

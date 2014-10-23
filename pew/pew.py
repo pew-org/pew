@@ -476,7 +476,7 @@ def restore_cmd():
         sys.exit('You must provide a valid virtualenv to target')
 
     env = sys.argv[1]
-    py = workon_home / env / env_bin_dir / 'python.exe' if windows else 'python'
+    py = workon_home / env / env_bin_dir / ('python.exe' if windows else 'python')
     exact_py = py.resolve().name
 
     check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=str(workon_home))
