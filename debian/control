@@ -2,14 +2,14 @@ Source: pew
 Maintainer: Dario Bertini <berdario+pypi@gmail.com>
 Section: python
 Priority: optional
-Build-Depends: python-setuptools (>= 0.6b3), python3, debhelper (>= 7.4.3), dh-python
+Build-Depends: python3-setuptools (>= 0.6b3), python3 (>= 3.4), debhelper (>= 7.4.3), dh-python
 Standards-Version: 3.9.1
 
 
 
-Package: pew
+Package: python3-pew
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}
+Depends: ${misc:Depends}, ${python3:Depends}
 Description: tools to manage multiple virtualenvs written in pure python,
  Python Env Wrapper is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
  .
