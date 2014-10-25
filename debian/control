@@ -7,7 +7,7 @@ Standards-Version: 3.9.1
 
 
 
-Package: python3-pew
+Package: pew
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}
 Description: tools to manage multiple virtualenvs written in pure python,
