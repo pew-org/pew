@@ -1,9 +1,10 @@
 Pew - Python Env Wrapper
 ========================
 
-[![PyPi version](https://pypip.in/v/pew/badge.png)](https://crate.io/packages/pew/)
+[![PyPi version](http://img.shields.io/pypi/v/pew.svg)](https://pypi.python.org/pypi/pew)
 [![Build Status](https://travis-ci.org/berdario/pew.png)](https://travis-ci.org/berdario/pew)
 [![Build status](https://ci.appveyor.com/api/projects/status/xxe096txh1fuqfag/branch/master?svg=true)](https://ci.appveyor.com/project/berdario/pew/branch/master)
+[![Wheel Status](https://pypip.in/wheel/pew/badge.svg)](https://pypi.python.org/pypi/pew/)
 
 **For new users coming from virtualenvwrapper and pre-0.1.6 users: after some users' suggestions, and after deeming not very useful to replicate 1to1 virtualenvwrapper's commands, now all the commands are subcommands of the pew command, or can used by prefixing "pew-"**
 
@@ -34,9 +35,17 @@ Installation
 
 See the [troubleshooting](#troubleshooting) section, if needed.
 
-There are packages for some linux distributions:
+There's a Nix package available, you can install it on [Nixos](http://nixos.org/) or on [most Unix-like OSes](http://nixos.org/nix/download.html):
 
-- Archlinux: [AUR package](https://aur.archlinux.org/packages/python-pew/)
+    nix-env -i python3.4-pew
+
+For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
+
+For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubuntu/ppa/)
+
+    sudo add-apt-repository ppa:pew-maintainers/ppa
+    sudo apt-get update
+    sudo apt-get install pew
 
 On Windows, you can install pew with [Chocolatey](http://chocolatey.org) by running the following in an elevated permission console:
 
