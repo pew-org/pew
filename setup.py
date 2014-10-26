@@ -15,14 +15,11 @@ It works on bash, zsh, fish, powershell, etc.
 For the documentation, you might want to read here:
 https://github.com/berdario/pew#usage'''
 
-backports = ['argparse'] if sys.version_info[:2] == (2, 6) else []
-if sys.version_info[:2] < (3, 4):
-    backports += ['pathlib>=1.0.1']
 
 setup(
     name='pew',
     version='0.1.13',
-    description='tools to manage multiple virtualenvs written in pure python, '
+    description='tool to manage multiple virtualenvs written in pure python, '
     'a virtualenvwrapper rewrite',
     long_description=long_desc,
     author='Dario Bertini',
@@ -30,7 +27,13 @@ setup(
     url='https://github.com/berdario/pew',
     license='MIT License',
     packages=['pew'],
-    install_requires=['virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=0.7'] + backports,
+    install_requires=['virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=0.8'],
+    extras_require={
+        ':python_version=="2.6"': ['argparse', 'pathlib'],
+        ':python_version=="2.7"': ['pathlib'],
+        ':python_version=="3.2"': ['pathlib'],
+        ':python_version=="3.3"': ['pathlib'],
+    },
     include_package_data=True,
     zip_safe=False,
     entry_points={
