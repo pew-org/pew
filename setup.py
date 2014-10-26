@@ -21,7 +21,7 @@ if sys.version_info[:2] < (3, 4):
 
 setup(
     name='pew',
-    version='0.1.12',
+    version='0.1.13',
     description='tools to manage multiple virtualenvs written in pure python, '
     'a virtualenvwrapper rewrite',
     long_description=long_desc,
