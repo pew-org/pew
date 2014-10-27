@@ -18,7 +18,7 @@ https://github.com/berdario/pew#usage'''
 
 setup(
     name='pew',
-    version='0.1.13',
+    version='0.1.14',
     description='tool to manage multiple virtualenvs written in pure python, '
     'a virtualenvwrapper rewrite',
     long_description=long_desc,

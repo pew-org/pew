@@ -18,7 +18,7 @@ except ImportError:
 
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own,
-                        env_bin_dir, check_path, which, temp_environ)
+                        env_bin_dir, check_path, temp_environ)
 
 windows = sys.platform == 'win32'
 
@@ -112,8 +112,7 @@ def shell(env, cwd=None):
     if not windows:
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
-        py = which('python' + str(sys.version_info[0])) # external python
-        shell_check = (py + ' -c "from pew.pew import '
+        shell_check = (sys.executable + ' -c "from pew.pew import '
                        'prevent_path_errors; prevent_path_errors()"')
         try:
             inve(str(env), shell, '-c', shell_check)
