@@ -19,6 +19,7 @@ except ImportError:
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own,
                         env_bin_dir, check_path, temp_environ)
+from pew._print_utils import print_virtualenvs
 
 windows = sys.platform == 'win32'
 
@@ -222,7 +223,7 @@ def lsvirtualenv(verbose):
     envs = lsenvs()
 
     if not verbose:
-        print(*envs, sep=' ')
+        print_virtualenvs(*envs)
     else:
         for env in envs:
             showvirtualenv(env)
