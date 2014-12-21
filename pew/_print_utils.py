@@ -1,5 +1,8 @@
 import os
-import shutil
+try:
+    from shutil import get_terminal_size
+except ImportError:
+    from backports.shutil_get_terminal_size import get_terminal_size
 
 
 def get_rows(venvs, columns_number):
@@ -11,7 +14,7 @@ def get_rows(venvs, columns_number):
 
 
 def get_best_columns_number(venvs):
-    max_width, _ = shutil.get_terminal_size()
+    max_width, _ = get_terminal_size()
     for columns_number in range(1, len(venvs) + 1):
         for row in get_rows(venvs, columns_number):
             row_length = sum(get_columns_size(venvs, columns_number))

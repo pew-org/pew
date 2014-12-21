@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 from setuptools import setup
-import sys
 import pew
 
 long_desc = '''Python Env Wrapper is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
@@ -27,11 +26,19 @@ setup(
     url='https://github.com/berdario/pew',
     license='MIT License',
     packages=['pew'],
-    install_requires=['virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=0.8'],
+    install_requires=[
+        'virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=0.8'
+    ],
     extras_require={
-        ':python_version=="2.6"': ['argparse', 'pathlib'],
-        ':python_version=="2.7"': ['pathlib'],
-        ':python_version=="3.2"': ['pathlib'],
+        ':python_version=="2.6"': [
+            'argparse', 'pathlib', 'backports.shutil_get_terminal_size'
+        ],
+        ':python_version=="2.7"': [
+            'pathlib', 'backports.shutil_get_terminal_size'
+        ],
+        ':python_version=="3.2"': [
+            'pathlib', 'backports.shutil_get_terminal_size'
+        ],
         ':python_version=="3.3"': ['pathlib'],
     },
     include_package_data=True,
