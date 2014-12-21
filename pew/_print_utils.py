@@ -43,9 +43,10 @@ def print_columns(venvs):
     columns_size = get_columns_size(venvs, columns_number)
     for row in get_rows(venvs, columns_number):
         row_format = '  '.join(
-            '{:<' + str(size) + '}' for size in columns_size[:len(row) - 1]
+            '{{{0:d}:<{1:d}}}'.format(index, size)
+            for index, size in enumerate(columns_size[:len(row) - 1])
         )
-        row_format += "  {}"
+        row_format += "  {{{0:d}}}".format(len(row) - 1)
         print(row_format.format(*row))
 
 

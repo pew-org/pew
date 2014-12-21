@@ -2,4 +2,4 @@ language: python
 python:
   - "3.4"
 install: pip install tox
-script: tox -e py26,py34,pypy3
+script: tox -e py26,py27,py33,py34,pypy,pypy3
