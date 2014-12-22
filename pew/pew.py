@@ -488,6 +488,9 @@ def in_cmd():
     if len(sys.argv) < 2:
         sys.exit('You must provide a valid virtualenv to target')
 
+    if len(sys.argv) == 2:
+        return workon_cmd()
+
     env = sys.argv[1]
     env_path = workon_home / env
     if not env_path.exists():
