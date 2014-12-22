@@ -1,5 +1,14 @@
 language: python
 python:
-  - "3.4"
+  - 3.4
+env:
+  matrix:
+    - TOXENV="py26"
+    - TOXENV="py27"
+    - TOXENV="py33"
+    - TOXENV="py34"
+    - TOXENV="pypy"
+    - TOXENV="pypy3"
+
 install: pip install tox
-script: tox -e py26,py27,py33,py34,pypy,pypy3
+script: tox -e $TOXENV
