@@ -4,9 +4,11 @@ import os
 from math import ceil
 try:
     from itertools import zip_longest
-    from shutil import get_terminal_size
 except ImportError:
     from itertools import izip_longest as zip_longest
+try:
+    from shutil import get_terminal_size
+except ImportError:
     from backports.shutil_get_terminal_size import get_terminal_size
 
 SEP = '  '
