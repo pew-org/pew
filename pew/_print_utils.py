@@ -1,62 +1,52 @@
+from __future__ import division, print_function
+
 import os
+from math import ceil
 try:
+    from itertools import zip_longest
     from shutil import get_terminal_size
 except ImportError:
+    from itertools import izip_longest as zip_longest
     from backports.shutil_get_terminal_size import get_terminal_size
+
+SEP = '  '
+L = len(SEP)
 
 
 def get_rows(venvs, columns_number):
-    lines_number = len(venvs) // columns_number
-    if len(venvs) % columns_number:
-        lines_number += 1
+    lines_number = int(ceil(len(venvs) / columns_number))
     for i in range(lines_number):
         yield venvs[i::lines_number]
+
+
+def row_len(names):
+    return sum(map(len, names)) + L*len(names) - L
 
 
 def get_best_columns_number(venvs):
     max_width, _ = get_terminal_size()
     for columns_number in range(1, len(venvs) + 1):
-        for row in get_rows(venvs, columns_number):
-            row_length = sum(get_columns_size(venvs, columns_number))
-            row_length += 2 * len(row) - 2
-            if row_length > max_width:
-                return (columns_number - 1) or 1
-    return columns_number
+        rows = get_rows(venvs, columns_number)
+        if max(map(row_len, rows)) > max_width:
+            return (columns_number - 1) or 1
+    else:
+        return columns_number
 
 
-def get_columns_size(venvs, columns_number):
-    columns_size = []
-    for row in get_rows(venvs, columns_number):
-        if not columns_size:
-            columns_size = [0] * len(row)
-        for i in range(len(row)):
-            columns_size[i] = max(len(row[i]), columns_size[i])
-    return columns_size
+def align_column(column):
+    m = max(map(len, column))
+    return [name.ljust(m) for name in column]
 
 
-def print_columns(venvs):
-    venvs = sorted(venvs)
-    columns_number = get_best_columns_number(venvs)
-    if columns_number == 1:
-        print_one_per_line(venvs)
-        return
-    columns_size = get_columns_size(venvs, columns_number)
-    for row in get_rows(venvs, columns_number):
-        row_format = '  '.join(
-            '{{{0:d}:<{1:d}}}'.format(index, size)
-            for index, size in enumerate(columns_size[:len(row) - 1])
-        )
-        row_format += "  {{{0:d}}}".format(len(row) - 1)
-        print(row_format.format(*row))
-
-
-def print_one_per_line(venvs):
-    for venv in sorted(venvs):
-        print(venv)
+def columnize(venvs):
+    columns_n = get_best_columns_number(venvs)
+    columns = map(align_column, zip_longest(*get_rows(venvs, columns_n), fillvalue=''))
+    return map(SEP.join, zip(*columns))
 
 
 def print_virtualenvs(*venvs):
+    venvs = sorted(venvs)
     if os.isatty(1):
-        print_columns(venvs)
+        print(*columnize(venvs), sep='\n')
     else:
-        print_one_per_line(venvs)
+        print(*venvs, sep=' ')

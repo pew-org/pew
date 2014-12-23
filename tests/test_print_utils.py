@@ -1,9 +1,7 @@
 from pew._print_utils import (
     get_rows,
-    get_columns_size,
     get_best_columns_number,
-    print_columns,
-    print_one_per_line,
+    columnize,
 )
 try:
     from unittest.mock import patch
@@ -23,16 +21,6 @@ def test_get_rows_even():
     assert len(rows) == 2
     assert rows[0] == ['a', 'c']
     assert rows[1] == ['b']
-
-
-def test_get_columns_size():
-    sizes = get_columns_size(['aa', 'b', 'c'], 2)
-    assert sizes == [2, 1]
-
-
-def test_get_columns_size_2():
-    sizes = get_columns_size(['a', 'b', 'ccc', 'dddd'], 2)
-    assert sizes == [1, 4]
 
 
 @patch('pew._print_utils.get_terminal_size', return_value=(8, 1))
@@ -59,21 +47,13 @@ def test_get_best_columns_number_4(mock):
     assert number == 1
 
 
-def test_print_one_per_line(capsys):
-    print_one_per_line(['a', 'b', 'ccc', 'dddd'])
-    out, err = capsys.readouterr()
-    assert out == "a\nb\nccc\ndddd\n"
-
-
 @patch('pew._print_utils.get_terminal_size', return_value=(8, 1))
 def test_print_columns(mock, capsys):
-    print_columns(['a', 'b', 'ccc', 'dddd'])
-    out, err = capsys.readouterr()
-    assert out == "a  ccc\nb  dddd\n"
+    columns = columnize(['a', 'b', 'ccc', 'dddd'])
+    assert '\n'.join(columns) == "a  ccc \nb  dddd"
 
 
 @patch('pew._print_utils.get_terminal_size', return_value=(2, 1))
 def test_print_columns_2(mock, capsys):
-    print_columns(['a', 'b', 'ccc', 'dddd'])
-    out, err = capsys.readouterr()
-    assert out == "a\nb\nccc\ndddd\n"
+    columns = columnize(['a', 'b', 'ccc', 'dddd'])
+    assert '\n'.join(columns) == "a   \nb   \nccc \ndddd"
