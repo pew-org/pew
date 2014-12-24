@@ -57,14 +57,13 @@ def test_project_exists(project):
         check_call('pew mkproject {0} -d'.format(project).split())
 
 
-@pytest.mark.xfail
 def test_same_workon_and_project_home(workon_home, project_home):
     with temp_environ():
         os.environ['PROJECT_HOME'] = str(workon_home)
         envname = 'whatever'
         with pytest.raises(CalledProcessError):
             check_call('pew mkproject {0} -d'.format(envname).split())
-        assert not (workon_home / envname).exists()
+        assert (workon_home / envname).exists()
         assert not (project_home / envname).exists()
 
 

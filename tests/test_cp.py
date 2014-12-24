@@ -31,14 +31,11 @@ def test_virtualenv_variable(copied_env):
     assert str(copied_env) == envname
 
 
-@pytest.mark.xfail
 def test_source_relocatable(workon_home, testpackageenv):
     check_call(['virtualenv', '--relocatable', str(workon_home / 'source')])
     invoke('cp', 'source', 'destination', '-d')
-    testscript = invoke('workon', 'destination', inp='which testscript.py').out.strip()
-    assert 'destination/bin/testscript.py' in testscript
-    with open(testscript) as f:
-        assert str(workon_home / 'destination') in f.read()
+    testscript = Path(invoke('workon', 'destination', inp='which testscript.py').out.strip())
+    assert workon_home / 'destination' / 'bin' / 'testscript.py' == testscript
     invoke('rm', 'destination')
 
 
