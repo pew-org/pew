@@ -12,6 +12,11 @@ from subprocess import CalledProcessError
 from pathlib import Path
 
 try:
+    from shutil import get_terminal_size
+except ImportError:
+    from backports.shutil_get_terminal_size import get_terminal_size
+
+try:
     from clonevirtualenv import clone_virtualenv
 except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
@@ -514,7 +519,7 @@ def pew():
                   file=sys.stderr)
 
     longest = max(map(len, cmds)) + 3
-    columns = getattr(shutil, 'get_terminal_size', lambda: (80, 24))()[0]
+    columns, _ = get_terminal_size()
 
     print('Available commands:\n')
     for cmd, fun in cmds.items():
