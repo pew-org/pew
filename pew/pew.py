@@ -113,6 +113,18 @@ def inve(env, *args, **kwargs):
                 raise
 
 
+def check_PS1():
+    if sys.platform.startswith('linux'):
+        PS1 = os.environ.get('PS1', '')
+        with (Path('/proc') / str(os.getppid()) / 'comm').open() as cmdname:
+            if cmdname.read().strip() in ('bash', 'zsh') and \
+                '$VIRTUAL_ENV' not in PS1:
+                print("May I suggest you to tweak your $PS1? It'll help you to "
+                      "keep track of your currently active virtualenv: "
+                      "https://github.com/berdario/pew#workon-opens-a-new-shell-prompt",
+                      file=sys.stderr)
+
+
 def shell(env, cwd=None):
     shell = 'powershell' if windows else os.environ['SHELL']
     if not windows:
@@ -124,6 +136,7 @@ def shell(env, cwd=None):
             inve(str(env), shell, '-c', shell_check)
         except CalledProcessError:
             return
+        check_PS1()
     or_ctrld = '' if windows else "or 'Ctrl+D' "
     sys.stderr.write("Launching subshell in virtual environment. Type "
                      "'exit' %sto return.\n" % or_ctrld)
