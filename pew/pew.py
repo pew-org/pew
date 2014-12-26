@@ -86,7 +86,13 @@ def unsetenv(key):
     if key in os.environ:
         del os.environ[key]
 
-def inve(env, command, *args, **kwargs):
+def inve(env, command=None, *args, **kwargs):
+    if not command:
+        command = 'powershell' if windows else os.environ['SHELL']
+        or_ctrld = '' if windows else "or 'Ctrl+D' "
+        sys.stderr.write("Launching subshell in virtual environment. Type "
+                         "'exit' %sto return.\n" % or_ctrld)
+
     # we don't strictly need to restore the environment, since pew runs in
     # its own process, but it feels like the right thing to do
     with temp_environ():
@@ -113,8 +119,8 @@ def inve(env, command, *args, **kwargs):
 
 
 def shell(env, cwd=None):
-    shell = 'powershell' if windows else os.environ['SHELL']
     if not windows:
+        shell = 'powershell' if windows else os.environ['SHELL']
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
         shell_check = (sys.executable + ' -c "from pew.pew import '
@@ -123,11 +129,8 @@ def shell(env, cwd=None):
             inve(str(env), shell, '-c', shell_check)
         except CalledProcessError:
             return
-    or_ctrld = '' if windows else "or 'Ctrl+D' "
-    sys.stderr.write("Launching subshell in virtual environment. Type "
-                     "'exit' %sto return.\n" % or_ctrld)
 
-    inve(str(env), shell, cwd=cwd)
+    inve(str(env), cwd=cwd)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
