@@ -22,7 +22,7 @@ def resolve_path(f):
     def call(cmd, **kwargs):
         ex = cmd[0]
         ex = which(ex) or ex
-        return f([ex] + list(cmd[1:]), **kwargs)  # list-conversion is required in case `cmd` is a tuple
+        return f([ex] + cmd[1:], **kwargs)
     return call
 
 if sys.platform == 'win32':
