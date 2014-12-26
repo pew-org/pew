@@ -86,8 +86,7 @@ def unsetenv(key):
     if key in os.environ:
         del os.environ[key]
 
-def inve(env, *args, **kwargs):
-    assert args
+def inve(env, command, *args, **kwargs):
     # we don't strictly need to restore the environment, since pew runs in
     # its own process, but it feels like the right thing to do
     with temp_environ():
@@ -102,13 +101,13 @@ def inve(env, *args, **kwargs):
         unsetenv('__PYVENV_LAUNCHER__')
 
         try:
-            return check_call(args, shell=windows, **kwargs)
+            return check_call([command] + list(args), shell=windows, **kwargs)
             # need to have shell=True on windows, otherwise the PYTHONPATH
             # won't inherit the PATH
         except OSError as e:
             if e.errno == 2:
                 print(kwargs)
-                sys.stderr.write("Unable to find %s\n" % args[0])
+                sys.stderr.write("Unable to find %s\n" % command)
             else:
                 raise
 
