@@ -118,7 +118,7 @@ def inve(env, command=None, *args, **kwargs):
                 raise
 
 
-def shell(env, cwd=None):
+def shell(env, **kwargs):
     if not windows:
         shell = 'powershell' if windows else os.environ['SHELL']
         # On Windows the PATH is usually set with System Utility
@@ -130,7 +130,7 @@ def shell(env, cwd=None):
         except CalledProcessError:
             return
 
-    inve(str(env), cwd=cwd)
+    inve(str(env), **kwargs)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
