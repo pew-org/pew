@@ -93,6 +93,17 @@ def inve(env, command=None, *args, **kwargs):
         sys.stderr.write("Launching subshell in virtual environment. Type "
                          "'exit' %sto return.\n" % or_ctrld)
 
+    if kwargs.pop('guard', False) and not windows:
+        # On Windows the PATH is usually set with System Utility
+        # so we won't worry about trying to check mistakes there
+        shell = 'powershell' if windows else os.environ['SHELL']
+        shell_check = (sys.executable + ' -c "from pew.pew import '
+                       'prevent_path_errors; prevent_path_errors()"')
+        try:
+            inve(str(env), shell, '-c', shell_check)
+        except CalledProcessError:
+            return
+
     # we don't strictly need to restore the environment, since pew runs in
     # its own process, but it feels like the right thing to do
     with temp_environ():
@@ -119,18 +130,7 @@ def inve(env, command=None, *args, **kwargs):
 
 
 def shell(env, **kwargs):
-    if not windows:
-        shell = 'powershell' if windows else os.environ['SHELL']
-        # On Windows the PATH is usually set with System Utility
-        # so we won't worry about trying to check mistakes there
-        shell_check = (sys.executable + ' -c "from pew.pew import '
-                       'prevent_path_errors; prevent_path_errors()"')
-        try:
-            inve(str(env), shell, '-c', shell_check)
-        except CalledProcessError:
-            return
-
-    inve(str(env), **kwargs)
+    inve(str(env), guard=True, **kwargs)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
