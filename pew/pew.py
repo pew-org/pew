@@ -139,10 +139,6 @@ def inve(env, command=None, *args, **kwargs):
                 raise
 
 
-def shell(env, **kwargs):
-    inve(str(env), guard=True, **kwargs)
-
-
 def mkvirtualenv(envname, python=None, packages=[], project=None,
                  requirements=None, rest=[]):
 
@@ -193,7 +189,7 @@ project directory to associate with the new environment.')
     mkvirtualenv(args.envname, args.python, args.packages, project,
                  args.requirements, rest)
     if args.activate:
-        shell(args.envname)
+        inve(args.envname, guard=True)
 
 
 def rmvirtualenvs(envs):
@@ -273,7 +269,7 @@ def workon_cmd():
         # Check if the virtualenv has an associated project directory and in
         # this case, use it as the current working directory.
         project_dir = get_project_dir(env) or os.getcwd()
-        shell(env, cwd=project_dir)
+        inve(env, guard=True, cwd=project_dir)
 
 
 def sitepackages_dir():
@@ -375,7 +371,7 @@ def cp_cmd():
     print('Copying {0} in {1}'.format(source, target_name))
     clone_virtualenv(str(source), str(target))
     if args.activate:
-        shell(target_name)
+        inve(target_name, guard=True)
 
 
 def setvirtualenvproject(env, project):
@@ -429,7 +425,7 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
         template = workon_home / ("template_" + template_name)
         inve(args.envname, str(template), args.envname, str(project))
     if args.activate:
-        shell(args.envname, cwd=str(project))
+        inve(args.envname, guard=True, cwd=str(project))
 
 
 def mktmpenv_cmd():
@@ -447,7 +443,7 @@ def mktmpenv_cmd():
     try:
         if args.activate:
             # only used for testing on windows
-            shell(env)
+            inve(env, guard=True)
     finally:
         rmvirtualenvs([env])
 
