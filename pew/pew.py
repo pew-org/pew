@@ -87,6 +87,17 @@ def unsetenv(key):
         del os.environ[key]
 
 def inve(env, command=None, *args, **kwargs):
+    """Run a command in the given virtual environment.
+
+    If no command is given, then default to opening a new sub-shell.
+    Which shell will be opened is platform-dependant.
+
+    When the ``guard`` keyword argument is ``True``, run a check to see
+    if the path is set up correctly.
+
+    Pass additional keyword arguments to ``subprocess.check_call()``.
+    """
+
     if not command:
         command = 'powershell' if windows else os.environ['SHELL']
         or_ctrld = '' if windows else "or 'Ctrl+D' "
