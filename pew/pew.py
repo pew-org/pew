@@ -107,10 +107,9 @@ def inve(env, command=None, *args, **kwargs):
     if kwargs.pop('guard', False) and not windows:
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
-        shell_check = (sys.executable + ' -c "from pew.pew import '
-                       'prevent_path_errors; prevent_path_errors()"')
+        check = '{0} -c "import pew.pew; pew.pew.prevent_path_errors()"'
         try:
-            inve(str(env), os.environ['SHELL'], '-c', shell_check)
+            inve(env, os.environ['SHELL'], '-c', check.format(sys.executable))
         except CalledProcessError:
             return
 
