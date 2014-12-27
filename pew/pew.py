@@ -97,6 +97,9 @@ def compute_path(env):
 
 
 def inve(env, command, *args, **kwargs):
+    """Run a command in the given virtual environment.
+
+    Pass additional keyword arguments to ``subprocess.check_call()``."""
     # we don't strictly need to restore the environment, since pew runs in
     # its own process, but it feels like the right thing to do
     with temp_environ():
