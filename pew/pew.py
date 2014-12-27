@@ -134,7 +134,6 @@ def inve(env, command=None, *args, **kwargs):
             # won't inherit the PATH
         except OSError as e:
             if e.errno == 2:
-                print(kwargs)
                 sys.stderr.write("Unable to find %s\n" % command)
             else:
                 raise
