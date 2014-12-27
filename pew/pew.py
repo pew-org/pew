@@ -100,9 +100,7 @@ def inve(env, command=None, *args, **kwargs):
 
     if not command:
         command = 'powershell' if windows else os.environ['SHELL']
-        or_ctrld = '' if windows else "or 'Ctrl+D' "
-        sys.stderr.write("Launching subshell in virtual environment. Type "
-                         "'exit' %sto return.\n" % or_ctrld)
+        sys.stderr.write('Entering {0} with {1}.'.format(env, command))
 
     if kwargs.pop('guard', False) and not windows:
         # On Windows the PATH is usually set with System Utility
