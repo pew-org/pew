@@ -16,6 +16,12 @@ def copied_env(workon_home, env1):
     yield workon_home / 'destination'
     invoke('rm', 'destination')
 
+@pytest.yield_fixture()
+def copied_var_env(envwithvar):
+    invoke('cp', 'envwithvar','destination','-d')
+    yield
+    invoke ('rm','destination')
+
 
 def test_new_env_activated(workon_home, testpackageenv):
     invoke('cp', 'source', 'destination', '-d')
@@ -48,3 +54,7 @@ def test_source_does_not_exists(workon_home):
 def test_no_global_site_packages(copied_env):
     site = Path(invoke('workon', copied_env.name, inp='pew sitepackages_dir').out)
     assert (site.parent / 'no-global-site-packages.txt').exists
+
+def test_copy_ini_file(copied_var_env):
+    out = invoke('workon', 'destination', inp='echo $TestVariable').out
+    assert 'Present' in out

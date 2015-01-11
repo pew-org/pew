@@ -10,6 +10,13 @@ import random
 import textwrap
 from subprocess import CalledProcessError
 from pathlib import Path
+from string import Template
+
+
+try:
+    from configparser import RawConfigParser
+except ImportError:
+    from ConfigParser import RawConfigParser
 
 try:
     from shutil import get_terminal_size
@@ -81,6 +88,18 @@ def get_project_dir(env):
 
     return project_dir
 
+#class to support reading ini file
+class InveParser(RawConfigParser):
+    #stop lowercasing keys
+    @staticmethod
+    def optionxform(option):
+        return option
+
+    def section_items(self, section, variables):
+        if self.has_section(section):
+            for (k, v) in self.items(section):
+                yield (k, Template(v).safe_substitute(variables))
+
 
 def unsetenv(key):
     if key in os.environ:
@@ -100,6 +119,11 @@ def inve(env, *args, **kwargs):
 
         unsetenv('PYTHONHOME')
         unsetenv('__PYVENV_LAUNCHER__')
+
+        #load environment variables from .inve.ini
+        parser = InveParser()
+        parser.read(str(envdir / '.inve.ini'))
+        os.environ.update(parser.section_items('env', os.environ))
 
         try:
             return check_call(args, shell=windows, **kwargs)
