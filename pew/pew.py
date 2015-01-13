@@ -22,6 +22,7 @@ except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
 from pew import __version__
+from pew.hooks import import_hooks, preactivate_hook, postactivate_hook
 from pew._utils import (check_call, invoke, expandpath, own,
                         env_bin_dir, check_path, temp_environ)
 from pew._print_utils import print_virtualenvs
@@ -81,6 +82,8 @@ def get_project_dir(env):
 
     return project_dir
 
+def get_hook_location(env):
+    return workon_home / env / '.pew' / 'hooks'
 
 def unsetenv(key):
     if key in os.environ:
@@ -128,7 +131,9 @@ def shell(env, cwd=None):
     sys.stderr.write("Launching subshell in virtual environment. Type "
                      "'exit' %sto return.\n" % or_ctrld)
 
+    preactivate_hook.call()
     inve(str(env), shell, cwd=cwd)
+    postactivate_hook.call()
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
@@ -261,6 +266,7 @@ def workon_cmd():
         # Check if the virtualenv has an associated project directory and in
         # this case, use it as the current working directory.
         project_dir = get_project_dir(env) or os.getcwd()
+        import_hooks(get_hook_location(env))
         shell(env, cwd=project_dir)
 
 
