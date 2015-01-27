@@ -310,9 +310,13 @@ To get a blue-colored name at the start of your prompt:
 
 #### zsh prompt ####
 
-Add this at the beginning of your `PS1`
+Add this to your .zshrc file, before your `PS1` declaration :
 
-`%{$fg_bold[blue]%}$(basename "$VIRTUAL_ENV")`
+`venv=$(basename "$VIRTUAL_ENV")`
+
+Then add this at the beginning of your `PS1` :
+
+`%{$fg_bold[blue]%}$venv${venv:+ }`
 
 #### fish prompt ####
 
