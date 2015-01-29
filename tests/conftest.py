@@ -33,7 +33,6 @@ def env2(workon_home):
     yield
     invoke('rm', 'env2')
 
-
 @pytest.yield_fixture()
 def testpackageenv(workon_home):
     testpackage = str(Path(__file__).parent / 'testpackage')
@@ -51,3 +50,15 @@ def testtemplate(workon_home):
     testtemplatefile.chmod(0o700)
     yield testtemplatefile
     testtemplatefile.unlink()
+
+@pytest.yield_fixture()
+def envwithvar(workon_home):
+    invoke('new', 'envwithvar', '-d')
+    sourceini = Path(__file__).parent / 'test_ini'
+    testinifile = workon_home / 'envwithvar' / '.inve.ini'
+    copy(str(sourceini), str(testinifile))
+    testinifile.chmod(0o700)
+    yield
+    testinifile.unlink()
+    invoke('rm','envwithvar')
+

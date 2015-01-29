@@ -1,0 +1,4 @@
+#test file for processing environment variables in ini files
+[env]
+TestVariable=Present
+
