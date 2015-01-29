@@ -89,7 +89,7 @@ def get_project_dir(env):
     return project_dir
 
 #class to support reading ini file
-class InveParser(RawConfigParser):
+class EnvParser(RawConfigParser):
     #stop lowercasing keys
     @staticmethod
     def optionxform(option):
@@ -122,7 +122,7 @@ def inve(env, *args, **kwargs):
 
         #load environment variables from .inve.ini
         parser = InveParser()
-        parser.read(str(envdir / '.inve.ini'))
+        parser.read(str(envdir / '.env'))
         os.environ.update(parser.section_items('env', os.environ))
 
         try:
