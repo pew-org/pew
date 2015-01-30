@@ -86,8 +86,31 @@ def unsetenv(key):
     if key in os.environ:
         del os.environ[key]
 
-def inve(env, *args, **kwargs):
-    assert args
+def inve(env, command=None, *args, **kwargs):
+    """Run a command in the given virtual environment.
+
+    If no command is given, then default to opening a new sub-shell.
+    Which shell will be opened is platform-dependant.
+
+    When the ``guard`` keyword argument is ``True``, run a check to see
+    if the path is set up correctly.
+
+    Pass additional keyword arguments to ``subprocess.check_call()``.
+    """
+
+    if not command:
+        command = 'powershell' if windows else os.environ['SHELL']
+        sys.stderr.write('Entering {0} with {1}.'.format(env, command))
+
+    if kwargs.pop('guard', False) and not windows:
+        # On Windows the PATH is usually set with System Utility
+        # so we won't worry about trying to check mistakes there
+        check = '{0} -c "import pew.pew; pew.pew.prevent_path_errors()"'
+        try:
+            inve(env, os.environ['SHELL'], '-c', check.format(sys.executable))
+        except CalledProcessError:
+            return
+
     # we don't strictly need to restore the environment, since pew runs in
     # its own process, but it feels like the right thing to do
     with temp_environ():
@@ -102,33 +125,14 @@ def inve(env, *args, **kwargs):
         unsetenv('__PYVENV_LAUNCHER__')
 
         try:
-            return check_call(args, shell=windows, **kwargs)
+            return check_call([command] + list(args), shell=windows, **kwargs)
             # need to have shell=True on windows, otherwise the PYTHONPATH
             # won't inherit the PATH
         except OSError as e:
             if e.errno == 2:
-                print(kwargs)
-                sys.stderr.write("Unable to find %s\n" % args[0])
+                sys.stderr.write("Unable to find %s\n" % command)
             else:
                 raise
-
-
-def shell(env, cwd=None):
-    shell = 'powershell' if windows else os.environ['SHELL']
-    if not windows:
-        # On Windows the PATH is usually set with System Utility
-        # so we won't worry about trying to check mistakes there
-        shell_check = (sys.executable + ' -c "from pew.pew import '
-                       'prevent_path_errors; prevent_path_errors()"')
-        try:
-            inve(str(env), shell, '-c', shell_check)
-        except CalledProcessError:
-            return
-    or_ctrld = '' if windows else "or 'Ctrl+D' "
-    sys.stderr.write("Launching subshell in virtual environment. Type "
-                     "'exit' %sto return.\n" % or_ctrld)
-
-    inve(str(env), shell, cwd=cwd)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
@@ -181,7 +185,7 @@ project directory to associate with the new environment.')
     mkvirtualenv(args.envname, args.python, args.packages, project,
                  args.requirements, rest)
     if args.activate:
-        shell(args.envname)
+        inve(args.envname, guard=True)
 
 
 def rmvirtualenvs(envs):
@@ -261,7 +265,7 @@ def workon_cmd():
         # Check if the virtualenv has an associated project directory and in
         # this case, use it as the current working directory.
         project_dir = get_project_dir(env) or os.getcwd()
-        shell(env, cwd=project_dir)
+        inve(env, guard=True, cwd=project_dir)
 
 
 def sitepackages_dir():
@@ -363,7 +367,7 @@ def cp_cmd():
     print('Copying {0} in {1}'.format(source, target_name))
     clone_virtualenv(str(source), str(target))
     if args.activate:
-        shell(target_name)
+        inve(target_name, guard=True)
 
 
 def setvirtualenvproject(env, project):
@@ -417,7 +421,7 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
         template = workon_home / ("template_" + template_name)
         inve(args.envname, str(template), args.envname, str(project))
     if args.activate:
-        shell(args.envname, cwd=str(project))
+        inve(args.envname, guard=True, cwd=str(project))
 
 
 def mktmpenv_cmd():
@@ -435,7 +439,7 @@ def mktmpenv_cmd():
     try:
         if args.activate:
             # only used for testing on windows
-            shell(env)
+            inve(env, guard=True)
     finally:
         rmvirtualenvs([env])
 
@@ -464,6 +468,9 @@ def in_cmd():
 
     if len(sys.argv) < 2:
         sys.exit('You must provide a valid virtualenv to target')
+
+    if len(sys.argv) == 2:
+        return workon_cmd()
 
     env = sys.argv[1]
     env_path = workon_home / env
