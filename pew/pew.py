@@ -19,7 +19,7 @@ except ImportError:
 try:
     from clonevirtualenv import clone_virtualenv
 except ImportError:
-    pass # setup.py needs to import this before the dependencies are installed
+    pass  # setup.py needs to import this before the dependencies are installed
 
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own,
@@ -30,10 +30,9 @@ windows = sys.platform == 'win32'
 
 
 def update_args_dict():
-    global args
-    args = dict(enumerate(sys.argv))
+    dict(enumerate(sys.argv))
 
-update_args_dict()
+args = update_args_dict()
 
 workon_home = expandpath(
     os.environ.get('WORKON_HOME',
@@ -52,7 +51,8 @@ def makedirs_and_symlink_if_needed(workon_home):
                 workon_home.symlink_to(str(link))
             except OSError as e:
                 # FIXME on TravisCI, even if I check with `link.exists()`, this
-                # exception can be raised and needs to be catched, maybe it's a race condition?
+                # exception can be raised and needs to be catched, maybe it's a
+                # race condition?
                 if e.errno != 17:
                     raise
 
@@ -63,9 +63,11 @@ inve_site = Path(__file__).parent
 
 
 def deploy_completions():
-    completions = {'complete.bash': Path('/etc/bash_completion.d/pew'),
-                   'complete.zsh': Path('/usr/local/share/zsh/site-functions/_pew'),
-                   'complete.fish': Path('/etc/fish/completions/pew.fish')}
+    completions = {
+        'complete.bash': Path('/etc/bash_completion.d/pew'),
+        'complete.zsh': Path('/usr/local/share/zsh/site-functions/_pew'),
+        'complete.fish': Path('/etc/fish/completions/pew.fish'),
+    }
     for comp, dest in completions.items():
         if not dest.parent.exists():
             dest.parent.mkdir(parents=True)
@@ -85,6 +87,7 @@ def get_project_dir(env):
 def unsetenv(key):
     if key in os.environ:
         del os.environ[key]
+
 
 def inve(env, *args, **kwargs):
     assert args
@@ -144,7 +147,8 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
             setvirtualenvproject(envname, project.absolute())
 
         if requirements:
-            inve(envname, 'pip', 'install', '--allow-all-external', '-r', str(expandpath(requirements)))
+            inve(envname, 'pip', 'install', '--allow-all-external', '-r',
+                 str(expandpath(requirements)))
 
         if packages:
             inve(envname, 'pip', 'install', '--allow-all-external', *packages)
@@ -220,8 +224,9 @@ def show_cmd():
 
 
 def lsenvs():
-    return sorted(set(env.parts[-3] for env in
-                      workon_home.glob(os.path.join('*', env_bin_dir, 'python*'))))
+    return sorted(set(env.parts[-3] for env in workon_home.glob(
+        os.path.join('*', env_bin_dir, 'python*')
+    )))
 
 
 def lsvirtualenv(verbose):
@@ -273,13 +278,13 @@ print(distutils.sysconfig.get_python_lib())').out)
 
 
 def add_cmd():
-    """Add the specified directories to the Python path for the currently active virtualenv.
+    """Add the specified directories to the Python path for the currently
+    active virtualenv.
 
-This will be done by placing the directory names in a path file named
-"virtualenv_path_extensions.pth" inside the virtualenv's site-packages
-directory; if this file does not exists, it will be created first.
-
-"""
+    This will be done by placing the directory names in a path file named
+    "virtualenv_path_extensions.pth" inside the virtualenv's site-packages
+    directory; if this file does not exists, it will be created first.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', dest='remove', action='store_true')
     parser.add_argument('dirs', nargs='+')
@@ -289,9 +294,15 @@ directory; if this file does not exists, it will be created first.
     new_paths = [os.path.abspath(d) + u"\n" for d in args.dirs]
     if not extra_paths.exists():
         with extra_paths.open('w') as extra:
-            extra.write(u'''import sys; sys.__plen = len(sys.path)
-import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)
-            ''')
+            extra.write(u'''import sys
+sys.__plen = len(sys.path)
+import sys
+new=sys.path[sys.__plen:]
+del sys.path[sys.__plen:]
+p=getattr(sys,'__egginsert',0)
+sys.path[p:p]=new
+sys.__egginsert = p+len(new)
+''')
 
     def rewrite(f):
         with extra_paths.open('r+') as extra:
@@ -311,7 +322,8 @@ def sitepackages_dir_cmd():
 
 
 def lssitepackages_cmd():
-    """Show the content of the site-packages directory of the current virtualenv."""
+    """Show the content of the site-packages directory of the current
+    virtualenv."""
     site = sitepackages_dir()
     print(*site.iterdir())
     extra_paths = site / '_virtualenv_path_extensions.pth'
@@ -322,7 +334,8 @@ def lssitepackages_cmd():
 
 
 def toggleglobalsitepackages_cmd():
-    """Toggle the current virtualenv between having and not having access to the global site-packages."""
+    """Toggle the current virtualenv between having and not having access to
+    the global site-packages."""
     quiet = args.get(1) == '-q'
     site = sitepackages_dir()
     ngsp_file = site.parent / 'no-global-site-packages.txt'
@@ -358,7 +371,9 @@ def cp_cmd():
     target = workon_home / target_name
 
     if target.exists():
-        sys.exit('%s virtualenv already exists in %s.' % (target_name, workon_home))
+        sys.exit('%s virtualenv already exists in %s.' % (
+            target_name, workon_home
+        ))
 
     print('Copying {0} in {1}'.format(source, target_name))
     clone_virtualenv(str(source), str(target))
@@ -373,7 +388,8 @@ def setvirtualenvproject(env, project):
 
 
 def setproject_cmd():
-    """Given a virtualenv directory and a project directory, set the virtualenv up to be associated with the project."""
+    """Given a virtualenv directory and a project directory, set the virtualenv
+    up to be associated with the project."""
     env = os.environ.get('VIRTUAL_ENV', args.get(1))
     project = args.get(2, os.path.abspath('.'))
     if not env:
@@ -409,7 +425,7 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
         sys.exit('Project %s already exists.' % args.envname)
 
     mkvirtualenv(args.envname, args.python, args.packages, project.absolute(),
-                        args.requirements, rest)
+                 args.requirements, rest)
 
     project.mkdir()
 
@@ -429,8 +445,13 @@ def mktmpenv_cmd():
 
     args, rest = parser.parse_known_args()
 
-    mkvirtualenv(env, args.python, args.packages, requirements=args.requirements,
-                 rest=rest)
+    mkvirtualenv(
+        env,
+        args.python,
+        args.packages,
+        requirements=args.requirements,
+        rest=rest
+    )
     print('This is a temporary environment. It will be deleted when you exit')
     try:
         if args.activate:
@@ -475,16 +496,20 @@ def in_cmd():
 
 
 def restore_cmd():
-    """Try to restore a broken virtualenv by reinstalling the same python version on top of it"""
+    """Try to restore a broken virtualenv by reinstalling the same python
+    version on top of it"""
 
     if len(sys.argv) < 2:
         sys.exit('You must provide a valid virtualenv to target')
 
     env = sys.argv[1]
-    py = workon_home / env / env_bin_dir / ('python.exe' if windows else 'python')
+    py = workon_home / env / env_bin_dir / (
+        'python.exe' if windows else 'python'
+    )
     exact_py = py.resolve().name
 
-    check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=str(workon_home))
+    check_call(["virtualenv", env, "--python=%s" % exact_py],
+               cwd=str(workon_home))
 
 
 def version_cmd():
@@ -499,7 +524,8 @@ Either the env is corrupted (try running `pew restore env`),
 Or an upgrade of your Python version broke your env,
 Or check the contents of your $PATH. You might be adding new directories to it
 from inside your shell's configuration file.
-In this case, for further details please see: https://github.com/berdario/pew#the-environment-doesnt-seem-to-be-activated''')
+In this case, for further details please see: \
+https://github.com/berdario/pew#the-environment-doesnt-seem-to-be-activated''')
 
 
 def pew():
@@ -509,7 +535,8 @@ def pew():
         try:
             command = cmds[sys.argv[1]]
             sys.argv = ['-'.join(sys.argv[:2])] + sys.argv[2:]
-            update_args_dict()
+            global args
+            args = update_args_dict()
             try:
                 return command()
             except CalledProcessError as e:
