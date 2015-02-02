@@ -5,9 +5,14 @@ from pew._utils import temp_environ, invoke_pew as invoke
 
 import pytest
 
-check_env = [sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"]
+check_env = [
+    sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"
+]
 
-@pytest.mark.skipif(sys.platform == 'win32', reason='cannot supply stdin to powershell')
+
+@pytest.mark.skipif(
+    sys.platform == 'win32', reason='cannot supply stdin to powershell'
+)
 def test_workon(env1):
     cmd = '{0} {1} "{2}"'.format(*check_env)
     out = invoke('workon', 'env1', inp=cmd).out

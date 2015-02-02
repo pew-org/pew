@@ -8,7 +8,9 @@ from pew._utils import invoke_pew as invoke
 
 windows = platform == 'win32'
 
-skip_windows = pytest.mark.skipif(windows, reason='cannot supply stdin to powershell')
+skip_windows = pytest.mark.skipif(
+    windows, reason='cannot supply stdin to powershell'
+)
 
 
 @skip_windows
