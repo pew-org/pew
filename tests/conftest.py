@@ -55,7 +55,7 @@ def testtemplate(workon_home):
 def envwithvar(workon_home):
     invoke('new', 'envwithvar', '-d')
     sourceini = Path(__file__).parent / 'test_ini'
-    testinifile = workon_home / 'envwithvar' / '.inve.ini'
+    testinifile = workon_home / 'envwithvar' / '.env'
     copy(str(sourceini), str(testinifile))
     testinifile.chmod(0o700)
     yield

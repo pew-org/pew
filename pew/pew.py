@@ -11,12 +11,7 @@ import textwrap
 from subprocess import CalledProcessError
 from pathlib import Path
 from string import Template
-
-
-try:
-    from configparser import RawConfigParser
-except ImportError:
-    from ConfigParser import RawConfigParser
+import shlex
 
 try:
     from shutil import get_terminal_size
@@ -89,17 +84,34 @@ def get_project_dir(env):
     return project_dir
 
 #class to support reading ini file
-class EnvParser(RawConfigParser):
-    #stop lowercasing keys
-    @staticmethod
-    def optionxform(option):
-        return option
+class EnvParser:
+    def __init__(self):
+        self._d = {}
+        self._filename = None
 
-    def section_items(self, section, variables):
-        if self.has_section(section):
-            for (k, v) in self.items(section):
-                yield (k, Template(v).safe_substitute(variables))
+    def __init__(self, filename):
+        self.read(filename)
 
+    def read(self, filename):
+        self._d = {}
+        self._filename = filename
+        with open(filename,'rU') as f:
+            for line in f.read_lines():
+                lexer = shlex.shlex(line, posix=True)
+                lexer.wordchars += '/.+-():'
+                tokens = list(lexer)
+                if len(tokens) != 3:
+                    continue
+                name, op, value = tokens
+                if op != '=':
+                    continue
+                self._d[name]=value
+
+    def write(self, filename):
+        pass
+
+    def items(self):
+        return self._d
 
 def unsetenv(key):
     if key in os.environ:
@@ -121,9 +133,11 @@ def inve(env, *args, **kwargs):
         unsetenv('__PYVENV_LAUNCHER__')
 
         #load environment variables from .inve.ini
-        parser = InveParser()
-        parser.read(str(envdir / '.env'))
-        os.environ.update(parser.section_items('env', os.environ))
+        env_file = envdir / '.env'
+        if envfile.exists():
+            parser = EnvParser()
+            parser.read(str(envfile))
+            os.environ.update(parser.items())
 
         try:
             return check_call(args, shell=windows, **kwargs)
