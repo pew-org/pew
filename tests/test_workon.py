@@ -30,6 +30,3 @@ def test_no_pew_workon_home(workon_home):
     with temp_environ():
         os.environ['WORKON_HOME'] += '/not_there'
         assert 'does not exist' in invoke('in', 'doesnt_exist').err
-
-
-
