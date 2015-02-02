@@ -51,14 +51,4 @@ def testtemplate(workon_home):
     yield testtemplatefile
     testtemplatefile.unlink()
 
-@pytest.yield_fixture()
-def envwithvar(workon_home):
-    invoke('new', 'envwithvar', '-d')
-    sourceini = Path(__file__).parent / 'test_ini'
-    testinifile = workon_home / 'envwithvar' / '.env'
-    copy(str(sourceini), str(testinifile))
-    testinifile.chmod(0o700)
-    yield
-    testinifile.unlink()
-    invoke('rm','envwithvar')
 

@@ -133,7 +133,7 @@ def inve(env, *args, **kwargs):
         unsetenv('__PYVENV_LAUNCHER__')
 
         #load environment variables from .inve.ini
-        env_file = envdir / '.env'
+        envfile = envdir / '.env'
         if envfile.exists():
             parser = EnvParser()
             parser.read(str(envfile))

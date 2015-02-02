@@ -31,9 +31,5 @@ def test_no_pew_workon_home(workon_home):
         os.environ['WORKON_HOME'] += '/not_there'
         assert 'does not exist' in invoke('in', 'doesnt_exist').err
 
-def test_var(envwithvar):
-    check_var = [sys.executable, '-c', "import os; print(os.environ['TestVariable'])"]
-    out = invoke('in', 'envwithvar', *check_var).out
-    assert 'Present' in out
 
 
