@@ -20,7 +20,7 @@ def test_disp(env1):
 
 def test_unset(env1):
     invoke('var','env1','TestVariable','Present')
-    invoke('var','env1','-u','TestVariable')
+    invoke('var','env1','TestVariable','-u')
     out = invoke('var', 'env1', 'TestVariable').out
     assert 'Present' not in out
 
