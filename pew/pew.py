@@ -515,6 +515,13 @@ def version_cmd():
     """Prints current pew version"""
     print(__version__)
 
+def var_cmd():
+    """Sets, unsets and prints virtual environment variables"""
+    vars = EnvParser()
+    parser.read(str(workon_dir / envdir / '.env'))
+    for k, v in (parser.section_items('env', os.environ)):
+        print("%s: %s"%(k,v))
+
 
 def prevent_path_errors():
     if 'VIRTUAL_ENV' in os.environ and not check_path():
