@@ -1,4 +1,6 @@
 from pew._utils import invoke_pew as invoke
+from utils import skip_windows
+
 import tempfile
 import os
 import shutil
@@ -27,6 +29,7 @@ def test_project_exist(env1, tmp_cwd):
     shutil.rmtree(tmpdir)
 
 
+@skip_windows(reason='stdin is not closed properly on windows')
 def test_workon_when_project_is_relative(env1, tmp_cwd):
     os.mkdir('i_exist')
     out = invoke('setproject', 'env1', 'i_exist')

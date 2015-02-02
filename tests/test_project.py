@@ -8,6 +8,7 @@ from tempfile import gettempdir
 import pytest
 
 from pew._utils import temp_environ, invoke_pew as invoke
+from utils import skip_windows
 
 
 @pytest.yield_fixture(scope='session')
@@ -70,7 +71,9 @@ def test_same_workon_and_project_home(workon_home, project_home):
 def test_list_templates(testtemplate):
     assert 'test' in invoke('mkproject', '-l').out
 
-@pytest.mark.skipif(sys.platform == 'win32', reason='cannot scripts written in an arbitrary language on windows by relying on the shebang')
+
+@skip_windows(reason='cannot scripts written in an arbitrary language on '
+                     'windows by relying on the shebang')
 def test_apply_template(project_home, testtemplate):
     projname = 'project1'
     r = invoke('mkproject', '-t', 'test', projname, '-d')
