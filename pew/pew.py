@@ -10,7 +10,6 @@ import random
 import textwrap
 from subprocess import CalledProcessError
 from pathlib import Path
-from string import Template
 import shlex
 
 try:
@@ -530,7 +529,7 @@ def version_cmd():
     print(__version__)
 
 def var_cmd():
-    """Sets, unsets and prints virtual environment variables"""
+    """Sets, unsets and prints virtual environment variables."""
     vars = EnvParser()
     parser.read(str(workon_dir / envdir / '.env'))
     for k, v in (parser.section_items('env', os.environ)):
