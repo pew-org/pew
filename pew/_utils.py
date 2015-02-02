@@ -15,8 +15,8 @@ def which(fn):
 
 Doesn't look up commands ending in '.exe' (we don't use them),
 nor does it avoid looking up commands that already have their directory
-specified (we don't use them either) and it doesn't check the current directory,
-just like on *nix systems.
+specified (we don't use them either) and it doesn't check the current
+directory, just like on *nix systems.
 """
 
     def _access_check(fn):
@@ -54,13 +54,15 @@ Popen = resolve_path(Popen)
 
 Result = namedtuple('Result', 'out err')
 
-# TODO: it's better to fail early, and thus I'd need to check the exit code, but it'll
-# need a refactoring of a couple of tests
+# TODO: it's better to fail early, and thus I'd need to check the exit code,
+# but it'll need a refactoring of a couple of tests
 def invoke(*args, **kwargs):
     encoding = locale.getlocale()[1]
     inp = kwargs.pop('inp', '').encode(encoding)
     popen = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE, **kwargs)
-    return Result(*[o.strip().decode(encoding) for o in popen.communicate(inp)])
+    return Result(
+        *[o.strip().decode(encoding) for o in popen.communicate(inp)]
+    )
 
 
 invoke_pew = partial(invoke, 'pew')

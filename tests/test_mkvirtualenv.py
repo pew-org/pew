@@ -22,8 +22,9 @@ def are_we_connected():
         return False
 
 
-connection_required = pytest.mark.skipif(not are_we_connected(),
-                                         reason="An internet connection is required")
+connection_required = pytest.mark.skipif(
+    not are_we_connected(), reason="An internet connection is required"
+)
 
 
 def test_create(workon_home):

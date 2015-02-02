@@ -35,7 +35,9 @@ def test_create_directories(workon_home, project_home, project):
     assert (workon_home / project).exists()
     assert (project_home / project).exists()
 
-check_env = [sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"]
+check_env = [
+    sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"
+]
 
 
 def test_create_virtualenv(project_home, project):
@@ -70,10 +72,14 @@ def test_same_workon_and_project_home(workon_home, project_home):
 def test_list_templates(testtemplate):
     assert 'test' in invoke('mkproject', '-l').out
 
-@pytest.mark.skipif(sys.platform == 'win32', reason='cannot scripts written in an arbitrary language on windows by relying on the shebang')
+
+@pytest.mark.skipif(
+    sys.platform == 'win32',
+    reason='cannot scripts written in an arbitrary language on windows by '
+           'relying on the shebang')
 def test_apply_template(project_home, testtemplate):
     projname = 'project1'
-    r = invoke('mkproject', '-t', 'test', projname, '-d')
+    invoke('mkproject', '-t', 'test', projname, '-d')
     testfile = project_home / projname / 'TEST_FILE'
     assert testfile.exists()
     with testfile.open() as f:

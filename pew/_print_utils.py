@@ -42,7 +42,9 @@ def align_column(column):
 
 def columnize(venvs):
     columns_n = get_best_columns_number(venvs)
-    columns = map(align_column, zip_longest(*get_rows(venvs, columns_n), fillvalue=''))
+    columns = map(align_column, zip_longest(
+        *get_rows(venvs, columns_n), fillvalue=''
+    ))
     return map(SEP.join, zip(*columns))
 
 
