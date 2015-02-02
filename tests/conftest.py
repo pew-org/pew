@@ -33,6 +33,7 @@ def env2(workon_home):
     yield
     invoke('rm', 'env2')
 
+
 @pytest.yield_fixture()
 def testpackageenv(workon_home):
     testpackage = str(Path(__file__).parent / 'testpackage')
@@ -50,5 +51,3 @@ def testtemplate(workon_home):
     testtemplatefile.chmod(0o700)
     yield testtemplatefile
     testtemplatefile.unlink()
-
-
