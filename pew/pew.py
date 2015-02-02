@@ -549,7 +549,6 @@ def var_cmd():
         envvars.load(str(envfile))
     if args.unset:
         if args.var_name:
-            print("unsetting %s"%(args.var_name))
             envvars.del_variable(args.var_name)
             envvars.save(str(envfile))
         else:
