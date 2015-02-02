@@ -138,7 +138,7 @@ def inve(env, *args, **kwargs):
         unsetenv('PYTHONHOME')
         unsetenv('__PYVENV_LAUNCHER__')
 
-        #load environment variables from .inve.ini
+        #load environment variables from .env
         envfile = envdir / '.env'
         if envfile.exists():
             parser = EnvParser()
