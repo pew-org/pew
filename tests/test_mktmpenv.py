@@ -34,3 +34,8 @@ def test_mktmpenv_autodeletes(workon_home):
     invoke('mktmpenv', '-d' if platform == 'win32' else '')
     envs2 = set(invoke('ls').out.split())
     assert envs == envs2
+
+@skip_windows
+def test_mktmpenv_workon_alt(workon_alt):
+    out = invoke('mktmpenv', '-w', str(workon_alt), inp="python -c 'import os; print(os.environ[\'WORKON_HOME\'])").out
+    assert str(workon_alt) in out

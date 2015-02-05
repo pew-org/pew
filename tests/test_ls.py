@@ -23,3 +23,11 @@ def test_lssitepackages_add(workon_home):
     pkgs = invoke('in', 'env', 'pew', 'lssitepackages').out
     assert str(Path('.').absolute()) in pkgs
     invoke('rm', 'env')
+
+
+def test_ls_alt(workon_alt):
+    invoke('new','alt','-w',str(workon_alt))
+    envs = invoke('ls','-w',str(workon_alt)).out
+    assert 'alt' in envs
+    invoke('rm','alt','-w',str(workon_alt))
+
