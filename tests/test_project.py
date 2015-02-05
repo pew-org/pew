@@ -80,3 +80,12 @@ def test_apply_template(project_home, testtemplate):
         assert projname in f.read()
     invoke('rm', projname)
     rmtree(str(project_home / projname))
+
+def test_mkproject_alt(workon_alt, project_home):
+    projname = 'project1'
+    invoke('mkproject', projname, '-d', '-w', str(workon_alt))
+    envs = invoke('ls','-w',str(workon_alt)).out
+    assert projname in envs
+    invoke('rm', projname)
+    rmtree(str(project_home / projname))
+
