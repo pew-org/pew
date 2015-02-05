@@ -14,7 +14,7 @@ def test_restore(workon_home, env1):
     assert 'Error' not in result.err and 'fail' not in result.err
 
 
-def test_restore(workon_alt):
+def test_restore_alt(workon_alt):
     patterns = ['lib*/*/site.py*', 'Lib/site.py*']
     invoke('new','env1','-d','-w',str(workon_alt))
     to_be_deleted = set(chain(*((workon_alt / 'env1').glob(pat) for pat in patterns)))
