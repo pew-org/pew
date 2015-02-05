@@ -85,7 +85,7 @@ def test_requirements_file(workon_home):
         unlink(temp.name)
 
 def test_create_alt(workon_home, workon_alt):
-    invoke('new', 'alt', '-d', '-w' str(workon_alt))
+    invoke('new', 'alt', '-d', '-w', str(workon_alt))
     envs = set(invoke('ls').out.split())
     envs1 = set(invoke('ls').out.split())
     invoke('rm', 'alt', '-w', str(workon_alt))

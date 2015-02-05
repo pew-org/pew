@@ -22,7 +22,7 @@ def test_no_such_env(workon_home):
     check_call('pew rm not_here'.split())
 
 def test_remove_alt(workon_alt):
-	invoke('new','delete_this','-w',str(workon_alt),'-d')
+    invoke('new','delete_this','-w',str(workon_alt),'-d')
     envs = invoke('ls','-w',str(workon_alt)).out
     assert 'delete_this' in envs
     invoke('rm','delete_this','-w',str(workon_alt))
