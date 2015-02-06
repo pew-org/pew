@@ -165,7 +165,8 @@ requirements file to install a base set of packages into the new environment.')
                         default=True, dest='activate', help="After \
                         creation, continue with the existing shell (don't \
                         activate the new environment).")
-    parser.add_argument('-w','--workon', default=None)
+    parser.add_argument('-w','--workon', default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
     return parser
 
 
@@ -176,7 +177,7 @@ def new_cmd():
     parser.add_argument('-a', dest='project', help='Provide a full path to a \
 project directory to associate with the new environment.')
 
-    parser.add_argument('envname')
+    parser.add_argument('envname', help="The name of the virtualenv.")
     args, rest = parser.parse_known_args()
 
     if args.workon:
@@ -209,8 +210,9 @@ def rm_cmd():
     """Remove one or more environment, from $WORKON_HOME."""
     global workon_home
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w','--workon', default=None)
-    parser.add_argument('env', nargs="+", default=None)
+    parser.add_argument('-w','--workon', default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
+    parser.add_argument('env', nargs="+", default=None, help='The name of the virtualenv')
     args = parser.parse_args()
 
     if args.workon:
@@ -256,7 +258,8 @@ def ls_cmd():
     p_group = parser.add_mutually_exclusive_group()
     p_group.add_argument('-b', '--brief', action='store_false')
     p_group.add_argument('-l', '--long', action='store_true')
-    parser.add_argument('-w','--workon', default=None)
+    parser.add_argument('-w','--workon', default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
 
     args = parser.parse_args()
 
@@ -271,8 +274,9 @@ def workon_cmd():
     """List or change working virtual environments."""
     global workon_home
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w','--workon', default=None)
-    parser.add_argument('env', nargs="?", default=None)
+    parser.add_argument('-w','--workon', default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
+    parser.add_argument('env', nargs="?", default=None, help='The name of the virtualenv.')
     args = parser.parse_args()
 
     if args.workon:
@@ -314,8 +318,10 @@ directory; if this file does not exists, it will be created first.
     global workon_home
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', dest='remove', action='store_true')
-    parser.add_argument('dirs', nargs='+')
-    parser.add_argument('-w','--workon', default=None)
+    parser.add_argument('dirs', nargs='+', help='Provide a list of \
+                        directories to add to the virtualenv path.')
+    parser.add_argument('-w','--workon', default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
 
     args = parser.parse_args()
     
@@ -384,7 +390,8 @@ def cp_cmd():
                         default=True, dest='activate', help="After \
                         creation, continue with the existing shell (don't \
                         activate the new environment).")
-    parser.add_argument('-w','--workon', default=None)
+    parser.add_argument('-w','--workon', default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
 
     args = parser.parse_args()
     
@@ -422,9 +429,12 @@ def setproject_cmd():
 
     global workon_home
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w','--workon', default=None)
-    parser.add_argument('virtualenv_path', nargs='?', default=None)
-    parser.add_argument('project_path', nargs="?", default=None)
+    parser.add_argument('-w','--workon', default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
+    parser.add_argument('virtualenv_path', nargs='?', default=None,
+                        help='The path to the virtualenv.')
+    parser.add_argument('project_path', nargs="?", default=None,
+                        help='The path to the project directory.')
     args = parser.parse_args()
 
     if args.workon:
@@ -447,7 +457,8 @@ def mkproject_cmd():
 
     global workon_home
     parser = mkvirtualenv_argparser()
-    parser.add_argument('envname', nargs="?")
+    parser.add_argument('envname', nargs="?", help='The name of the \
+                        virtualenv.')
     parser.add_argument(
         '-t', action='append', default=[], dest='templates', help='Multiple \
 templates may be selected.  They are applied in the order specified on the \
@@ -532,7 +543,8 @@ def inall_cmd():
 
     global workon_home
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w','--workon',default=None)
+    parser.add_argument('-w','--workon',default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
     args, rest = parser.parse_known_args()
 
     if args.workon:
@@ -550,8 +562,9 @@ def in_cmd():
 
     global workon_home
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w','--workon',default=None)
-    parser.add_argument('env')
+    parser.add_argument('-w','--workon',default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
+    parser.add_argument('env', help='The name of the virtualenv.')
     args, rest = parser.parse_known_args()
 
     if args.workon:
@@ -571,8 +584,9 @@ def restore_cmd():
 
     global workon_home
     parser = argparse.ArgumentParser()
-    parser.add_argument('-w','--workon',default=None)
-    parser.add_argument('env')
+    parser.add_argument('-w','--workon',default=None, help='Specify an \
+                        alternative WORKON_HOME folder.')
+    parser.add_argument('env', help='The name of the virtualenv.')
     args = parser.parse_args()
     if args.workon:
         workon_home = expandpath(args.workon)
