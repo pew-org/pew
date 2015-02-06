@@ -56,8 +56,6 @@ def makedirs_and_symlink_if_needed(workon_home):
                 if e.errno != 17:
                     raise
 
-#makedirs_and_symlink_if_needed(workon_home)
-
 
 inve_site = Path(__file__).parent
 
