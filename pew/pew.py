@@ -56,7 +56,7 @@ def makedirs_and_symlink_if_needed(workon_home):
                 if e.errno != 17:
                     raise
 
-makedirs_and_symlink_if_needed(workon_home)
+#makedirs_and_symlink_if_needed(workon_home)
 
 
 inve_site = Path(__file__).parent
@@ -165,17 +165,24 @@ requirements file to install a base set of packages into the new environment.')
                         default=True, dest='activate', help="After \
                         creation, continue with the existing shell (don't \
                         activate the new environment).")
+    parser.add_argument('-w','--workon', default=None)
     return parser
 
 
 def new_cmd():
     """Create a new environment, in $WORKON_HOME."""
+    global workon_home
     parser = mkvirtualenv_argparser()
     parser.add_argument('-a', dest='project', help='Provide a full path to a \
 project directory to associate with the new environment.')
 
     parser.add_argument('envname')
     args, rest = parser.parse_known_args()
+
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
     project = expandpath(args.project) if args.project else None
 
     mkvirtualenv(args.envname, args.python, args.packages, project,
@@ -200,9 +207,17 @@ def rmvirtualenvs(envs):
 
 def rm_cmd():
     """Remove one or more environment, from $WORKON_HOME."""
-    if len(sys.argv) < 2:
-        sys.exit("Please specify an environment")
-    rmvirtualenvs(sys.argv[1:])
+    global workon_home
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-w','--workon', default=None)
+    parser.add_argument('env', nargs="+", default=None)
+    args = parser.parse_args()
+
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
+    rmvirtualenvs(args.env)
 
 
 def showvirtualenv(env):
@@ -236,23 +251,39 @@ def lsvirtualenv(verbose):
 
 def ls_cmd():
     """List available environments."""
+    global workon_home
     parser = argparse.ArgumentParser()
     p_group = parser.add_mutually_exclusive_group()
     p_group.add_argument('-b', '--brief', action='store_false')
     p_group.add_argument('-l', '--long', action='store_true')
+    parser.add_argument('-w','--workon', default=None)
+
     args = parser.parse_args()
+
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
     lsvirtualenv(args.long)
 
 
 def workon_cmd():
     """List or change working virtual environments."""
-    try:
-        env = sys.argv[1]
-    except IndexError:
-        lsvirtualenv(False)
-        return
+    global workon_home
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-w','--workon', default=None)
+    parser.add_argument('env', nargs="?", default=None)
+    args = parser.parse_args()
 
-    env_path = workon_home / env
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
+    if args.env is None:
+        lsvirtualenv(False)
+        return 
+
+    env_path = workon_home / args.env
     if not env_path.exists():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
 'pew-new {0}'.".format(env))
@@ -260,8 +291,8 @@ def workon_cmd():
 
         # Check if the virtualenv has an associated project directory and in
         # this case, use it as the current working directory.
-        project_dir = get_project_dir(env) or os.getcwd()
-        shell(env, cwd=project_dir)
+        project_dir = get_project_dir(args.env) or os.getcwd()
+        shell(args.env, cwd=project_dir)
 
 
 def sitepackages_dir():
@@ -280,10 +311,17 @@ This will be done by placing the directory names in a path file named
 directory; if this file does not exists, it will be created first.
 
 """
+    global workon_home
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', dest='remove', action='store_true')
     parser.add_argument('dirs', nargs='+')
+    parser.add_argument('-w','--workon', default=None)
+
     args = parser.parse_args()
+    
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
 
     extra_paths = sitepackages_dir() / '_virtualenv_path_extensions.pth'
     new_paths = [os.path.abspath(d) + u"\n" for d in args.dirs]
@@ -338,6 +376,7 @@ def toggleglobalsitepackages_cmd():
 
 def cp_cmd():
     """Duplicate the named virtualenv to make a new one."""
+    global workon_home
     parser = argparse.ArgumentParser()
     parser.add_argument('source')
     parser.add_argument('target', nargs='?')
@@ -345,8 +384,14 @@ def cp_cmd():
                         default=True, dest='activate', help="After \
                         creation, continue with the existing shell (don't \
                         activate the new environment).")
+    parser.add_argument('-w','--workon', default=None)
 
     args = parser.parse_args()
+    
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
     source = expandpath(args.source)
     if not source.exists():
         source = workon_home / args.source
@@ -374,22 +419,35 @@ def setvirtualenvproject(env, project):
 
 def setproject_cmd():
     """Given a virtualenv directory and a project directory, set the virtualenv up to be associated with the project."""
-    env = os.environ.get('VIRTUAL_ENV', args.get(1))
-    project = args.get(2, os.path.abspath('.'))
+
+    global workon_home
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-w','--workon', default=None)
+    parser.add_argument('virtualenv_path', nargs='?', default=None)
+    parser.add_argument('project_path', nargs="?", default=None)
+    args = parser.parse_args()
+
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
+    env = os.environ.get('VIRTUAL_ENV', args.virtualenv_path)
+    project = args.project_path
+    
+    if project is None:
+        project = os.path.abspath('.')
     if not env:
-        sys.exit('pew-setproject [virtualenv_path] [project_path]')
-    setvirtualenvproject(env, project)
+        parser.print_usage()
+    else:
+        setvirtualenvproject(env, project)
 
 
 def mkproject_cmd():
     """Create a new project directory and its associated virtualenv."""
-    if '-l' in sys.argv or '--list' in sys.argv:
-        templates = [t.name[9:] for t in workon_home.glob("template_*")]
-        print("Available project templates:", *templates, sep='\n')
-        return
 
+    global workon_home
     parser = mkvirtualenv_argparser()
-    parser.add_argument('envname')
+    parser.add_argument('envname', nargs="?")
     parser.add_argument(
         '-t', action='append', default=[], dest='templates', help='Multiple \
 templates may be selected.  They are applied in the order specified on the \
@@ -398,6 +456,19 @@ command line.')
         '-l', '--list', action='store_true', help='List available templates.')
 
     args, rest = parser.parse_known_args()
+
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
+    if args.list:
+        templates = [t.name[9:] for t in workon_home.glob("template_*")]
+        print("Available project templates:", *templates, sep='\n')
+        return
+
+    if args.envname is None:
+        argparse.print_usage()
+        return
 
     projects_home = Path(os.environ.get('PROJECT_HOME', '.'))
     if not projects_home.exists():
@@ -422,12 +493,17 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
 
 def mktmpenv_cmd():
     """Create a temporary virtualenv."""
+    global workon_home
     parser = mkvirtualenv_argparser()
     env = '.'
+    args, rest = parser.parse_known_args()
+
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
     while (workon_home / env).exists():
         env = hex(random.getrandbits(64))[2:-1]
-
-    args, rest = parser.parse_known_args()
 
     mkvirtualenv(env, args.python, args.packages, requirements=args.requirements,
                  rest=rest)
@@ -453,38 +529,59 @@ def wipeenv_cmd():
 
 def inall_cmd():
     """Run a command in each virtualenv."""
+
+    global workon_home
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-w','--workon',default=None)
+    args, rest = parser.parse_known_args()
+
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
     envs = lsenvs()
     for env in envs:
         print("\n%s:" % env)
-        inve(env, *sys.argv[1:])
+        inve(env, *rest)
 
 
 def in_cmd():
     """Run a command in the given virtualenv."""
 
-    if len(sys.argv) < 2:
-        sys.exit('You must provide a valid virtualenv to target')
+    global workon_home
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-w','--workon',default=None)
+    parser.add_argument('env')
+    args, rest = parser.parse_known_args()
 
-    env = sys.argv[1]
-    env_path = workon_home / env
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
+
+    env_path = workon_home / args.env
     if not env_path.exists():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
-'pew-new {0}'.".format(env))
+'pew-new {0}'.".format(args.env))
 
-    inve(env, *sys.argv[2:])
+    inve(args.env, *rest)
 
 
 def restore_cmd():
     """Try to restore a broken virtualenv by reinstalling the same python version on top of it"""
 
-    if len(sys.argv) < 2:
-        sys.exit('You must provide a valid virtualenv to target')
+    global workon_home
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-w','--workon',default=None)
+    parser.add_argument('env')
+    args = parser.parse_args()
+    if args.workon:
+        workon_home = expandpath(args.workon)
+    makedirs_and_symlink_if_needed(workon_home)
 
-    env = sys.argv[1]
-    py = workon_home / env / env_bin_dir / ('python.exe' if windows else 'python')
+    py = workon_home / args.env / env_bin_dir / ('python.exe' if windows else 'python')
     exact_py = py.resolve().name
 
-    check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=str(workon_home))
+    check_call(["virtualenv", args.env, "--python=%s" % exact_py], cwd=str(workon_home))
 
 
 def version_cmd():
