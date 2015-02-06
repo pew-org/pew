@@ -23,7 +23,6 @@ def workon_home():
 @pytest.yield_fixture(scope='session')
 def workon_alt():
     tmpdir = os.environ.get('TMPDIR', gettempdir())
-    os.environ['WORKON_HOME'] = str(Path(tmpdir) / 'WORKON_ALT')
 
     workon = Path(tmpdir) / 'WORKON_ALT'
     rmtree(str(workon), ignore_errors=True)

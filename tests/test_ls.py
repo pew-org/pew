@@ -26,7 +26,7 @@ def test_lssitepackages_add(workon_home):
 
 
 def test_ls_alt(workon_alt):
-    invoke('new','alt','-w',str(workon_alt))
+    invoke('new','alt','-w',str(workon_alt),'-d')
     envs = invoke('ls','-w',str(workon_alt)).out
     assert 'alt' in envs
     invoke('rm','alt','-w',str(workon_alt))
