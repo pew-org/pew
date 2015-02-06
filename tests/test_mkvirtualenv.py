@@ -87,7 +87,7 @@ def test_requirements_file(workon_home):
 def test_create_alt(workon_home, workon_alt):
     invoke('new', 'alt', '-d', '-w', str(workon_alt))
     envs = set(invoke('ls').out.split())
-    envs1 = set(invoke('ls').out.split())
+    envs1 = set(invoke('ls','-w',str(workon_alt)).out.split())
     invoke('rm', 'alt', '-w', str(workon_alt))
     assert 'alt' not in envs
     assert 'alt' in envs1

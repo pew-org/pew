@@ -15,8 +15,8 @@ def test_restore(workon_home, env1):
 
 
 def test_restore_alt(workon_alt):
-    patterns = ['lib*/*/site.py*', 'Lib/site.py*']
     invoke('new','env1','-d','-w',str(workon_alt))
+    patterns = ['lib*/*/site.py*', 'Lib/site.py*']
     to_be_deleted = set(chain(*((workon_alt / 'env1').glob(pat) for pat in patterns)))
     for site in to_be_deleted:
         site.unlink()
