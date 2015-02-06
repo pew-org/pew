@@ -288,7 +288,7 @@ def workon_cmd():
     env_path = workon_home / args.env
     if not env_path.exists():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
-'pew-new {0}'.".format(env))
+'pew-new {0}'.".format(args.env))
     else:
 
         # Check if the virtualenv has an associated project directory and in
