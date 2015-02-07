@@ -35,7 +35,7 @@ def test_no_pew_workon_home(workon_home):
 def test_workon_alt(workon_alt):
     invoke('new','-w',str(workon_alt),'env1','-d')
     cmd = '{0} {1} "{2}"'.format(*check_env)
-    out = invoke('workon', 'env1', '-w', str(workon_alr), inp=cmd).out
+    out = invoke('workon', 'env1', '-w', str(workon_alt), inp=cmd).out
     assert 'env1' == os.path.basename(out.splitlines()[-1].strip())
     invoke('rm','-w',str(workon_alt))
 

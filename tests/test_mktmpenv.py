@@ -37,5 +37,5 @@ def test_mktmpenv_autodeletes(workon_home):
 
 @skip_windows
 def test_mktmpenv_workon_alt(workon_alt):
-    out = invoke('mktmpenv', '-w', str(workon_alt), inp="python -c 'import os; print(os.environ[\'WORKON_HOME\'])").out
+    out = invoke('mktmpenv', '-w', str(workon_alt), inp="""python -c 'import os; print(os.environ["VIRTUAL_ENV"])'""").out
     assert str(workon_alt) in out
