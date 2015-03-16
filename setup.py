@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 from setuptools import setup
-import pew
 
 long_desc = '''Python Env Wrapper is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
@@ -46,7 +45,12 @@ setup(
     entry_points={
         'console_scripts':
         ["pew-{0} = pew.pew:{0}_cmd".format(cmd[:-4])
-         for cmd in dir(pew.pew) if cmd.endswith("_cmd")] +
+         for cmd in ('new_cmd', 'rm_cmd', 'show_cmd', 'ls_cmd', 'workon_cmd',
+                     'add_cmd', 'sitepackages_dir_cmd', 'lssitepackages_cmd',
+                     'toggleglobalsitepackages_cmd', 'cp_cmd',
+                     'setproject_cmd', 'mkproject_cmd', 'mktmpenv_cmd',
+                     'wipeenv_cmd', 'inall_cmd', 'in_cmd', 'restore_cmd',
+                     'version_cmd')] +
         ['pew = pew.pew:pew']},
     classifiers=[
         'Programming Language :: Python :: 2',
