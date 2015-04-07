@@ -96,7 +96,6 @@ class EnvParser:
         with open(filename,'rU') as f:
             for line in f.readlines():
                 lexer = shlex.shlex(line, posix=True)
-                lexer.wordchars += '/.+-():'
                 tokens = list(lexer)
                 if len(tokens) != 3:
                     continue
