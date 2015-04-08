@@ -91,15 +91,18 @@ class EnvParser:
             self.load(filename)
 
     def load(self, filename):
+        #code taken from honcho
+        #Copyright (c) 2012 Nick Stenning, http://whiteink.com/
         self._d = {}
         self._filename = filename
         with open(filename,'rU') as f:
             for line in f.readlines():
                 lexer = shlex.shlex(line, posix=True)
                 tokens = list(lexer)
-                if len(tokens) != 3:
+                if len(tokens) < 3:
                     continue
-                name, op, value = tokens
+                name, op = tokens[:2]
+                value = ''.join(tokens[2:])
                 if op != '=':
                     continue
                 self._d[name]=value
