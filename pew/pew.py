@@ -105,6 +105,10 @@ class EnvParser:
                 value = ''.join(tokens[2:])
                 if op != '=':
                     continue
+                if not re.match(r'[A-Za-z_][A-Za-z_0-9]*', name):
+                    continue
+                value = value.replace(r'\n', '\n')
+                value = value.replace(r'\t', '\t')
                 self._d[name]=value
 
     def save(self, filename):
