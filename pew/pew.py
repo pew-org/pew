@@ -11,6 +11,7 @@ import textwrap
 from subprocess import CalledProcessError
 from pathlib import Path
 import shlex
+import re
 
 try:
     from shutil import get_terminal_size
