@@ -9,6 +9,7 @@ import shutil
 import random
 import textwrap
 from subprocess import CalledProcessError
+from tempfile import NamedTemporaryFile
 from pathlib import Path
 
 try:
@@ -86,17 +87,21 @@ def unsetenv(key):
     if key in os.environ:
         del os.environ[key]
 
+
+def compute_path(env):
+    envdir = workon_home / env
+    return os.pathsep.join([
+        str(envdir / env_bin_dir),
+        os.environ['PATH'],
+    ])
+
 def inve(env, *args, **kwargs):
     assert args
     # we don't strictly need to restore the environment, since pew runs in
     # its own process, but it feels like the right thing to do
     with temp_environ():
-        envdir = workon_home / env
-        os.environ['VIRTUAL_ENV'] = str(envdir)
-        os.environ['PATH'] = os.pathsep.join([
-            str(envdir / env_bin_dir),
-            os.environ['PATH'],
-        ])
+        os.environ['VIRTUAL_ENV'] = str(workon_home / env)
+        os.environ['PATH'] = compute_path(env)
 
         unsetenv('PYTHONHOME')
         unsetenv('__PYVENV_LAUNCHER__')
@@ -113,22 +118,40 @@ def inve(env, *args, **kwargs):
                 raise
 
 
+def fork_shell(env, shellcmd, cwd):
+    or_ctrld = '' if windows else "or 'Ctrl+D' "
+    sys.stderr.write("Launching subshell in virtual environment. Type "
+                     "'exit' %sto return.\n" % or_ctrld)
+
+    inve(env, *shellcmd, cwd=cwd)
+
+
+def fork_bash(env, cwd):
+    # bash is a special little snowflake, and prevent_path_errors cannot work there
+    # https://github.com/berdario/pew/issues/58#issuecomment-102182346
+    with NamedTemporaryFile('w+') as rcfile:
+        with expandpath('~/.bashrc').open() as bashrc:
+            rcfile.write(bashrc.read())
+        rcfile.write('\nexport PATH=' + compute_path(env))
+        fork_shell(env, ['bash', '--rcfile', rcfile.name], cwd)
+
+
 def shell(env, cwd=None):
+    env = str(env)
     shell = 'powershell' if windows else os.environ['SHELL']
-    if not windows:
+    if not windows and shell != 'bash':
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
         shell_check = (sys.executable + ' -c "from pew.pew import '
                        'prevent_path_errors; prevent_path_errors()"')
         try:
-            inve(str(env), shell, '-c', shell_check)
+            inve(env, shell, '-c', shell_check)
         except CalledProcessError:
             return
-    or_ctrld = '' if windows else "or 'Ctrl+D' "
-    sys.stderr.write("Launching subshell in virtual environment. Type "
-                     "'exit' %sto return.\n" % or_ctrld)
-
-    inve(str(env), shell, cwd=cwd)
+    if shell == 'bash':
+        fork_bash(env, cwd)
+    else:
+        fork_shell(env, [shell], cwd)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
