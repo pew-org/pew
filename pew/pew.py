@@ -22,7 +22,7 @@ except ImportError:
     pass # setup.py needs to import this before the dependencies are installed
 
 from pew import __version__
-from pew._utils import (check_call, invoke, expandpath, own,
+from pew._utils import (check_call, invoke, expandpath, own, spawn,
                         env_bin_dir, check_path, temp_environ)
 from pew._print_utils import print_virtualenvs
 
@@ -102,7 +102,7 @@ def inve(env, *args, **kwargs):
         unsetenv('__PYVENV_LAUNCHER__')
 
         try:
-            return check_call(args, shell=windows, **kwargs)
+            return spawn(args, shell=windows, **kwargs)
             # need to have shell=True on windows, otherwise the PYTHONPATH
             # won't inherit the PATH
         except OSError as e:
@@ -121,7 +121,11 @@ def shell(env, cwd=None):
         shell_check = (sys.executable + ' -c "from pew.pew import '
                        'prevent_path_errors; prevent_path_errors()"')
         try:
-            inve(str(env), shell, '-c', shell_check)
+            if shell == 'bash':
+                check_cmd = [shell, '-ic', shell_check]
+            else:
+                check_cmd = [shell, '-c', shell_check]
+            inve(str(env), *check_cmd)
         except CalledProcessError:
             return
     or_ctrld = '' if windows else "or 'Ctrl+D' "

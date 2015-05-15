@@ -1,13 +1,14 @@
 import os
 import sys
 import locale
+import pty
 from contextlib import contextmanager
-from subprocess import check_call, Popen, PIPE
+from subprocess import check_call, Popen, PIPE, CalledProcessError
 from collections import namedtuple
 from functools import partial
 from pathlib import Path
 
-locale.setlocale(locale.LC_ALL, '')
+locale.setlocale(locale.LC_ALL, 'en_GB.UTF-8')
 
 
 def which(fn):
@@ -51,6 +52,15 @@ def resolve_path(f):
 
 check_call = resolve_path(check_call)
 Popen = resolve_path(Popen)
+
+def spawn(args, **kwargs):
+    if args[0] == 'bash':
+        retcode = pty.spawn(args)
+        if retcode:
+            raise CalledProcessError(retcode, args)
+        return retcode
+    else:
+        return check_call(args, **kwargs)
 
 Result = namedtuple('Result', 'out err')
 
