@@ -32,7 +32,7 @@ complete -f -c $pew -n '__pew_needs_command' -a new -d 'Create a new environment
 complete -f -c $pew -n '__pew_using_command new' -s h -d 'Show help'
 complete -f -c $pew -n '__pew_using_command new' -s p -l python -d 'Python executable'
 complete -f -c $pew -n '__pew_using_command new' -s i -d 'Install a package after the environment is created'
-complete -f -c $pew -n '__pew_using_command new' -s a -d 'Project directory to associate'
+complete -f -c $pew -n '__pew_using_command new' -s a -a '(__fish_complete_directories (commandline -ct))' -d 'Project directory to associate'
 complete -f -c $pew -n '__pew_using_command new' -s r -d 'Pip requirements file'
 
 
@@ -59,7 +59,7 @@ complete -f -c $pew -n '__pew_using_command show' -a '(__pew_list_envs)' -d 'Vir
 
 #### rm
 complete -f -c $pew -n '__pew_needs_command' -a rm -d 'Remove one or more environments'
-complete -f -c $pew -n '__pew_using_command rm' -a '(__pew_list_envs)' -d 'Node env'
+complete -f -c $pew -n '__pew_using_command rm' -a '(__pew_list_envs)' -d 'Virtual env'
 
 #### cp
 complete -f -c $pew -n '__pew_needs_command' -a cp -d 'Duplicate an existing virtualenv environment'
