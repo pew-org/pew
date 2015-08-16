@@ -31,13 +31,13 @@ setup(
     ],
     extras_require={
         ':python_version=="2.6"': [
-            'argparse', 'pathlib', 'backports.shutil_get_terminal_size'
+            'argparse', 'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
         ],
         ':python_version=="2.7"': [
-            'pathlib', 'backports.shutil_get_terminal_size'
+            'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
         ],
         ':python_version=="3.2"': [
-            'pathlib', 'backports.shutil_get_terminal_size'
+            'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
         ],
         ':python_version=="3.3"': ['pathlib'],
     },
