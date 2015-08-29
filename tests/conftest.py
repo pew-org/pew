@@ -20,6 +20,17 @@ def workon_home():
     rmtree(str(workon))
 
 
+@pytest.yield_fixture(scope='session')
+def workon_alt():
+    tmpdir = os.environ.get('TMPDIR', gettempdir())
+
+    workon = Path(tmpdir) / 'WORKON_ALT'
+    rmtree(str(workon), ignore_errors=True)
+    workon.mkdir(parents=True)
+    yield workon
+    rmtree(str(workon))
+
+
 @pytest.yield_fixture()
 def env1(workon_home):
     invoke('new', 'env1', '-d')

@@ -121,7 +121,7 @@ Command Reference
 
 Create a new environment, in the WORKON_HOME.
 
-`usage: pew-new [-hd] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] envname`
+`usage: pew-new [-hd] [-w WORKON_HOME] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] envname`
 
 The new environment is automatically activated after being initialized.
 
@@ -131,11 +131,13 @@ The `-i` option can be used to install one or more packages (by repeating the op
 
 The `-r` option can be used to specify a text file listing packages to be installed. The argument value is passed to `pip -r` to be installed.
 
+The `-w` option can be used to specify the `WORKON_HOME` directory, overriding the value specified in the environment variable.
+
 ### workon ###
 
 List or change working virtual environments.
 
-`usage: pew-workon [environment_name]`
+`usage: pew-workon [-w WORKON_HOME] [environment_name]`
 
 If no `environment_name` is given the list of available environments is printed to stdout.
 
@@ -143,13 +145,13 @@ If no `environment_name` is given the list of available environments is printed 
 
 Create a temporary virtualenv.
 
-`usage: pew-mktmpenv [-h] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS]`
+`usage: pew-mktmpenv [-h] [-w WORKON_HOME] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS]`
 
 ### ls ###
 
 List all of the environments.
 
-`usage: pew-ls [-h] [-b | -l]`
+`usage: pew-ls [-h] [-b | -l] [-w WORKON_HOME]`
 
 ### show ###
 
@@ -159,19 +161,19 @@ List all of the environments.
 
 Run a command in each virtualenv.
 
-`usage: pew-inall [command]`
+`usage: pew-inall [-w WORKON_HOME] [command]`
 
 ### in ###
 
 Run a command in the given virtualenv.
 
-`usage: pew-in [env] [command]`
+`usage: pew-in [-w WORKON_HOME] [env] [command]`
 
 ### rm ###
 
 Remove one or more environments, from the WORKON_HOME.
 
-`usage: pew-rm envs [envs ...]`
+`usage: pew-rm [-w WORKON_HOME] envs [envs ...]`
 
 You have to exit from the environment you want to remove.
 
@@ -216,7 +218,7 @@ Controls whether the active virtualenv will access the packages in the global Py
 
 Create a new virtualenv in the `WORKON_HOME` and project directory in `PROJECT_HOME`.
 
-`usage: pew-mkproject [-hd] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] [-t TEMPLATES] [-l] envname`
+`usage: pew-mkproject [-hd] [-w WORKON_HOME] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] [-t TEMPLATES] [-l] envname`
 
 The template option may be repeated to have several templates used to create a new project. The templates are applied in the order named on the command line. All other options are passed to `pew-new` to create a virtual environment with the same name as the project.
 
@@ -226,7 +228,7 @@ A template is simply an executable to be found in `WORKON_HOME`, it will be call
 
 Bind an existing virtualenv to an existing project.
 
-`usage: pew-setproject [virtualenv_path] [project_path]`
+`usage: pew-setproject [-w WORKON_HOME] [virtualenv_path] [project_path]`
 
 When no arguments are given, the current virtualenv and current directory are assumed.
 
@@ -235,7 +237,7 @@ When no arguments are given, the current virtualenv and current directory are as
 Try to restore a broken virtualenv by reinstalling the same python
 version on top of it
 
-`usage: pew-restore env`
+`usage: pew-restore [-w WORKON_HOME] env`
 
 Configuration
 -------------
