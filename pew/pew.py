@@ -138,7 +138,7 @@ def fork_bash(env, cwd):
 
 def shell(env, cwd=None):
     env = str(env)
-    shell = 'powershell' if windows else os.environ['SHELL']
+    shell = 'powershell' if windows else os.environ.get('SHELL', 'sh')
     if not windows and shell != 'bash':
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
@@ -529,7 +529,7 @@ def pew():
     cmds = dict((cmd[:-4], fun)
                 for cmd, fun in globals().items() if cmd.endswith('_cmd'))
     if sys.argv[1:]:
-        try:
+        if sys.argv[1] in cmds:
             command = cmds[sys.argv[1]]
             sys.argv = ['-'.join(sys.argv[:2])] + sys.argv[2:]
             update_args_dict()
@@ -537,7 +537,7 @@ def pew():
                 return command()
             except CalledProcessError as e:
                 return e.returncode
-        except KeyError:
+        else:
             print("ERROR: command %s does not exist." % sys.argv[1],
                   file=sys.stderr)
 
