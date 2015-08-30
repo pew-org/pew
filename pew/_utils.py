@@ -7,33 +7,12 @@ from subprocess import check_call, Popen, PIPE, CalledProcessError
 from collections import namedtuple
 from functools import partial
 from pathlib import Path
+try:
+    from shutil import which
+except ImportError:
+    from shutilwhich import which
 
-locale.setlocale(locale.LC_ALL, 'en_GB.UTF-8')
-
-
-def which(fn):
-    """Simplified version of shutil.which for internal usage.
-
-Doesn't look up commands ending in '.exe' (we don't use them),
-nor does it avoid looking up commands that already have their directory
-specified (we don't use them either) and it doesn't check the current directory,
-just like on *nix systems.
-"""
-
-    def _access_check(fn):
-        return (os.path.exists(fn) and os.access(fn, os.F_OK | os.X_OK)
-                and not os.path.isdir(fn))
-    pathext = os.environ.get("PATHEXT", "").split(os.pathsep)
-    files = [fn + ext.lower() for ext in pathext]
-    path = os.environ.get("PATH", os.defpath).split(os.pathsep)
-    seen = set()
-    for dir in map(os.path.normcase, path):
-        if dir not in seen:
-            seen.add(dir)
-            for name in map(lambda f: os.path.join(dir, f), files):
-                if _access_check(name):
-                    return name
-
+locale.setlocale(locale.LC_ALL, '')
 
 def check_path():
     parent = os.path.dirname
@@ -41,17 +20,15 @@ def check_path():
 
 
 def resolve_path(f):
-    if sys.platform != 'win32':
-        return f
-    else:
-        def call(cmd, **kwargs):
-            ex = cmd[0]
-            ex = which(ex) or ex
-            return f([ex] + list(cmd[1:]), **kwargs)
-        return call
+    def call(cmd, **kwargs):
+        ex = cmd[0]
+        ex = which(ex) or ex
+        return f([ex] + list(cmd[1:]), **kwargs)  # list-conversion is required in case `cmd` is a tuple
+    return call
 
-check_call = resolve_path(check_call)
-Popen = resolve_path(Popen)
+if sys.platform == 'win32':
+    check_call = resolve_path(check_call)
+    Popen = resolve_path(Popen)
 
 def spawn(args, **kwargs):
     if args[0] == 'bash':

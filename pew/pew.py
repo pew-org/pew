@@ -86,6 +86,7 @@ def unsetenv(key):
     if key in os.environ:
         del os.environ[key]
 
+
 def inve(env, *args, **kwargs):
     assert args
     # we don't strictly need to restore the environment, since pew runs in
@@ -114,8 +115,8 @@ def inve(env, *args, **kwargs):
 
 
 def shell(env, cwd=None):
-    shell = 'powershell' if windows else os.environ['SHELL']
-    if not windows:
+    shell = 'powershell' if windows else os.environ.get('SHELL', 'sh')
+    if not windows and shell != 'bash':
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
         shell_check = (sys.executable + ' -c "from pew.pew import '
@@ -131,7 +132,6 @@ def shell(env, cwd=None):
     or_ctrld = '' if windows else "or 'Ctrl+D' "
     sys.stderr.write("Launching subshell in virtual environment. Type "
                      "'exit' %sto return.\n" % or_ctrld)
-
     inve(str(env), shell, cwd=cwd)
 
 
@@ -510,7 +510,7 @@ def pew():
     cmds = dict((cmd[:-4], fun)
                 for cmd, fun in globals().items() if cmd.endswith('_cmd'))
     if sys.argv[1:]:
-        try:
+        if sys.argv[1] in cmds:
             command = cmds[sys.argv[1]]
             sys.argv = ['-'.join(sys.argv[:2])] + sys.argv[2:]
             update_args_dict()
@@ -518,7 +518,7 @@ def pew():
                 return command()
             except CalledProcessError as e:
                 return e.returncode
-        except KeyError:
+        else:
             print("ERROR: command %s does not exist." % sys.argv[1],
                   file=sys.stderr)
 

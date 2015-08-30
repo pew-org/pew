@@ -4,7 +4,7 @@ Pew - Python Env Wrapper
 [![PyPi version](http://img.shields.io/pypi/v/pew.svg)](https://pypi.python.org/pypi/pew)
 [![Build Status](https://travis-ci.org/berdario/pew.png)](https://travis-ci.org/berdario/pew)
 [![Build status](https://ci.appveyor.com/api/projects/status/xxe096txh1fuqfag/branch/master?svg=true)](https://ci.appveyor.com/project/berdario/pew/branch/master)
-[![Wheel Status](https://pypip.in/wheel/pew/badge.svg)](https://pypi.python.org/pypi/pew/)
+[![PyPi](https://img.shields.io/pypi/format/pew.svg)](https://pypi.python.org/pypi/pew/)
 
 **For new users coming from virtualenvwrapper and pre-0.1.6 users: after some users' suggestions, and after deeming not very useful to replicate 1to1 virtualenvwrapper's commands, now all the commands are subcommands of the pew command, or can used by prefixing "pew-"**
 
