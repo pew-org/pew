@@ -20,7 +20,7 @@ except ImportError:
 try:
     from clonevirtualenv import clone_virtualenv
 except ImportError:
-    pass # setup.py needs to import this before the dependencies are installed
+    pass  # setup.py needs to import this before the dependencies are installed
 
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own,
@@ -434,7 +434,7 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
         sys.exit('Project %s already exists.' % args.envname)
 
     mkvirtualenv(args.envname, args.python, args.packages, project.absolute(),
-                        args.requirements, rest)
+                 args.requirements, rest)
 
     project.mkdir()
 

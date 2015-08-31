@@ -13,6 +13,7 @@ except ImportError:
 
 locale.setlocale(locale.LC_ALL, '')
 
+
 def check_path():
     parent = os.path.dirname
     return parent(parent(which('python'))) == os.environ['VIRTUAL_ENV']
@@ -30,6 +31,7 @@ if sys.platform == 'win32':
     Popen = resolve_path(Popen)
 
 Result = namedtuple('Result', 'out err')
+
 
 # TODO: it's better to fail early, and thus I'd need to check the exit code, but it'll
 # need a refactoring of a couple of tests
