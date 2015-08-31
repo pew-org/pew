@@ -372,23 +372,40 @@ def cp_cmd():
                         activate the new environment).")
 
     args = parser.parse_args()
-    source = expandpath(args.source)
+    target_name = copy_virtualenv_project(args.source, args.target)
+    if args.activate:
+        shell(target_name)
+
+
+def copy_virtualenv_project(source, target):
+    source = expandpath(source)
     if not source.exists():
-        source = workon_home / args.source
+        source = workon_home / source
         if not source.exists():
             sys.exit('Please provide a valid virtualenv to copy')
 
-    target_name = args.target or source.name
+    target_name = target or source.name
 
     target = workon_home / target_name
 
     if target.exists():
-        sys.exit('%s virtualenv already exists in %s.' % (target_name, workon_home))
+        sys.exit('%s virtualenv already exists in %s.' % (
+            target_name, workon_home
+        ))
 
     print('Copying {0} in {1}'.format(source, target_name))
     clone_virtualenv(str(source), str(target))
-    if args.activate:
-        shell(target_name)
+    return target_name
+
+
+def rename_cmd():
+    """Rename a virtualenv"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument('source')
+    parser.add_argument('target')
+    pargs = parser.parse_args()
+    copy_virtualenv_project(pargs.source, pargs.target)
+    rmvirtualenvs(pargs.source)
 
 
 def setvirtualenvproject(env, project):
