@@ -17,10 +17,7 @@ try:
 except ImportError:
     from backports.shutil_get_terminal_size import get_terminal_size
 
-try:
-    from clonevirtualenv import clone_virtualenv
-except ImportError:
-    pass  # setup.py needs to import this before the dependencies are installed
+from clonevirtualenv import clone_virtualenv
 
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own,
@@ -43,21 +40,11 @@ def makedirs_and_symlink_if_needed(workon_home):
         link = expandpath('~/.virtualenvs')
         if os.name == 'posix' and 'WORKON_HOME' not in os.environ and \
            'XDG_DATA_HOME' not in os.environ and not link.exists():
-            try:
-                workon_home.symlink_to(str(link))
-            except OSError as e:
-                # FIXME on TravisCI, even if I check with `link.exists()`, this
-                # exception can be raised and needs to be catched, maybe it's a race condition?
-                if e.errno != 17:
-                    raise
-
-makedirs_and_symlink_if_needed(workon_home)
-
-
-inve_site = Path(__file__).parent
+             workon_home.symlink_to(str(link))
 
 
 def deploy_completions():
+    inve_site = Path(__file__).parent
     completions = {'complete.bash': Path('/etc/bash_completion.d/pew'),
                    'complete.zsh': Path('/usr/local/share/zsh/site-functions/_pew'),
                    'complete.fish': Path('/etc/fish/completions/pew.fish')}
@@ -545,6 +532,8 @@ In this case, for further details please see: https://github.com/berdario/pew#th
 
 
 def pew():
+    makedirs_and_symlink_if_needed(workon_home)
+
     cmds = dict((cmd[:-4], fun)
                 for cmd, fun in globals().items() if cmd.endswith('_cmd'))
     if sys.argv[1:]:

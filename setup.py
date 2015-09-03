@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 from setuptools import setup
-import pew
 
 long_desc = '''Python Env Wrapper is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
