@@ -415,11 +415,15 @@ def setvirtualenvproject(env, project):
 
 
 def setproject_cmd():
-    """Given a virtualenv directory and a project directory, set the virtualenv up to be associated with the project."""
-    env = os.environ.get('VIRTUAL_ENV', args.get(1))
-    project = args.get(2, os.path.abspath('.'))
+    """Given a virtualenv directory and a project directory, set the
+    virtualenv up to be associated with the project."""
+    args = dict(enumerate(sys.argv))
+    project = os.path.abspath(args.get(2, '.'))
+    env = args.get(1, os.environ.get('VIRTUAL_ENV'))
     if not env:
-        sys.exit('pew-setproject [virtualenv_path] [project_path]')
+        sys.exit('pew-setproject [virtualenv] [project_path]')
+    if not os.path.isdir(project):
+        sys.exit('pew-setproject: %s does not exist' % project)
     setvirtualenvproject(env, project)
 
 

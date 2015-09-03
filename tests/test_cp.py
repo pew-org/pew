@@ -3,12 +3,17 @@ from subprocess import check_call
 from pathlib import Path
 
 from pew._utils import invoke_pew as invoke
+from utils import skip_windows
 
 import pytest
 
 which_cmd = 'where' if platform == 'win32' else 'which'
 
-pytestmark = pytest.mark.skipif(platform == 'win32', reason='temporarily disable tests, due to issues with the virtualenv-clone executable, maybe this bug? http://bugs.python.org/issue20614')
+pytestmark = skip_windows(
+    reason='temporarily disable tests, due to issues with the virtualenv-clone'
+    ' executable, maybe this bug? http://bugs.python.org/issue20614'
+)
+
 
 @pytest.yield_fixture()
 def copied_env(workon_home, env1):
