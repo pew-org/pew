@@ -4,7 +4,7 @@ _pew_list_venvs () {
 	local expl
 	local -a venvs
 
-    venvs=(${(f)"$(_call_program venvs pew-ls --long 2>/dev/null)"})
+    venvs=(${(f)"$(_call_program venvs pew ls --long 2>/dev/null)"})
     _wanted venvs expl 'virtual envs' compadd -a venvs
 }
 
@@ -100,6 +100,3 @@ case $state in
             ;;
         esac
 esac
-
-
-

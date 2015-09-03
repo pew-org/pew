@@ -44,10 +44,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     entry_points={
-        'console_scripts':
-        ["pew-{0} = pew.pew:{0}_cmd".format(cmd[:-4])
-         for cmd in dir(pew.pew) if cmd.endswith("_cmd")] +
-        ['pew = pew.pew:pew']},
+        'console_scripts': ['pew = pew.pew:pew']},
     classifiers=[
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',

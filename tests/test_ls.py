@@ -5,7 +5,7 @@ from pew._utils import invoke_pew as invoke
 
 def test_get_site_packages_dir(workon_home):
     invoke('new', 'env', '-d')
-    d = invoke('in', 'env', 'pew-sitepackages_dir').out
+    d = invoke('in', 'env', 'pew', 'sitepackages_dir').out
     assert Path(d).exists
     invoke('rm', 'env')
 

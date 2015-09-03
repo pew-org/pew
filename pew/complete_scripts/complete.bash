@@ -7,7 +7,7 @@ _pew()
 
     case $prev in
         ls|show|rm|workon|cp|setproject)
-            COMPREPLY=( $(compgen -W "$(pew-ls)" -- ${cur}) )
+            COMPREPLY=( $(compgen -W "$(pew ls)" -- ${cur}) )
             return 0
             ;;
         inall)
@@ -27,7 +27,7 @@ _pew()
             return 0
             ;;
     esac
-    
+
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
 
 } &&
