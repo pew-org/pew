@@ -121,7 +121,7 @@ def fork_bash(env, cwd):
 
 def shell(env, cwd=None):
     env = str(env)
-    shell = 'powershell' if windows else os.environ.get('SHELL', 'sh')
+    shell = os.environ.get('SHELL', 'powershell' if windows else 'sh')
     if not windows and shell != 'bash':
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
