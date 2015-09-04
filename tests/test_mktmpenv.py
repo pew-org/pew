@@ -20,7 +20,7 @@ def test_mktmpenv_extra_name(workon_home):
         check_call('pew mktmpenv yada'.split())
 
 
-@skip_windows
+@skip_windows(reason='cannot supply stdin to powershell')
 def test_mktmpenv_ngsp(workon_home):
     site = Path(invoke('mktmpenv', inp='pew sitepackages_dir').out)
     assert (site.parent / 'no-global-site-packages.txt').exists
