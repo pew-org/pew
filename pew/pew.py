@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from __future__ import print_function, absolute_import
+from __future__ import print_function, absolute_import, unicode_literals
 
 import os
 import sys
@@ -297,10 +297,10 @@ directory; if this file does not exists, it will be created first.
     args = parser.parse_args(argv)
 
     extra_paths = sitepackages_dir() / '_virtualenv_path_extensions.pth'
-    new_paths = [os.path.abspath(d) + u"\n" for d in args.dirs]
+    new_paths = [os.path.abspath(d) + "\n" for d in args.dirs]
     if not extra_paths.exists():
         with extra_paths.open('w') as extra:
-            extra.write(u'''import sys; sys.__plen = len(sys.path)
+            extra.write('''import sys; sys.__plen = len(sys.path)
 import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)
             ''')
 
