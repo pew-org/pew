@@ -226,8 +226,23 @@ def rm_cmd(argv):
     rmvirtualenvs(argv)
 
 
+def packages(site_packages):
+    nodes = site_packages.iterdir()
+    return set([x.stem.split('-')[0] for x in nodes]) - set(['__pycache__'])
+
+
 def showvirtualenv(env):
-    print(env)
+    columns, _ = get_terminal_size()
+    pkgs = packages(sitepackages_dir(env))
+    env_python = workon_home / env / env_bin_dir / 'python'
+    l = len(env) + 2
+    version = invoke(str(env_python), '-V')
+    version = ' - '.join((version.out + version.err).splitlines())
+    print(env, ': ', version, sep='')
+    print(textwrap.fill(' '.join(pkgs),
+                        width=columns-l,
+                        initial_indent=(l * ' '),
+                        subsequent_indent=(l * ' ')), '\n')
 
 
 def show_cmd(argv):
@@ -285,11 +300,12 @@ def workon_cmd(argv):
         shell(env, cwd=project_dir)
 
 
-def sitepackages_dir():
-    if 'VIRTUAL_ENV' not in os.environ:
+def sitepackages_dir(env=os.environ.get('VIRTUAL_ENV')):
+    if not env:
         sys.exit('ERROR: no virtualenv active')
     else:
-        return Path(invoke('python', '-c', 'import distutils; \
+        env_python = workon_home / env / env_bin_dir / 'python'
+        return Path(invoke(str(env_python), '-c', 'import distutils; \
 print(distutils.sysconfig.get_python_lib())').out)
 
 
