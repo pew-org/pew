@@ -42,16 +42,26 @@ def makedirs_and_symlink_if_needed(workon_home):
            'XDG_DATA_HOME' not in os.environ and not link.exists():
              workon_home.symlink_to(str(link))
 
+pew_site = Path(__file__).parent
+
+
+def completions_cmd(argv):
+    "Prints the path for the current $SHELL completion file"
+    shell = Path(os.environ.get('SHELL', '')).stem
+    if shell in ('bash', 'zsh', 'fish'):
+        print(pew_site / 'complete_scripts' / ('complete.' + shell))
+    else:
+        print('Completions are unavailable for %s' % repr(shell), file=sys.stderr)
+
 
 def deploy_completions():
-    inve_site = Path(__file__).parent
     completions = {'complete.bash': Path('/etc/bash_completion.d/pew'),
                    'complete.zsh': Path('/usr/local/share/zsh/site-functions/_pew'),
                    'complete.fish': Path('/etc/fish/completions/pew.fish')}
     for comp, dest in completions.items():
         if not dest.parent.exists():
             dest.parent.mkdir(parents=True)
-        shutil.copy(str(inve_site / 'complete_scripts' / comp), str(dest))
+        shutil.copy(str(pew_site / 'complete_scripts' / comp), str(dest))
 
 
 def get_project_dir(env):
