@@ -112,17 +112,22 @@ def fork_shell(env, shellcmd, cwd):
 def fork_bash(env, cwd):
     # bash is a special little snowflake, and prevent_path_errors cannot work there
     # https://github.com/berdario/pew/issues/58#issuecomment-102182346
-    with NamedTemporaryFile('w+') as rcfile:
-        with expandpath('~/.bashrc').open() as bashrc:
-            rcfile.write(bashrc.read())
-        rcfile.write('\nexport PATH=' + compute_path(env))
-        fork_shell(env, ['bash', '--rcfile', rcfile.name], cwd)
+    bashrcpath = expandpath('~/.bashrc')
+    if bashrcpath.exists():
+        with NamedTemporaryFile('w+') as rcfile:
+            with bashrcpath.open() as bashrc:
+                rcfile.write(bashrc.read())
+            rcfile.write('\nexport PATH=' + compute_path(env))
+            fork_shell(env, ['bash', '--rcfile', rcfile.name], cwd)
+    else:
+        fork_shell(env, ['bash'], cwd)
 
 
 def shell(env, cwd=None):
     env = str(env)
     shell = os.environ.get('SHELL', 'powershell' if windows else 'sh')
-    if not windows and shell != 'bash':
+    shell_name = Path(shell).stem
+    if shell_name not in ('powershell', 'bash'):
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
         shell_check = (sys.executable + ' -c "from pew.pew import '
@@ -131,7 +136,7 @@ def shell(env, cwd=None):
             inve(env, shell, '-c', shell_check)
         except CalledProcessError:
             return
-    if shell == 'bash':
+    if shell_name == 'bash':
         fork_bash(env, cwd)
     else:
         fork_shell(env, [shell], cwd)
