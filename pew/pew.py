@@ -473,14 +473,22 @@ def mktmpenv_cmd(argv):
 
 
 def wipeenv_cmd(argv):
-    """Remove all installed packages from the current env."""
-    pkgs = map(lambda d: d.split("==")[0], invoke('pip', 'freeze').out.split())
-    to_remove = [pkg for pkg in pkgs if pkg not in ('distribute', 'wsgiref')]
-    if to_remove:
-        print("Uninstalling packages:\n%s" % "\n".join(to_remove))
-        check_call(['pip', 'uninstall', '-y'] + to_remove)
+    """Remove all installed packages from the current (or supplied) env."""
+    env = argv[0] if argv else os.environ.get('VIRTUAL_ENV')
+
+    if not env:
+        sys.exit('ERROR: no virtualenv active')
+    elif not (workon_home / env).exists():
+        sys.exit("ERROR: Environment '{0}' does not exist.".format(env))
     else:
-        print("Nothing to remove")
+        env_pip = str(workon_home / env / env_bin_dir / 'pip')
+        pkgs = set(d.split("==")[0] for d in invoke(env_pip, 'freeze').out.split())
+        to_remove = sorted(pkgs - set(['distribute', 'wsgiref']))
+        if to_remove:
+            print("Uninstalling packages:\n%s" % " ".join(to_remove))
+            inve(env, 'pip', 'uninstall', '-y', *to_remove)
+        else:
+            print("Nothing to remove")
 
 
 def inall_cmd(argv):
