@@ -12,8 +12,7 @@ end
 
 
 function __pew_list_envs
-    #eval "$pew ls" | tr " " "\n"
-    eval "$pew ls -l"
+    eval "$pew ls" | tr " " "\n"
 end
 
 function __pew_using_command

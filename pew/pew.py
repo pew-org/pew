@@ -45,13 +45,13 @@ def makedirs_and_symlink_if_needed(workon_home):
 pew_site = Path(__file__).parent
 
 
-def completions_cmd(argv):
-    "Prints the path for the current $SHELL completion file"
+def shell_config_cmd(argv):
+    "Prints the path for the current $SHELL helper file"
     shell = Path(os.environ.get('SHELL', '')).stem
     if shell in ('bash', 'zsh', 'fish'):
-        print(pew_site / 'complete_scripts' / ('complete.' + shell))
+        print(pew_site / 'shell_config' / ('init.' + shell))
     else:
-        print('Completions are unavailable for %s' % repr(shell), file=sys.stderr)
+        print('Completions and prompts are unavailable for %s' % repr(shell), file=sys.stderr)
 
 
 def deploy_completions():
@@ -61,7 +61,7 @@ def deploy_completions():
     for comp, dest in completions.items():
         if not dest.parent.exists():
             dest.parent.mkdir(parents=True)
-        shutil.copy(str(pew_site / 'complete_scripts' / comp), str(dest))
+        shutil.copy(str(pew_site / 'shell_config' / comp), str(dest))
 
 
 def get_project_dir(env):
@@ -128,6 +128,7 @@ def fork_bash(env, cwd):
             with bashrcpath.open() as bashrc:
                 rcfile.write(bashrc.read())
             rcfile.write('\nexport PATH=' + compute_path(env))
+            rcfile.flush()
             fork_shell(env, ['bash', '--rcfile', rcfile.name], cwd)
     else:
         fork_shell(env, ['bash'], cwd)
