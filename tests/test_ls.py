@@ -3,6 +3,10 @@ from pathlib import Path
 from pew._utils import invoke_pew as invoke
 
 
+def test_ls(workon_home):
+    r = invoke('ls')
+    assert not r.out and not r.err
+
 def test_get_site_packages_dir(workon_home):
     invoke('new', 'env', '-d')
     d = invoke('in', 'env', 'pew', 'sitepackages_dir').out

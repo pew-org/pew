@@ -27,6 +27,7 @@ def row_len(names):
 
 def get_best_columns_number(venvs):
     max_width, _ = get_terminal_size()
+    columns_number = 1
     for columns_number in range(1, len(venvs) + 1):
         rows = get_rows(venvs, columns_number)
         if max(map(row_len, rows)) > max_width:
