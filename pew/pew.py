@@ -26,6 +26,9 @@ from pew._print_utils import print_virtualenvs
 
 windows = sys.platform == 'win32'
 
+if sys.version_info[0] == 2:
+    input = raw_input
+
 
 workon_home = expandpath(
     os.environ.get('WORKON_HOME',
@@ -41,17 +44,26 @@ def makedirs_and_symlink_if_needed(workon_home):
         if os.name == 'posix' and 'WORKON_HOME' not in os.environ and \
            'XDG_DATA_HOME' not in os.environ and not link.exists():
              workon_home.symlink_to(str(link))
+        return True
+    else:
+        return False
 
 pew_site = Path(__file__).parent
+
+def supported_shell():
+    shell = Path(os.environ.get('SHELL', '')).stem
+    if shell in ('bash', 'zsh', 'fish'):
+        return shell
 
 
 def shell_config_cmd(argv):
     "Prints the path for the current $SHELL helper file"
-    shell = Path(os.environ.get('SHELL', '')).stem
-    if shell in ('bash', 'zsh', 'fish'):
+    shell = supported_shell()
+    if shell:
         print(pew_site / 'shell_config' / ('init.' + shell))
     else:
-        print('Completions and prompts are unavailable for %s' % repr(shell), file=sys.stderr)
+        print('Completions and prompts are unavailable for %s' %
+              repr(os.environ.get('SHELL', '')), file=sys.stderr)
 
 
 def deploy_completions():
@@ -571,8 +583,37 @@ from inside your shell's configuration file.
 In this case, for further details please see: https://github.com/berdario/pew#the-environment-doesnt-seem-to-be-activated''')
 
 
+def first_run_setup():
+    shell = supported_shell()
+    if shell:
+        if shell == 'fish':
+            source_cmd = 'source (pew shell_config)'
+        else:
+            source_cmd = 'source $(pew shell_config)'
+        rcpath = expandpath({'bash': '~/.bashrc'
+                           , 'zsh': '~/.zshrc'
+                           , 'fish': '~/.config/fish/config.fish'}[shell])
+        with rcpath.open('r+') as rcfile:
+            if (source_cmd + '\n') not in rcfile.readlines():
+                choice = 'X'
+                while choice not in ('y', '', 'n'):
+                    choice = input("It seems that you're running pew for the first time\n"
+                                   "do you want to modify %s to source completions and"
+                                   " update your prompt? [y/N]\n> " % rcpath).lower()
+                if choice == 'y':
+                    rcfile.write('\n# added by Pew\n%s\n' % source_cmd)
+                    print('Done')
+                else:
+                    print('\nOk, if you want to do it manually, just add\n %s\nat'
+                          ' the end of %s' % (source_cmd, rcpath))
+                print('\nWill now continue with the command:', *sys.argv[1:])
+                input('[enter]')
+
+
 def pew():
-    makedirs_and_symlink_if_needed(workon_home)
+    first_run = makedirs_and_symlink_if_needed(workon_home)
+    if first_run and sys.stdin.isatty():
+        first_run_setup()
 
     cmds = dict((cmd[:-4], fun)
                 for cmd, fun in globals().items() if cmd.endswith('_cmd'))
