@@ -636,7 +636,7 @@ def pew():
         if fun.__doc__:
             print(textwrap.fill(
                 fun.__doc__.splitlines()[0],
-                columns,
+                columns or 1000,
                 initial_indent=(' {0}: '.format(cmd)).ljust(longest),
                 subsequent_indent=longest * ' '))
         else:

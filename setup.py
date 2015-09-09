@@ -2,13 +2,11 @@
 
 from setuptools import setup
 
-long_desc = '''Python Env Wrapper is a set of tools to manage multiple virtual environments. The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
+long_desc = '''Python Env Wrapper is a set of commands to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). Pew can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
-Pew makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages inve: the idea/alternative implementation of a better activate script.
+Virtualenvs makes it easier to work on more than one project at a time without introducing conflicts in their dependencies.
 
-The advantage is that pew doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
-
-It works on bash, zsh, fish, powershell, etc.
+Pew is completely shell-agnostic and thus works on bash, zsh, fish, powershell, etc.
 
 For the documentation, you might want to read here:
 https://github.com/berdario/pew#usage'''
@@ -16,9 +14,8 @@ https://github.com/berdario/pew#usage'''
 
 setup(
     name='pew',
-    version='0.1.14',
-    description='tool to manage multiple virtualenvs written in pure python, '
-    'a virtualenvwrapper rewrite',
+    version='0.1.15',
+    description='tool to manage multiple virtualenvs written in pure python',
     long_description=long_desc,
     author='Dario Bertini',
     author_email='berdario+pypi@gmail.com',

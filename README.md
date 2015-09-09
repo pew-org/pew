@@ -6,25 +6,11 @@ Pew - Python Env Wrapper
 [![Build status](https://ci.appveyor.com/api/projects/status/xxe096txh1fuqfag/branch/master?svg=true)](https://ci.appveyor.com/project/berdario/pew/branch/master)
 [![PyPi](https://img.shields.io/pypi/format/pew.svg)](https://pypi.python.org/pypi/pew/)
 
-Python Env Wrapper is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
+Python Env Wrapper is a set of commands to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). Pew can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
-Pew makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea/alternative implementation of a better activate script.
+Virtualenvs makes it easier to work on more than one project at a time without introducing conflicts in their dependencies.
 
-The advantage is that pew doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
-
-It works on bash, zsh, fish, powershell, etc.
-
-Another side effect is that its code is much shorter and (hopefully) easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s (the project upon which this is based). How many Python programmers know at a glance what does `"${out_args[@]-}"` do? or `eval "envname=\$$#"`?
-
-* Part of the conciseness of pew is thanks to inve itself: "shelling out" let us avoid to keep track of the previous environment variable values, and to create a deactivate script.
-
-* Part is thanks to Python libraries, like argparse.
-
-* Part is thanks to the stricter Python error handling.
-
-* Part is thanks to some [differences](#differences-from-virtualenvwrapper).
-
-* Part is also probably due to my objectionable taste for code layout :)
+Pew is completely shell-agnostic and thus works on bash, zsh, fish, powershell, etc.
 
 Installation
 ------------
@@ -115,6 +101,8 @@ You can also specify a requirements file, to be passed on to pip, and activate a
 Command Reference
 -----------------
 
+When invoked without arguments pew will output the list of all commands with each one's description
+
 ### new ###
 
 Create a new environment, in the WORKON_HOME.
@@ -148,6 +136,8 @@ Create a temporary virtualenv.
 List all of the environments.
 
 `usage: pew ls [-h] [-b | -l]`
+
+The `--long` options will print each virtualenv side-by-side with its Python version and the contents of its site-packages
 
 ### show ###
 
@@ -235,6 +225,26 @@ version on top of it
 
 `usage: pew restore env`
 
+### rename ###
+
+Rename a virtualenv (by copying it over to the new name, and deleting the old one)
+
+`usage: pew rename source target`
+
+### wipeenv ###
+
+Remove all installed packages from the current (or supplied) env.
+
+`usage: pew wipeenv [env]`
+
+### shell_config ###
+
+Prints the path for the current $SHELL helper file
+
+`usage: pew shell_config`
+
+
+
 Configuration
 -------------
 
@@ -272,13 +282,13 @@ Congratulations! You found a bug, please [let me know](https://github.com/berdar
 Running Tests
 -------------
 
-pew's test suite is a straight port of virtualenvwrapper's, dropping test related to things absent in pew and converting the scripts to use commands "echoed inside the workon commands" (almost surely there was a better approach, but I wasn't sure how to integrate it with shunit asserts, and I didn't want to rewrite all the tests as well); This means that they're slightly uglier and they spew out more unimportant output when running.
+The test suite for pew uses [tox](http://codespeak.net/tox). Most tests are actually integration tests that will fork shells, create virtualenvs and in some cases even download python packages from Pypi. The whole test suite takes around 1 minute to run on a single interpreter.
 
-The test suite for pew uses [shunit2](http://shunit2.googlecode.com/) and [tox](http://codespeak.net/tox). The shunit2 source is included in the `tests` directory, but tox must be installed separately (`pip install tox`).
+With every commit and pull request, the test suite is run over all supported interpreters on travis-ci (for unix-like) and appveyor (for windows).
 
 To run individual test scripts, run from the top level directory of the repository a command like:
 
-`tox tests/test_cd.sh`
+`tox tests/test_setproject.py`
 
 To run tests under a single version of Python, specify the appropriate environment when running tox:
 
@@ -286,41 +296,29 @@ To run tests under a single version of Python, specify the appropriate environme
 
 Combine the two modes to run specific tests with a single version of Python:
 
-`tox -e py27 tests/test_cd.sh`
+`tox -e py27 tests/test_setproject.py`
+
+You can also filter them:
+
+`tox -e py34 -- -k workon`
 
 Add new tests by modifying an existing file or creating new script in the tests directory.
 
 
-Differences from Virtualenvwrapper
-----------------------------------
+Display the environment name in the terminal prompt
+---------------------------------------------------
 
-### workon opens a new shell prompt ###
+### bash/zsh ###
 
-I don't think there's any shortcoming to workon on another environment without exiting from the previous, and I've done it myself some times while developing, you'll probably want to keep it in mind and remember to exit properly each time... After all you just need to press Ctrl+D.
+The first run setup should take care of this for you.
 
-Another consequence is that the prompt won't be updated... but this can be easily fixed by using the `$VIRTUAL_ENV` variable.
+You can do it manually by appending to your `.bashrc`/`.zshrc`
 
-To get a blue-colored name at the start of your prompt:
+`source $(pew shell_config)`
 
-#### bash prompt ####
+#### fish ####
 
-`PS1="\[\033[01;34m\]\$(basename '$VIRTUAL_ENV')\e[0m$PS1"`
-
-#### zsh prompt ####
-
-Add this to your .zshrc file, before your `PS1` declaration :
-
-`venv=$(basename "$VIRTUAL_ENV")`
-
-Then add this at the beginning of your `PS1` :
-
-`%{$fg_bold[blue]%}$venv${venv:+ }`
-
-#### fish prompt ####
-
-`set -g __fish_prompt_venv (set_color --bold -b blue white) (basename "$VIRTUAL_ENV") "$__fish_prompt_normal "`
-
-and then echo `__fish_prompt_venv` in the `fish_prompt` function.
+Just like for bash/zsh, but since fish uses a `fish_prompt` function and not a `PS1` environment variable, the setup will only make available to you a fish function `pew_prompt`. Just use its output in the `fish_prompt` function.
 
 #### powershell prompt ####
 
@@ -328,27 +326,9 @@ Add this to a prompt function:
 
 `Write-Host -NoNewLine -f blue ([System.IO.Path]::GetFileName($env:VIRTUAL_ENV))`
 
-### there're no cd* commands ###
-
-Due to the fact that the commands cannot change the environment from which they've been called, the `cdvirtualenv`, `cdsitepackages` and `cdproject` are missing.
-
-They can be simply implemented like:
-
-`cd $VIRTUAL_ENV` for `cdvirtualenv`
-
-`cd $(pew sitepackages_dir)` for `cdsitepackages`
-
-`cd $(cat $VIRTUAL_ENV/.project)` for `cdproject`
-
-Just like in the inve idea, a pew command that returns a string of commands to be sourced could be created, and by putting it in your .bashrc/.zshrc/config.fish these aliases/command creations could be automated.
-
-### due to argparse, not every argument order is supported ###
-
-If in doubt, for the commands that use argparse, just run them with the `--help` flag, e.g.:
-
-`pew new --help`
-
 ### no hooks (for now) ###
+
+(There's currently a Pull Request open for it)
 
 Adding hooks for installing some packages on each new virtualenv creation is quite easy, but I couldn't find some comprehensive hook examples, and virtualenvwrapper's hook implementation lets the hook return a script to be sourced.
 
@@ -356,20 +336,37 @@ This could be handled by (instead of getting back a script to be sourced) gettin
 
 But to handle just the simple case, using the existing virtualenvwrapper's infrastructure (which relied on stevedore) seemed like overkill, and given that the most interesting virtualenvwrapper's extensions have been merged to the trunk at the end, and that I never used virtualenvwrapper's hook first hand, I decided to skip them, at least for now.
 
-### lots of VIRTUALENVWRAPPER* env variables aren't used ###
-
-Some of those, like VIRTUALENVWRAPPER_VIRTUALENV, just defaulted to virtualenv itself and never got any use inside virtualenvwrapper, and I couldn't find someone that made use for it in the wild... so, given that external commands can still be overridden (e.g. by changing the PATH) I chose to leave them out.
-
-### the commands don't have the same exact name ###
-
-Since `0.1.6`
 
 Thanks
 ------
 
-Thanks to Michael F. Lamb for his thought provoking gist
+Everyone who submitted patches/PR, as of September 2015:
 
-Thanks to Dough Hellman for his virtualenvwrapper code and for the tests and of his documentation that I got to reuse extensively
+- José Luis Lafuente
+- Arthur Vuillard
+- Jakub Stasiak
+- Ryan Hiebert
+- Michael Hofer
+- Daniel Harding
+- Timothy Corbett-Clark
+- Simon Junod
+- Robin
+- Matei Trușcă
+- Lucas Cimon
+
+
+Thanks also to Michael F. Lamb for his thought provoking gist and to Dough Hellman for virtualenvwrapper
+
+Rationale
+---------
+
+Pew is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea for a better activate script.
+
+Pew was originally a rewrite of virtualenvwrapper, the advantage is that pew doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
+
+It works on bash, zsh, fish, powershell, etc.
+
+Thanks to using Python libraries and setuptools for dependency management, to Python stricter error handling and the fact that "shelling out" let us avoid keeping track of the previous values environment variables, Pew code is much shorter and  easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s. How many Python programmers know at a glance what does `"${out_args[@]-}"` do? or `eval "envname=\$$#"`?
 
 License
 -------
