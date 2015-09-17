@@ -18,9 +18,14 @@ except ImportError:
     from backports.shutil_get_terminal_size import get_terminal_size
 
 from clonevirtualenv import clone_virtualenv
-from pythonz.commands.install import InstallCommand
-from pythonz.commands.list import ListCommand as ListPythons
-from pythonz.commands.locate import LocateCommand as LocatePython
+try:
+    from pythonz.commands.install import InstallCommand
+    from pythonz.commands.list import ListCommand as ListPythons
+    from pythonz.commands.locate import LocateCommand as LocatePython
+except KeyError:
+    # Pythonz is an interactive tool that requires a valid $HOME, for now we'll
+    # just ignore the Error to appease the CI environment
+    pass
 
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own,
