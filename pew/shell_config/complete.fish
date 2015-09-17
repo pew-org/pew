@@ -36,7 +36,7 @@ complete -f -c $pew -n '__pew_using_command new' -s r -d 'Pip requirements file'
 
 
 #### workon
-complete -f -c $pew -n '__pew_needs_command' -a workon -d 'Actives an existing virtual environment'
+complete -f -c $pew -n '__pew_needs_command' -a workon -d 'Activates an existing virtual environment'
 complete -f -c $pew -n '__pew_using_command workon' -a '(__pew_list_envs)' -d 'Virtual env'
 
 #### mktmpenv
@@ -49,7 +49,7 @@ complete -f -c $pew -n '__pew_using_command mktmpenv' -s r -d 'Pip requirements 
 
 #### ls
 complete -f -c $pew -n '__pew_needs_command' -a ls -d 'List all existing virtual environments'
-complete -f -c $pew -n '__pew_using_command ls' -s l -l long -d 'Multiline ls'
+complete -f -c $pew -n '__pew_using_command ls' -s l -l long -d 'Verbose ls'
 complete -f -c $pew -n '__pew_using_command ls' -s b -l brief -d 'One line ls'
 
 #### show
@@ -94,3 +94,23 @@ complete -f -c $pew -n '__pew_needs_command' -a setproject -d 'Bind an existing 
 
 #### version
 complete -f -c $pew -n '__pew_needs_command' -a version -d 'Prints current version'
+
+#### wipeenv
+complete -f -c $pew -n '__pew_needs_command' -a wipeenv -d 'Remove all installed packages from a virtualenv'
+complete -f -c $pew -n '__pew_using_command workon' -a '(__pew_list_envs)' -d 'Virtual env'
+
+#### restore
+complete -f -c $pew -n '__pew_needs_command' -a restore -d 'Try to restore a broken virtualenv'
+complete -f -c $pew -n '__pew_using_command workon' -a '(__pew_list_envs)' -d 'Virtual env'
+
+#### rename
+complete -f -c $pew -n '__pew_needs_command' -a rename -d 'Rename a virtualenv'
+
+#### install
+complete -f -c $pew -n '__pew_needs_command' -a install -d 'Use Pythonz to download and build a Python vm'
+
+#### list_pythons
+complete -f -c $pew -n '__pew_needs_command' -a list_pythons -d 'List the pythons installed by Pythonz'
+
+#### locate_python
+complete -f -c $pew -n '__pew_needs_command' -a locate_python -d 'Locate the path for the python version installed by Pythonz'

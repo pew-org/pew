@@ -14,7 +14,7 @@ https://github.com/berdario/pew#usage'''
 
 setup(
     name='pew',
-    version='0.1.15',
+    version='0.1.16',
     description='tool to manage multiple virtualenvs written in pure python',
     long_description=long_desc,
     author='Dario Bertini',
@@ -23,7 +23,7 @@ setup(
     license='MIT License',
     packages=['pew'],
     install_requires=[
-        'virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=0.8'
+        'virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=0.8', 'pythonz-bd>=1.10.1'
     ],
     extras_require={
         ':python_version=="2.6"': [

@@ -18,6 +18,9 @@ except ImportError:
     from backports.shutil_get_terminal_size import get_terminal_size
 
 from clonevirtualenv import clone_virtualenv
+from pythonz.commands.install import InstallCommand
+from pythonz.commands.list import ListCommand as ListPythons
+from pythonz.commands.locate import LocateCommand as LocatePython
 
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own,
@@ -568,6 +571,21 @@ def restore_cmd(argv):
     check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=str(workon_home))
 
 
+def install_cmd(argv):
+    '''Use Pythonz to download and build the specified Python version'''
+    InstallCommand().run(argv)
+
+
+def list_pythons_cmd(argv):
+    '''List the pythons installed by Pythonz (or all the installable ones)'''
+    ListPythons().run(argv)
+
+
+def locate_python_cmd(argv):
+    '''Locate the path for the python version installed by Pythonz'''
+    LocatePython().run(argv)
+
+
 def version_cmd(argv):
     """Prints current pew version"""
     print(__version__)
@@ -632,7 +650,7 @@ def pew():
     columns, _ = get_terminal_size()
 
     print('Available commands:\n')
-    for cmd, fun in cmds.items():
+    for cmd, fun in sorted(cmds.items()):
         if fun.__doc__:
             print(textwrap.fill(
                 fun.__doc__.splitlines()[0],

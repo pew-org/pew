@@ -3,10 +3,10 @@ _pew()
     local cur prev words cword args commands
     _init_completion || return
     args="--help --python -i -a -r"
-    commands="ls add mkproject rm lssitepackages cp workon new mktmpenv setproject show wipeenv sitepackages_dir inall toggleglobalsitepackages"
+    commands="ls add mkproject rm lssitepackages cp workon new mktmpenv setproject show wipeenv sitepackages_dir inall toggleglobalsitepackages rename restore install list_pythons locate_python"
 
     case $prev in
-        ls|show|rm|workon|cp|setproject)
+        ls|show|rm|workon|cp|setproject|rename|wipeenv)
             COMPREPLY=( $(compgen -W "$(pew ls)" -- ${cur}) )
             return 0
             ;;

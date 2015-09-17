@@ -23,11 +23,16 @@ case $state in
             'add:Add directories to python path of active virtualenv'
             'cp:Duplicate the named virtualenv to make a new one'
             'inall:Run a command in each virtualenv:command'
+            'install:Use Pythonz to download and build the specified Python version'
+            'list_pythons:List the pythons installed by Pythonz (or all the installable ones)'
+            'locate_python:Locate the path for the python version installed by Pythonz'
             'ls:List all existing virtual environments'
             'lssitepackages:List currently active site-packages'
             'mkproject:Create environment with an associated project directory'
             'mktmpenv:Create a temporary virtualenv'
             'new:Create a new environment'
+            'rename:Rename a virtualenv'
+            'restore:Try to restore a broken virtualenv by reinstalling the same python version on top of it'
             'rm:Remove one or more environments'
             'setproject:Bind an existing virtualenv to an existing project directory'
             'show:Display currently active virtualenv'
@@ -69,7 +74,7 @@ case $state in
 
             (ls)
                 _arguments \
-                    '(-l --long)--long[Multiline ls]' \
+                    '(-l --long)--long[Verbose ls]' \
                     '(-b --brief)--brief[One line ls]'
             ;;
             (inall)
@@ -77,7 +82,7 @@ case $state in
                     '*:command'
             ;;
 
-            (show|workon|rm)
+            (show|workon|rm|wipeenv|restore)
                 _arguments \
                     '1:virtual env:_pew_list_venvs'
             ;;
