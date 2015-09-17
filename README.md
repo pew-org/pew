@@ -86,37 +86,37 @@ Once inside, you can check the current python version, list the packages present
 
 You can also specify a requirements file, to be passed on to pip, and activate another virtualenv with workon:
 
-	~> pew new -r ~/Projects/topaz/requirements.txt topaz
-	New python executable in topaz/bin/python
-	[SNIP]
-	Successfully installed rply pytest invoke requests py
-	Cleaning up...
-	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
-	topaz ~> ^D
+    ~> pew new -r ~/Projects/topaz/requirements.txt topaz
+    New python executable in topaz/bin/python
+    [SNIP]
+    Successfully installed rply pytest invoke requests py
+    Cleaning up...
+    Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
+    topaz ~> ^D
 
-	~> pew workon myproject
-	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
-	myproject ~>
+    ~> pew workon myproject
+    Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
+    myproject ~>
 
 Since 0.1.16, Pew integrates Pythonz, which allows you to easily install a new python version (only on linux and macosx)
 
- ~> pew install 2.6.1 --type pypy
- WARNING: Linux binaries are dynamically linked, as is usual, and thus might not be usable due to the sad story of linux binary compatibility,  check the PyPy website for more information
- Downloading pypy-2.6.1-linux64.tar.bz2 as /home/dario/.pythonz/dists/pypy-2.6.1-linux64.tar.bz2
- ########################################################################## 100%
- Extracting pypy-2.6.1-linux64.tar.bz2 into /home/dario/.pythonz/build/PyPy-2.6.1
- Installing PyPy-2.6.1 into /home/dario/.pythonz/pythons/PyPy-2.6.1
+    ~> pew install 2.6.1 --type pypy
+    WARNING: Linux binaries are dynamically linked, as is usual, and thus might not be usable due to the sad story of linux binary    compatibility,  check the PyPy website for more information
+    Downloading pypy-2.6.1-linux64.tar.bz2 as /home/dario/.pythonz/dists/pypy-2.6.1-linux64.tar.bz2
+    ########################################################################## 100%
+    Extracting pypy-2.6.1-linux64.tar.bz2 into /home/dario/.pythonz/build/PyPy-2.6.1
+    Installing PyPy-2.6.1 into /home/dario/.pythonz/pythons/PyPy-2.6.1
 
- Installed PyPy-2.6.1 successfully.
- ~> pew new --python=$(pythonz locate 2.6.1 --type pypy) latest_pypy
- Running virtualenv with interpreter /home/dario/.pythonz/pythons/PyPy-2.6.1/bin/python
- New pypy executable in latest_pypy/bin/python
- Also creating executable in latest_pypy/bin/pypy
- Installing setuptools, pip, wheel...done.
- Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
- latest_pypy ~> python -V
- Python 2.7.10 (f3ad1e1e1d62, Aug 28 2015, 10:45:29)
- [PyPy 2.6.1 with GCC 4.8.4]
+    Installed PyPy-2.6.1 successfully.
+    ~> pew new --python=$(pythonz locate 2.6.1 --type pypy) latest_pypy
+    Running virtualenv with interpreter /home/dario/.pythonz/pythons/PyPy-2.6.1/bin/python
+    New pypy executable in latest_pypy/bin/python
+    Also creating executable in latest_pypy/bin/pypy
+    Installing setuptools, pip, wheel...done.
+    Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
+    latest_pypy ~> python -V
+    Python 2.7.10 (f3ad1e1e1d62, Aug 28 2015, 10:45:29)
+    [PyPy 2.6.1 with GCC 4.8.4]
 
 
 Command Reference
