@@ -17,22 +17,23 @@ try:
 except ImportError:
     from backports.shutil_get_terminal_size import get_terminal_size
 
+windows = sys.platform == 'win32'
+
 from clonevirtualenv import clone_virtualenv
-try:
+if not windows:
     from pythonz.commands.install import InstallCommand
+    from pythonz.installer.pythoninstaller import PythonInstaller, AlreadyInstalledError
     from pythonz.commands.list import ListCommand as ListPythons
     from pythonz.commands.locate import LocateCommand as LocatePython
-except KeyError:
-    # Pythonz is an interactive tool that requires a valid $HOME, for now we'll
-    # just ignore the Error to appease the CI environment
-    pass
+else:
+    # Pythonz does not support windows
+    InstallCommand = ListPythons = LocatePython = \
+        lambda : sys.exit('Command not supported on this platform')
 
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own,
                         env_bin_dir, check_path, temp_environ)
 from pew._print_utils import print_virtualenvs
-
-windows = sys.platform == 'win32'
 
 if sys.version_info[0] == 2:
     input = raw_input
@@ -578,7 +579,17 @@ def restore_cmd(argv):
 
 def install_cmd(argv):
     '''Use Pythonz to download and build the specified Python version'''
-    InstallCommand().run(argv)
+    installer = InstallCommand()
+    options, versions = installer.parser.parse_args(argv)
+    if len(versions) != 1:
+        installer.parser.print_help()
+        sys.exit(1)
+    else:
+        try:
+            actual_installer = PythonInstaller.get_installer(versions[0], options)
+            actual_installer.install()
+        except AlreadyInstalledError as e:
+            print(e)
 
 
 def list_pythons_cmd(argv):

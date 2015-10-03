@@ -401,7 +401,7 @@ Everyone who submitted patches/PR, as of September 2015:
 - Lucas Cimon
 
 
-Thanks also to Michael F. Lamb for his thought provoking gist and to Dough Hellman for virtualenvwrapper
+Thanks also to Michael F. Lamb for his thought provoking gist and to Doug Hellman for virtualenvwrapper
 
 Rationale
 ---------

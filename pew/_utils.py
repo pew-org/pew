@@ -30,7 +30,7 @@ if sys.platform == 'win32':
     check_call = resolve_path(check_call)
     Popen = resolve_path(Popen)
 
-Result = namedtuple('Result', 'out err')
+Result = namedtuple('Result', 'returncode out err')
 
 
 # TODO: it's better to fail early, and thus I'd need to check the exit code, but it'll
@@ -39,7 +39,8 @@ def invoke(*args, **kwargs):
     encoding = locale.getlocale()[1]
     inp = kwargs.pop('inp', '').encode(encoding)
     popen = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE, **kwargs)
-    return Result(*[o.strip().decode(encoding) for o in popen.communicate(inp)])
+    out, err = [o.strip().decode(encoding) for o in popen.communicate(inp)]
+    return Result(popen.returncode, out, err)
 
 
 invoke_pew = partial(invoke, 'pew')
