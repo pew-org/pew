@@ -23,7 +23,7 @@ setup(
     license='MIT License',
     packages=['pew'],
     install_requires=[
-        'virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=0.8', 'pythonz-bd>=1.10.2'
+        'virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=17.1', 'pythonz-bd>=1.10.2'
     ],
     extras_require={
         ':python_version=="2.6"': [
