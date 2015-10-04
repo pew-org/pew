@@ -530,10 +530,14 @@ def wipeenv_cmd(argv):
         sys.exit("ERROR: Environment '{0}' does not exist.".format(env))
     else:
         env_pip = str(workon_home / env / env_bin_dir / 'pip')
-        pkgs = set(d.split("==")[0] for d in invoke(env_pip, 'freeze').out.split())
+        all_pkgs = set(invoke(env_pip, 'freeze').out.splitlines())
+        pkgs = set(p for p in all_pkgs if len(p.split("==")) == 2)
+        ignored = sorted(all_pkgs - pkgs)
+        pkgs = set(p.split("==")[0] for p in pkgs)
         to_remove = sorted(pkgs - set(['distribute', 'wsgiref']))
         if to_remove:
-            print("Uninstalling packages:\n%s" % " ".join(to_remove))
+            print("Ignoring:\n %s" % "\n ".join(ignored))
+            print("Uninstalling packages:\n %s" % "\n ".join(to_remove))
             inve(env, 'pip', 'uninstall', '-y', *to_remove)
         else:
             print("Nothing to remove")
