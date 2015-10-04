@@ -439,7 +439,7 @@ def rename_cmd(argv):
     parser.add_argument('target')
     pargs = parser.parse_args(argv)
     copy_virtualenv_project(pargs.source, pargs.target)
-    rmvirtualenvs(pargs.source)
+    rmvirtualenvs([pargs.source])
 
 
 def setvirtualenvproject(env, project):
