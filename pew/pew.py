@@ -192,7 +192,7 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
         if packages:
             inve(envname, 'pip', 'install', '--allow-all-external', *packages)
 
-    except CalledProcessError:
+    except (CalledProcessError, KeyboardInterrupt):
         rmvirtualenvs([envname])
         raise
 
@@ -644,6 +644,22 @@ def first_run_setup():
                 input('[enter]')
 
 
+def print_commands(cmds):
+    longest = max(map(len, cmds)) + 3
+    columns, _ = get_terminal_size()
+
+    print('Available commands:\n')
+    for cmd, fun in sorted(cmds.items()):
+        if fun.__doc__:
+            print(textwrap.fill(
+                fun.__doc__.splitlines()[0],
+                columns or 1000,
+                initial_indent=(' {0}: '.format(cmd)).ljust(longest),
+                subsequent_indent=longest * ' '))
+        else:
+            print(' ' + cmd)
+
+
 def pew():
     first_run = makedirs_and_symlink_if_needed(workon_home)
     if first_run and sys.stdin.isatty():
@@ -658,20 +674,12 @@ def pew():
                 return command(sys.argv[2:])
             except CalledProcessError as e:
                 return e.returncode
+            except KeyboardInterrupt:
+                pass
         else:
             print("ERROR: command %s does not exist." % sys.argv[1],
                   file=sys.stderr)
-
-    longest = max(map(len, cmds)) + 3
-    columns, _ = get_terminal_size()
-
-    print('Available commands:\n')
-    for cmd, fun in sorted(cmds.items()):
-        if fun.__doc__:
-            print(textwrap.fill(
-                fun.__doc__.splitlines()[0],
-                columns or 1000,
-                initial_indent=(' {0}: '.format(cmd)).ljust(longest),
-                subsequent_indent=longest * ' '))
-        else:
-            print(' ' + cmd)
+            print_commands(cmds)
+            sys.exit(1)
+    else:
+        print_commands(cmds)
