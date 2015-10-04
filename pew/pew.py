@@ -542,9 +542,15 @@ def wipeenv_cmd(argv):
 def inall_cmd(argv):
     """Run a command in each virtualenv."""
     envs = lsenvs()
+    errors = False
     for env in envs:
         print("\n%s:" % env)
-        inve(env, *argv)
+        try:
+            inve(env, *argv)
+        except CalledProcessError as e:
+            errors = True
+            print(e, file=sys.stderr)
+    sys.exit(errors)
 
 
 def in_cmd(argv):
