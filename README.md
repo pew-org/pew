@@ -15,21 +15,37 @@ Pew is completely shell-agnostic and thus works on bash, zsh, fish, powershell, 
 Installation
 ------------
 
+### pip
+
+_Pew and its dependencies rely on a couple of features of pip/setuptools which might not available on old versions. In case your distribution doesn't ship with one recent enough, you'll probably want to run `pip install --upgrade pip` before the installation._
+
 `pip install pew`
 
+
+
 See the [troubleshooting](#troubleshooting) section, if needed.
+
+There are also some packages, more or less up-to-date:
+
+### Arch linux
+
+For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
+
+### Nix
 
 There's a Nix package available, you can install it on [Nixos](http://nixos.org/) or on [most Unix-like OSes](http://nixos.org/nix/download.html):
 
     nix-env -i python3.4-pew
 
-For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
+### Ubuntu PPA
 
 For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubuntu/ppa/)
 
     sudo add-apt-repository ppa:pew-maintainers/ppa
     sudo apt-get update
     sudo apt-get install pew
+
+### Windows/Chocolatey
 
 On Windows, you can install pew with [Chocolatey](http://chocolatey.org) by running the following in an elevated permission console:
 

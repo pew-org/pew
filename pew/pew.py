@@ -52,7 +52,7 @@ def makedirs_and_symlink_if_needed(workon_home):
         link = expandpath('~/.virtualenvs')
         if os.name == 'posix' and 'WORKON_HOME' not in os.environ and \
            'XDG_DATA_HOME' not in os.environ and not link.exists():
-             workon_home.symlink_to(str(link))
+             link.symlink_to(str(workon_home))
         return True
     else:
         return False
