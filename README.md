@@ -20,7 +20,7 @@ Installation
 
 ### pip
 
-_Pew and its dependencies rely on a couple of features of pip/setuptools which might not available on old versions. In case your distribution doesn't ship with one recent enough, you'll probably want to run `pip install --upgrade pip` before the installation._
+_Pew and its dependencies rely on a couple of features of pip/setuptools which might not be available on old versions. In case your distribution doesn't ship with one recent enough, you'll probably want to run `pip install --upgrade pip` before the installation._
 
 `pip install pew`
 
@@ -42,7 +42,7 @@ There's a Nix package available, you can install it on [Nixos](http://nixos.org/
 
 ### Ubuntu PPA
 
-For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubuntu/ppa/)
+For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubuntu/ppa/):
 
     sudo add-apt-repository ppa:pew-maintainers/ppa
     sudo apt-get update
@@ -117,7 +117,7 @@ You can also specify a requirements file, to be passed on to pip, and activate a
     Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
     myproject ~>
 
-Since 0.1.16, Pew integrates Pythonz, which allows you to easily install a new python version (only on linux and macosx)
+Since 0.1.16, Pew integrates Pythonz, which allows you to easily install a new python version (only on linux and macosx):
 
     ~> pew install 2.6.1 --type pypy
     WARNING: Linux binaries are dynamically linked, as is usual, and thus might not be usable due to the sad story of linux binary    compatibility,  check the PyPy website for more information
@@ -141,7 +141,7 @@ Since 0.1.16, Pew integrates Pythonz, which allows you to easily install a new p
 Command Reference
 -----------------
 
-When invoked without arguments pew will output the list of all commands with each one's description
+When invoked without arguments `pew` will output the list of all commands with each one's description
 
 ### new ###
 
@@ -232,11 +232,11 @@ Locate the path for the python version installed by Pythonz
 
 Duplicate an existing virtualenv environment. The source can be an environment managed by virtualenvwrapper or an external environment created elsewhere.
 
-Copying virtual environments is not well supported. Each virtualenv has path information hard-coded into it, and there may be cases where the copy code does not know to update a particular file. Use with caution.
+_Copying virtual environments is not well supported. Each virtualenv has path information hard-coded into it, and there may be cases where the copy code does not know to update a particular file. Use with caution._
 
 `usage: pew cp [-hd] source [targetenvname]`
 
-Target environment name is required for WORKON_HOME duplications. However, target environment name can be ommited for importing external environments. If omitted, the new environment is given the same name as the original.
+Target environment name is required for WORKON_HOME duplications. However, target environment name can be omitted for importing external environments. If omitted, the new environment is given the same name as the original.
 
 ### sitepackages_dir ###
 
@@ -273,7 +273,7 @@ Create a new virtualenv in the `WORKON_HOME` and project directory in `PROJECT_H
 
 The template option may be repeated to have several templates used to create a new project. The templates are applied in the order named on the command line. All other options are passed to `pew new` to create a virtual environment with the same name as the project.
 
-A template is simply an executable to be found in `WORKON_HOME`, it will be called with the name of the project, and the project directory as first and second argument, respectively. A `template_django` script is given as example inside the `pew` package.
+A template is simply an executable to be found in `WORKON_HOME`, it will be called with the name of the project, and the project directory as first and second argument, respectively. A `template_django` script is given as an example inside the `pew` package.
 
 ### setproject ###
 
@@ -313,7 +313,7 @@ Prints the path for the current $SHELL helper file
 Configuration
 -------------
 
-You can customize pew's virtualenvs directory location, with the `$XDG_DATA_HOME` or `$WORKON_HOME` environment variables, and the locations of new projects created with mkproject by setting `$PROJECT_HOME` (otherwise, the current directory will be selected)
+You can customize pew's virtualenvs directory location, with the `$XDG_DATA_HOME` or `$WORKON_HOME` environment variables, and the locations of new projects created with mkproject by setting `$PROJECT_HOME` (otherwise, the current directory will be selected).
 
 
 Troubleshooting
@@ -321,20 +321,20 @@ Troubleshooting
 
 ### The environment doesn't seem to be activated ###
 
-If you've defined in your shell rc file, to export a PATH location that might shadow the executables needed by pew (or your project), you might find that when getting into the environment, they will still be at the head of the PATH.
+If you've defined in your shell rc file to export a PATH location that might shadow the executables needed by pew (or your project), you might find that when getting into the environment, they will still be at the head of the PATH.
 
 There're multiple way to overcome this issue:
 
 * Move your export statements into the profile (`.bash_profile` and `.zprofile` for bash and zsh respectively, or in fish wrap your statements in a `if status --is-login` block ) and set up your terminal emulator to launch your shell as a login shell
 * Change your exports to put the new location at the tail, instead of the head of the PATH, e.g.: `export PATH=${PATH}:/usr/bin`
-* Change the files your OS provide to setup the base environment (it might come useful to look into /etc/paths.d /etc/profile and [environment.plist](http://stackoverflow.com/a/8421952/293735))
+* Change the files your OS provides to setup the base environment (it might be useful to look into `/etc/paths.d`, `/etc/profile`, and [environment.plist](http://stackoverflow.com/a/8421952/293735))
 
-If you're running the `zsh` configuration tool `prezto`, and/or you're on MacOSX, [you might want to read this](https://github.com/thoughtbot/dotfiles/pull/426#issue-109716011) (it's about another project for handling dotfiles, but the misconfiguration there described is quite similar to one witnessed on other OSX/prezto systems).
+If you're running the `zsh` configuration tool `prezto`, and/or you're on MacOSX, [you might want to read this](https://github.com/thoughtbot/dotfiles/pull/426#issue-109716011) (it's about another project for handling dotfiles, but the misconfiguration described is quite similar to one witnessed on other OSX/prezto systems).
 
 
 ### pkg_resources.DistributionNotFound: virtualenv ###
 
-This might happen after a Python update, especially on MacOSX, upgrading setuptools might fix that (you should need superuser permissions to do it)
+This might happen after a Python update, especially on MacOSX, upgrading `setuptools` might fix that (you should need superuser permissions to do it)
 
 `easy_install -U setuptools`
 
@@ -349,7 +349,7 @@ Congratulations! You found a bug, please [let me know](https://github.com/berdar
 Running Tests
 -------------
 
-The test suite for pew uses [tox](http://codespeak.net/tox). Most tests are actually integration tests that will fork shells, create virtualenvs and in some cases even download python packages from Pypi. The whole test suite takes around 1 minute to run on a single interpreter.
+The test suite for `pew` uses [tox](http://codespeak.net/tox). Most tests are actually integration tests that will fork shells, create virtualenvs and in some cases even download python packages from Pypi. The whole test suite takes around 1 minute to run on a single interpreter.
 
 With every commit and pull request, the test suite is run over all supported interpreters on travis-ci (for unix-like) and appveyor (for windows).
 
@@ -357,7 +357,7 @@ To run individual test scripts, run from the top level directory of the reposito
 
 `tox tests/test_setproject.py`
 
-To run tests under a single version of Python, specify the appropriate environment when running tox:
+To run tests under a single version of Python, specify the appropriate environment when running `tox`:
 
 `tox -e py27`
 
@@ -429,11 +429,11 @@ Rationale
 
 Pew is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea for a better activate script.
 
-Pew was originally a rewrite of virtualenvwrapper, the advantage is that pew doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
+Pew was originally a rewrite of virtualenvwrapper, the advantage is that pew doesn't hook into a shell, but is only a set of commands, thus completely shell-agnostic:
 
 It works on bash, zsh, fish, powershell, etc.
 
-Thanks to using Python libraries and setuptools for dependency management, to Python stricter error handling and the fact that "shelling out" let us avoid keeping track of the previous values environment variables, Pew code is much shorter and  easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s. How many Python programmers know at a glance what does `"${out_args[@]-}"` do? or `eval "envname=\$$#"`?
+Thanks to using Python libraries and setuptools for dependency management, to Python stricter error handling and the fact that "shelling out" let us avoid keeping track of the previous environment variable values, pew code is much shorter and easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s. How many Python programmers know at a glance what does `"${out_args[@]-}"` do? Or `eval "envname=\$$#"`?
 
 License
 -------
