@@ -1,7 +1,7 @@
 language: python
 sudo: false
 python:
-  - 3.4
+  - 3.5
 env:
   matrix:
     - TOXENV="py26"
@@ -9,6 +9,7 @@ env:
     - TOXENV="py32"
     - TOXENV="py33"
     - TOXENV="py34"
+    - TOXENV="py35"
     - TOXENV="pypy"
     - TOXENV="pypy3"
 

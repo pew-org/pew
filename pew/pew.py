@@ -182,19 +182,19 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
 
     try:
         check_call(["virtualenv", envname] + rest, cwd=str(workon_home))
-
-        if project:
-            setvirtualenvproject(envname, project.absolute())
-
-        if requirements:
-            inve(envname, 'pip', 'install', '--allow-all-external', '-r', str(expandpath(requirements)))
-
-        if packages:
-            inve(envname, 'pip', 'install', '--allow-all-external', *packages)
-
     except (CalledProcessError, KeyboardInterrupt):
         rmvirtualenvs([envname])
         raise
+    else:
+        if project:
+            setvirtualenvproject(envname, project.absolute())
+        if requirements:
+            inve(envname, 'pip', 'install', '--allow-all-external', '-r', str(expandpath(requirements)))
+        if packages:
+            inve(envname, 'pip', 'install', '--allow-all-external', *packages)
+
+
+
 
 
 def mkvirtualenv_argparser():
