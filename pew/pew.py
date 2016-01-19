@@ -8,6 +8,7 @@ import argparse
 import shutil
 import random
 import textwrap
+from functools import partial
 from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 from pathlib import Path
@@ -38,6 +39,7 @@ from pew._print_utils import print_virtualenvs
 if sys.version_info[0] == 2:
     input = raw_input
 
+err = partial(print, file=sys.stderr)
 
 workon_home = expandpath(
     os.environ.get('WORKON_HOME',
@@ -71,8 +73,8 @@ def shell_config_cmd(argv):
     if shell:
         print(pew_site / 'shell_config' / ('init.' + shell))
     else:
-        print('Completions and prompts are unavailable for %s' %
-              repr(os.environ.get('SHELL', '')), file=sys.stderr)
+        err('Completions and prompts are unavailable for %s' %
+            repr(os.environ.get('SHELL', '')))
 
 
 def deploy_completions():
@@ -127,15 +129,15 @@ def inve(env, command, *args, **kwargs):
             # won't inherit the PATH
         except OSError as e:
             if e.errno == 2:
-                sys.stderr.write("Unable to find %s\n" % command)
+                err('Unable to find', command)
             else:
                 raise
 
 
 def fork_shell(env, shellcmd, cwd):
     or_ctrld = '' if windows else "or 'Ctrl+D' "
-    sys.stderr.write("Launching subshell in virtual environment. Type "
-                     "'exit' %sto return.\n" % or_ctrld)
+    err("Launching subshell in virtual environment. Type 'exit' ", or_ctrld,
+        "to return.", sep='')
 
     inve(env, *shellcmd, cwd=cwd)
 
@@ -231,14 +233,13 @@ def rmvirtualenvs(envs):
     for env in envs:
         env = workon_home / env
         if os.environ.get('VIRTUAL_ENV') == str(env):
-            print("ERROR: You cannot remove the active environment \
-(%s)." % env, file=sys.stderr)
+            err("ERROR: You cannot remove the active environment (%s)." % env)
             break
         try:
             shutil.rmtree(str(env))
         except OSError as e:
-            print("Error while trying to remove the {0} env: \
-\n{1}".format(env, e.strerror), file=sys.stderr)
+            err("Error while trying to remove the {0} env: \n{1}".format
+                (env, e.strerror))
 
 
 def rm_cmd(argv):
@@ -553,7 +554,7 @@ def inall_cmd(argv):
             inve(env, *argv)
         except CalledProcessError as e:
             errors = True
-            print(e, file=sys.stderr)
+            err(e)
     sys.exit(errors)
 
 
@@ -687,8 +688,7 @@ def pew():
             except KeyboardInterrupt:
                 pass
         else:
-            print("ERROR: command %s does not exist." % sys.argv[1],
-                  file=sys.stderr)
+            err("ERROR: command", sys.argv[1], "does not exist.")
             print_commands(cmds)
             sys.exit(1)
     else:
