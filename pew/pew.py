@@ -88,13 +88,15 @@ def deploy_completions():
 
 
 def get_project_dir(env):
-    project_dir = None
     project_file = workon_home / env / '.project'
     if project_file.exists():
         with project_file.open() as f:
             project_dir = f.readline().strip()
-
-    return project_dir
+            if os.path.exists(project_dir):
+                return project_dir
+            else:
+                err('Corrupted or outdated:', project_file, '\nDirectory',
+                    project_dir, "doesn't exist.")
 
 
 def unsetenv(key):
@@ -194,9 +196,6 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
             inve(envname, 'pip', 'install', '--allow-all-external', '-r', str(expandpath(requirements)))
         if packages:
             inve(envname, 'pip', 'install', '--allow-all-external', *packages)
-
-
-
 
 
 def mkvirtualenv_argparser():
@@ -457,6 +456,8 @@ def setproject_cmd(argv):
     env = args.get(0, os.environ.get('VIRTUAL_ENV'))
     if not env:
         sys.exit('pew setproject [virtualenv] [project_path]')
+    if not (workon_home / env).exists():
+        sys.exit("Environment '%s' doesn't exist." % env)
     if not os.path.isdir(project):
         sys.exit('pew setproject: %s does not exist' % project)
     setvirtualenvproject(env, project)
