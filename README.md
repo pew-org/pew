@@ -34,12 +34,6 @@ There are also some packages, more or less up-to-date:
 
 For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
 
-### Nix
-
-There's a Nix package available, you can install it on [Nixos](http://nixos.org/) or on [most Unix-like OSes](http://nixos.org/nix/download.html):
-
-    nix-env -i python3.4-pew
-
 ### Ubuntu PPA
 
 For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubuntu/ppa/):
@@ -48,11 +42,9 @@ For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubun
     sudo apt-get update
     sudo apt-get install pew
 
-### Windows/Chocolatey
+### Windows/Cygwin notes
 
-On Windows, you can install pew with [Chocolatey](http://chocolatey.org) by running the following in an elevated permission console:
-
-    choco python pew
+A python installed from the normal `.exe` file [behaves differently](https://github.com/berdario/pew/issues/80#issuecomment-168279648) from a python installed inside Cygwin. For this reason if you want to use Pew inside a Cygwin shell, you should use a Cygwin python, and if you want to use it inside Powershell, you should use your normal Python install, and avoid a Cygwin one.
 
 Usage
 -----
