@@ -1,17 +1,31 @@
 import os
 import sys
 import locale
+from codecs import getwriter
 from contextlib import contextmanager
 from subprocess import check_call, Popen, PIPE
 from collections import namedtuple
-from functools import partial
+from functools import partial, wraps
 from pathlib import Path
+from tempfile import NamedTemporaryFile as _ntf
 try:
     from shutil import which
 except ImportError:
     from shutilwhich import which
 
 locale.setlocale(locale.LC_ALL, '')
+encoding = locale.getlocale()[1]
+
+if sys.version_info[0] == 2:
+    @wraps(_ntf)
+    def NamedTemporaryFile(mode):
+        return getwriter(encoding)(_ntf(mode))
+
+    def to_unicode(x):
+        return x.decode(encoding)
+else:
+    NamedTemporaryFile = _ntf
+    to_unicode = str
 
 
 def check_path():
@@ -36,7 +50,6 @@ Result = namedtuple('Result', 'returncode out err')
 # TODO: it's better to fail early, and thus I'd need to check the exit code, but it'll
 # need a refactoring of a couple of tests
 def invoke(*args, **kwargs):
-    encoding = locale.getlocale()[1]
     inp = kwargs.pop('inp', '').encode(encoding)
     popen = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE, **kwargs)
     out, err = [o.strip().decode(encoding) for o in popen.communicate(inp)]

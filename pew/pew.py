@@ -10,7 +10,6 @@ import random
 import textwrap
 from functools import partial
 from subprocess import CalledProcessError
-from tempfile import NamedTemporaryFile
 from pathlib import Path
 
 try:
@@ -32,8 +31,8 @@ else:
         lambda : sys.exit('Command not supported on this platform')
 
 from pew import __version__
-from pew._utils import (check_call, invoke, expandpath, own,
-                        env_bin_dir, check_path, temp_environ)
+from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir,
+                        check_path, temp_environ, NamedTemporaryFile, to_unicode)
 from pew._print_utils import print_virtualenvs
 
 if sys.version_info[0] == 2:
@@ -152,7 +151,7 @@ def fork_bash(env, cwd):
         with NamedTemporaryFile('w+') as rcfile:
             with bashrcpath.open() as bashrc:
                 rcfile.write(bashrc.read())
-            rcfile.write('\nexport PATH=' + compute_path(env))
+            rcfile.write('\nexport PATH=' + to_unicode(compute_path(env)))
             rcfile.flush()
             fork_shell(env, ['bash', '--rcfile', rcfile.name], cwd)
     else:
