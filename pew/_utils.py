@@ -13,10 +13,9 @@ try:
 except ImportError:
     from shutilwhich import which
 
-locale.setlocale(locale.LC_ALL, '')
-encoding = locale.getlocale()[1]
-
 if sys.version_info[0] == 2:
+    locale.setlocale(locale.LC_ALL, '')
+
     @wraps(_ntf)
     def NamedTemporaryFile(mode):
         return getwriter(encoding)(_ntf(mode))
@@ -27,6 +26,7 @@ else:
     NamedTemporaryFile = _ntf
     to_unicode = str
 
+encoding = locale.getlocale()[1]
 
 def check_path():
     parent = os.path.dirname
