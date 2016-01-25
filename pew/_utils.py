@@ -13,9 +13,15 @@ try:
 except ImportError:
     from shutilwhich import which
 
-if sys.version_info[0] == 2:
-    locale.setlocale(locale.LC_ALL, '')
+py2 = sys.version_info[0] == 2
+windows = sys.platform == 'win32'
 
+if py2 or windows:
+    locale.setlocale(locale.LC_CTYPE, '')
+
+encoding = locale.getlocale()[1]
+
+if py2:
     @wraps(_ntf)
     def NamedTemporaryFile(mode):
         return getwriter(encoding)(_ntf(mode))
@@ -25,8 +31,6 @@ if sys.version_info[0] == 2:
 else:
     NamedTemporaryFile = _ntf
     to_unicode = str
-
-encoding = locale.getlocale()[1]
 
 def check_path():
     parent = os.path.dirname
@@ -40,7 +44,7 @@ def resolve_path(f):
         return f([ex] + list(cmd[1:]), **kwargs)  # list-conversion is required in case `cmd` is a tuple
     return call
 
-if sys.platform == 'win32':
+if windows:
     check_call = resolve_path(check_call)
     Popen = resolve_path(Popen)
 
