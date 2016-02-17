@@ -151,7 +151,7 @@ def fork_bash(env, cwd):
         with NamedTemporaryFile('w+') as rcfile:
             with bashrcpath.open() as bashrc:
                 rcfile.write(bashrc.read())
-            rcfile.write('\nexport PATH=' + to_unicode(compute_path(env)))
+            rcfile.write('\nexport PATH="' + to_unicode(compute_path(env)) + '"')
             rcfile.flush()
             fork_shell(env, ['bash', '--rcfile', rcfile.name], cwd)
     else:
