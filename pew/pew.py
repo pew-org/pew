@@ -25,6 +25,8 @@ if not windows:
     from pythonz.installer.pythoninstaller import PythonInstaller, AlreadyInstalledError
     from pythonz.commands.list import ListCommand as ListPythons
     from pythonz.commands.locate import LocateCommand as LocatePython
+    from pythonz.define import PATH_PYTHONS
+    from pythonz.util import Package, is_installed
 else:
     # Pythonz does not support windows
     InstallCommand = ListPythons = LocatePython = \
@@ -177,10 +179,38 @@ def shell(env, cwd=None):
         fork_shell(env, [shell], cwd)
 
 
+def locate_python_by_version(version, pytype):
+    """
+    Save the user a little typing and attempt to find the installed
+    Python path given just the version number.
+    E.g., 3.4.3 -> /home/user/.pythonz/pythons/CPython-3.4.3/bin/python3
+
+    Only intended to find pythons installed by Pythonz.
+    Windows is therefore unsupported.
+
+    :param version: numerical version (e.g., 2.7.10, 3.5.1)
+    :param pytype: Python implementation (e.g., cpython, pypy)
+    :returns: path string or None
+    """
+    path = None
+    if windows:
+        return path
+    pkg = Package(version, pytype)
+    if is_installed(pkg):
+        for bin in ('python3', 'python', 'pypy3', 'pypy'):
+            path = os.path.join(PATH_PYTHONS, pkg.name, 'bin', bin)
+            if os.path.exists(path):
+                break
+    return path
+
+
 def mkvirtualenv(envname, python=None, packages=[], project=None,
-                 requirements=None, rest=[]):
+                 requirements=None, pytype='cpython', rest=[]):
 
     if python:
+        version_path = locate_python_by_version(python, pytype)
+        if version_path:
+            python = version_path
         rest = ["--python=%s" % python] + rest
 
     try:
@@ -200,6 +230,8 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
 def mkvirtualenv_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--python')
+    parser.add_argument('--type', default='cpython', help='Type of Python \
+version: cpython, stackless, pypy, pypy3 or jython.')
     parser.add_argument('-i', action='append', dest='packages', help='Install \
 a package after the environment is created. This option may be repeated.')
     parser.add_argument('-r', dest='requirements', help='Provide a pip \
@@ -220,9 +252,8 @@ project directory to associate with the new environment.')
     parser.add_argument('envname')
     args, rest = parser.parse_known_args(argv)
     project = expandpath(args.project) if args.project else None
-
     mkvirtualenv(args.envname, args.python, args.packages, project,
-                 args.requirements, rest)
+                 args.requirements, args.type, rest)
     if args.activate:
         shell(args.envname)
 
@@ -490,7 +521,7 @@ Create it or set PROJECT_HOME to an existing directory.' % projects_home)
         sys.exit('Project %s already exists.' % args.envname)
 
     mkvirtualenv(args.envname, args.python, args.packages, project.absolute(),
-                 args.requirements, rest)
+                 args.requirements, args.type, rest)
 
     project.mkdir()
 
@@ -511,7 +542,7 @@ def mktmpenv_cmd(argv):
     args, rest = parser.parse_known_args(argv)
 
     mkvirtualenv(env, args.python, args.packages, requirements=args.requirements,
-                 rest=rest)
+                 pytype=args.type, rest=rest)
     print('This is a temporary environment. It will be deleted when you exit')
     try:
         if args.activate:
