@@ -198,8 +198,9 @@ def locate_python_by_version(version, pytype):
     pkg = Package(version, pytype)
     if is_installed(pkg):
         for bin in ('python3', 'python', 'pypy3', 'pypy'):
-            path = os.path.join(PATH_PYTHONS, pkg.name, 'bin', bin)
-            if os.path.exists(path):
+            guess = os.path.join(PATH_PYTHONS, pkg.name, 'bin', bin)
+            if os.path.exists(guess):
+                path = guess
                 break
     return path
 
