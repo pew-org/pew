@@ -22,7 +22,7 @@ def test_install():
                     reason='Limit this slow and expensive test to the oldest '
                     'Python version in the CI environment')
 def test_uninstall():
-    py_version = ['2.7.9', '--type', 'cpython']
+    py_version = ['2.6.1', '--type', 'pypy']
     invoke('install', *py_version)
     assert invoke('uninstall', *py_version).returncode == 0
     assert invoke('locate_python', *py_version).returncode != 0
