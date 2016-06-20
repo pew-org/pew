@@ -1,2 +1,2 @@
-recursive-include pew/complete_scripts *
+recursive-include pew/shell_config *
 recursive-exclude pew *~

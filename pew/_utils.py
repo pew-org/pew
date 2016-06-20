@@ -1,38 +1,36 @@
 import os
 import sys
 import locale
+from codecs import getwriter
 from contextlib import contextmanager
 from subprocess import check_call, Popen, PIPE
 from collections import namedtuple
-from functools import partial
+from functools import partial, wraps
 from pathlib import Path
+from tempfile import NamedTemporaryFile as _ntf
+try:
+    from shutil import which
+except ImportError:
+    from shutilwhich import which
 
-locale.setlocale(locale.LC_ALL, '')
+py2 = sys.version_info[0] == 2
+windows = sys.platform == 'win32'
 
+if py2 or windows:
+    locale.setlocale(locale.LC_CTYPE, '')
 
-def which(fn):
-    """Simplified version of shutil.which for internal usage.
+encoding = locale.getlocale()[1]
 
-Doesn't look up commands ending in '.exe' (we don't use them),
-nor does it avoid looking up commands that already have their directory
-specified (we don't use them either) and it doesn't check the current directory,
-just like on *nix systems.
-"""
+if py2:
+    @wraps(_ntf)
+    def NamedTemporaryFile(mode):
+        return getwriter(encoding)(_ntf(mode))
 
-    def _access_check(fn):
-        return (os.path.exists(fn) and os.access(fn, os.F_OK | os.X_OK)
-                and not os.path.isdir(fn))
-    pathext = os.environ.get("PATHEXT", "").split(os.pathsep)
-    files = [fn + ext.lower() for ext in pathext]
-    path = os.environ.get("PATH", os.defpath).split(os.pathsep)
-    seen = set()
-    for dir in map(os.path.normcase, path):
-        if dir not in seen:
-            seen.add(dir)
-            for name in map(lambda f: os.path.join(dir, f), files):
-                if _access_check(name):
-                    return name
-
+    def to_unicode(x):
+        return x.decode(encoding)
+else:
+    NamedTemporaryFile = _ntf
+    to_unicode = str
 
 def check_path():
     parent = os.path.dirname
@@ -40,27 +38,26 @@ def check_path():
 
 
 def resolve_path(f):
-    if sys.platform != 'win32':
-        return f
-    else:
-        def call(cmd, **kwargs):
-            ex = cmd[0]
-            ex = which(ex) or ex
-            return f([ex] + list(cmd[1:]), **kwargs)
-        return call
+    def call(cmd, **kwargs):
+        ex = cmd[0]
+        ex = which(ex) or ex
+        return f([ex] + list(cmd[1:]), **kwargs)  # list-conversion is required in case `cmd` is a tuple
+    return call
 
-check_call = resolve_path(check_call)
-Popen = resolve_path(Popen)
+if windows:
+    check_call = resolve_path(check_call)
+    Popen = resolve_path(Popen)
 
-Result = namedtuple('Result', 'out err')
+Result = namedtuple('Result', 'returncode out err')
+
 
 # TODO: it's better to fail early, and thus I'd need to check the exit code, but it'll
 # need a refactoring of a couple of tests
 def invoke(*args, **kwargs):
-    encoding = locale.getlocale()[1]
     inp = kwargs.pop('inp', '').encode(encoding)
     popen = Popen(args, stdin=PIPE, stdout=PIPE, stderr=PIPE, **kwargs)
-    return Result(*[o.strip().decode(encoding) for o in popen.communicate(inp)])
+    out, err = [o.strip().decode(encoding) for o in popen.communicate(inp)]
+    return Result(popen.returncode, out, err)
 
 
 invoke_pew = partial(invoke, 'pew')

@@ -4,52 +4,47 @@ Pew - Python Env Wrapper
 [![PyPi version](http://img.shields.io/pypi/v/pew.svg)](https://pypi.python.org/pypi/pew)
 [![Build Status](https://travis-ci.org/berdario/pew.png)](https://travis-ci.org/berdario/pew)
 [![Build status](https://ci.appveyor.com/api/projects/status/xxe096txh1fuqfag/branch/master?svg=true)](https://ci.appveyor.com/project/berdario/pew/branch/master)
-[![Wheel Status](https://pypip.in/wheel/pew/badge.svg)](https://pypi.python.org/pypi/pew/)
+[![PyPi](https://img.shields.io/pypi/format/pew.svg)](https://pypi.python.org/pypi/pew/)
 
-**For new users coming from virtualenvwrapper and pre-0.1.6 users: after some users' suggestions, and after deeming not very useful to replicate 1to1 virtualenvwrapper's commands, now all the commands are subcommands of the pew command, or can used by prefixing "pew-"**
+[![Pull Request stats](http://www.issuestats.com/github/berdario/pew/badge/pr?style=flat-square)](http://www.issuestats.com/github/berdario/pew)
+[![Issue stats](http://www.issuestats.com/github/berdario/pew/badge/issue?style=flat-square)](http://www.issuestats.com/github/berdario/pew)
 
-Python Env Wrapper is a set of tools to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). The tools can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
+Python Env Wrapper is a set of commands to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). Pew can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
-Pew makes it easier to work on more than one project at a time without introducing conflicts in their dependencies. It is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea/alternative implementation of a better activate script.
+Virtualenvs makes it easier to work on more than one project at a time without introducing conflicts in their dependencies.
 
-The advantage is that pew doesn't hook into a shell, but is only a set of commands that is thus completely shell-agnostic:
-
-It works on bash, zsh, fish, powershell, etc.
-
-Another side effect is that its code is much shorter and (hopefully) easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s (the project upon which this is based). How many Python programmers know at a glance what does `"${out_args[@]-}"` do? or `eval "envname=\$$#"`?
-
-* Part of the conciseness of pew is thanks to inve itself: "shelling out" let us avoid to keep track of the previous environment variable values, and to create a deactivate script.
-
-* Part is thanks to Python libraries, like argparse.
-
-* Part is thanks to the stricter Python error handling.
-
-* Part is thanks to some [differences](#differences-from-virtualenvwrapper).
-
-* Part is also probably due to my objectionable taste for code layout :)
+Pew is completely shell-agnostic and thus works on bash, zsh, fish, powershell, etc.
 
 Installation
 ------------
 
+### pip
+
+_Pew and its dependencies rely on a couple of features of pip/setuptools which might not be available on old versions. In case your distribution doesn't ship with one recent enough, you'll probably want to run `pip install --upgrade pip` before the installation._
+
 `pip install pew`
+
+
 
 See the [troubleshooting](#troubleshooting) section, if needed.
 
-There's a Nix package available, you can install it on [Nixos](http://nixos.org/) or on [most Unix-like OSes](http://nixos.org/nix/download.html):
+There are also some packages, more or less up-to-date:
 
-    nix-env -i python3.4-pew
+### Arch linux
 
 For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
 
-For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubuntu/ppa/)
+### Ubuntu PPA
+
+For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubuntu/ppa/):
 
     sudo add-apt-repository ppa:pew-maintainers/ppa
     sudo apt-get update
     sudo apt-get install pew
 
-On Windows, you can install pew with [Chocolatey](http://chocolatey.org) by running the following in an elevated permission console:
+### Windows/Cygwin notes
 
-    choco python pew
+A python installed from the normal `.exe` file [behaves differently](https://github.com/berdario/pew/issues/80#issuecomment-168279648) from a python installed inside Cygwin. For this reason if you want to use Pew inside a Cygwin shell, you should use a Cygwin python, and if you want to use it inside Powershell, you should use your normal Python install, and avoid a Cygwin one.
 
 Usage
 -----
@@ -102,26 +97,49 @@ Once inside, you can check the current python version, list the packages present
 
 You can also specify a requirements file, to be passed on to pip, and activate another virtualenv with workon:
 
-	~> pew new -r ~/Projects/topaz/requirements.txt topaz
-	New python executable in topaz/bin/python
-	[SNIP]
-	Successfully installed rply pytest invoke requests py
-	Cleaning up...
-	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
-	topaz ~> ^D
+    ~> pew new -r ~/Projects/topaz/requirements.txt topaz
+    New python executable in topaz/bin/python
+    [SNIP]
+    Successfully installed rply pytest invoke requests py
+    Cleaning up...
+    Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
+    topaz ~> ^D
 
-	~> pew workon myproject
-	Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
-	myproject ~>
+    ~> pew workon myproject
+    Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
+    myproject ~>
+
+Since 0.1.16, Pew integrates Pythonz, which allows you to easily install a new python version (only on linux and macosx):
+
+    ~> pew install 2.6.1 --type pypy
+    WARNING: Linux binaries are dynamically linked, as is usual, and thus might not be usable due to the sad story of linux binary    compatibility,  check the PyPy website for more information
+    Downloading pypy-2.6.1-linux64.tar.bz2 as /home/dario/.pythonz/dists/pypy-2.6.1-linux64.tar.bz2
+    ########################################################################## 100%
+    Extracting pypy-2.6.1-linux64.tar.bz2 into /home/dario/.pythonz/build/PyPy-2.6.1
+    Installing PyPy-2.6.1 into /home/dario/.pythonz/pythons/PyPy-2.6.1
+
+    Installed PyPy-2.6.1 successfully.
+    ~> pew new --python=$(pythonz locate 2.6.1 --type pypy) latest_pypy
+    Running virtualenv with interpreter /home/dario/.pythonz/pythons/PyPy-2.6.1/bin/python
+    New pypy executable in latest_pypy/bin/python
+    Also creating executable in latest_pypy/bin/pypy
+    Installing setuptools, pip, wheel...done.
+    Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
+    latest_pypy ~> python -V
+    Python 2.7.10 (f3ad1e1e1d62, Aug 28 2015, 10:45:29)
+    [PyPy 2.6.1 with GCC 4.8.4]
+
 
 Command Reference
 -----------------
+
+When invoked without arguments `pew` will output the list of all commands with each one's description
 
 ### new ###
 
 Create a new environment, in the WORKON_HOME.
 
-`usage: pew-new [-hd] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] envname`
+`usage: pew new [-hd] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] envname`
 
 The new environment is automatically activated after being initialized.
 
@@ -135,7 +153,7 @@ The `-r` option can be used to specify a text file listing packages to be instal
 
 List or change working virtual environments.
 
-`usage: pew-workon [environment_name]`
+`usage: pew workon [environment_name]`
 
 If no `environment_name` is given the list of available environments is printed to stdout.
 
@@ -143,47 +161,74 @@ If no `environment_name` is given the list of available environments is printed 
 
 Create a temporary virtualenv.
 
-`usage: pew-mktmpenv [-h] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS]`
+`usage: pew mktmpenv [-h] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS]`
 
 ### ls ###
 
 List all of the environments.
 
-`usage: pew-ls [-h] [-b | -l]`
+`usage: pew ls [-h] [-b | -l]`
+
+The `--long` options will print each virtualenv side-by-side with its Python version and the contents of its site-packages
 
 ### show ###
 
-`usage: pew-show [env]`
+`usage: pew show [env]`
 
 ### inall ###
 
 Run a command in each virtualenv.
 
-`usage: pew-inall [command]`
+`usage: pew inall [command]`
 
 ### in ###
 
 Run a command in the given virtualenv.
 
-`usage: pew-in [env] [command]`
+`usage: pew in [env] [command]`
 
 ### rm ###
 
 Remove one or more environments, from the WORKON_HOME.
 
-`usage: pew-rm envs [envs ...]`
+`usage: pew rm envs [envs ...]`
 
 You have to exit from the environment you want to remove.
+
+### install ###
+Use Pythonz to download and build a Python vm
+
+`usage: pew install [options] version`
+
+To install Python3.5.0
+
+`pew install 3.5.0`
+
+To install Pypy:
+
+`pew install 2.6.1 --type pypy`
+
+### list_pythons ###
+List the pythons installed by Pythonz
+
+`usage: pew list_pythons [options]`
+
+You can list all the Pythons available to install with `-a` or `--all-versions`
+
+### locate_python ###
+Locate the path for the python version installed by Pythonz
+
+`usage: pew locate_python [options] version`
 
 ### cp ###
 
 Duplicate an existing virtualenv environment. The source can be an environment managed by virtualenvwrapper or an external environment created elsewhere.
 
-Copying virtual environments is not well supported. Each virtualenv has path information hard-coded into it, and there may be cases where the copy code does not know to update a particular file. Use with caution.
+_Copying virtual environments is not well supported. Each virtualenv has path information hard-coded into it, and there may be cases where the copy code does not know to update a particular file. Use with caution._
 
-`usage: pew-cp [-hd] source [targetenvname]`
+`usage: pew cp [-hd] source [targetenvname]`
 
-Target environment name is required for WORKON_HOME duplications. However, target environment name can be ommited for importing external environments. If omitted, the new environment is given the same name as the original.
+Target environment name is required for WORKON_HOME duplications. However, target environment name can be omitted for importing external environments. If omitted, the new environment is given the same name as the original.
 
 ### sitepackages_dir ###
 
@@ -197,7 +242,7 @@ Equivalent to `ls $(sitepackages_dir)`.
 
 Adds the specified directories to the Python path for the currently-active virtualenv.
 
-`usage: pew-add [-h] [-d] dirs [dirs ...]`
+`usage: pew add [-h] [-d] dirs [dirs ...]`
 
 Sometimes it is desirable to share installed packages that are not in the system `site-packages` directory and which should not be installed in each virtualenv. One possible solution is to symlink the source into the environment `site-packages` directory, but it is also easy to add extra directories to the PYTHONPATH by including them in a `.pth` file inside `site-packages` using `add2virtualenv`.
 
@@ -209,24 +254,24 @@ The directory names are added to a path file named `_virtualenv_path_extensions.
 
 Controls whether the active virtualenv will access the packages in the global Python `site-packages` directory.
 
-`usage: pew-toggleglobalsitepackages [-q]`
+`usage: pew toggleglobalsitepackages [-q]`
 
 
 ### mkproject ###
 
 Create a new virtualenv in the `WORKON_HOME` and project directory in `PROJECT_HOME`.
 
-`usage: pew-mkproject [-hd] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] [-t TEMPLATES] [-l] envname`
+`usage: pew mkproject [-hd] [-p PYTHON] [-i PACKAGES] [-a PROJECT] [-r REQUIREMENTS] [-t TEMPLATES] [-l] envname`
 
-The template option may be repeated to have several templates used to create a new project. The templates are applied in the order named on the command line. All other options are passed to `pew-new` to create a virtual environment with the same name as the project.
+The template option may be repeated to have several templates used to create a new project. The templates are applied in the order named on the command line. All other options are passed to `pew new` to create a virtual environment with the same name as the project.
 
-A template is simply an executable to be found in `WORKON_HOME`, it will be called with the name of the project, and the project directory as first and second argument, respectively. A `template_django` script is given as example inside the `pew` package.
+A template is simply an executable to be found in `WORKON_HOME`, it will be called with the name of the project, and the project directory as first and second argument, respectively. A `template_django` script is given as an example inside the `pew` package.
 
 ### setproject ###
 
 Bind an existing virtualenv to an existing project.
 
-`usage: pew-setproject [virtualenv_path] [project_path]`
+`usage: pew setproject [virtualenv_path] [project_path]`
 
 When no arguments are given, the current virtualenv and current directory are assumed.
 
@@ -235,7 +280,27 @@ When no arguments are given, the current virtualenv and current directory are as
 Try to restore a broken virtualenv by reinstalling the same python
 version on top of it
 
-`usage: pew-restore env`
+`usage: pew restore env`
+
+### rename ###
+
+Rename a virtualenv (by copying it over to the new name, and deleting the old one)
+
+`usage: pew rename source target`
+
+### wipeenv ###
+
+Remove all installed packages from the current (or supplied) env.
+
+`usage: pew wipeenv [env]`
+
+### shell_config ###
+
+Prints the path for the current $SHELL helper file
+
+`usage: pew shell_config`
+
+
 
 ### var ###
 Set, unset or display environment variables for the virtual environment. pew shells must be restarted to reflect changes to environment variables. Variable information is stored in an .env file in the virtual environment. The .env file format is compatible with foreman and honcho.
@@ -250,7 +315,7 @@ When call with a variable name and a value, will set that variable to that value
 Configuration
 -------------
 
-You can customize pew's virtualenvs directory location, with the `$XDG_DATA_HOME` or `$WORKON_HOME` environment variables, and the locations of new projects created with mkproject by setting `$PROJECT_HOME` (otherwise, the current directory will be selected)
+You can customize pew's virtualenvs directory location, with the `$XDG_DATA_HOME` or `$WORKON_HOME` environment variables, and the locations of new projects created with mkproject by setting `$PROJECT_HOME` (otherwise, the current directory will be selected).
 
 
 Troubleshooting
@@ -258,18 +323,20 @@ Troubleshooting
 
 ### The environment doesn't seem to be activated ###
 
-If you've defined in your shell rc file, to export a PATH location that might shadow the executables needed by pew (or your project), you might find that when getting into the environment, they will still be at the head of the PATH.
+If you've defined in your shell rc file to export a PATH location that might shadow the executables needed by pew (or your project), you might find that when getting into the environment, they will still be at the head of the PATH.
 
 There're multiple way to overcome this issue:
 
 * Move your export statements into the profile (`.bash_profile` and `.zprofile` for bash and zsh respectively, or in fish wrap your statements in a `if status --is-login` block ) and set up your terminal emulator to launch your shell as a login shell
 * Change your exports to put the new location at the tail, instead of the head of the PATH, e.g.: `export PATH=${PATH}:/usr/bin`
-* Change the files your OS provide to setup the base environment (it might come useful to look into /etc/paths.d /etc/profile and [environment.plist](http://stackoverflow.com/a/8421952/293735))
+* Change the files your OS provides to setup the base environment (it might be useful to look into `/etc/paths.d`, `/etc/profile`, and [environment.plist](http://stackoverflow.com/a/8421952/293735))
+
+If you're running the `zsh` configuration tool `prezto`, and/or you're on MacOSX, [you might want to read this](https://github.com/thoughtbot/dotfiles/pull/426#issue-109716011) (it's about another project for handling dotfiles, but the misconfiguration described is quite similar to one witnessed on other OSX/prezto systems).
 
 
 ### pkg_resources.DistributionNotFound: virtualenv ###
 
-This might happen after a Python update, especially on MacOSX, upgrading setuptools might fix that (you should need superuser permissions to do it)
+This might happen after a Python update, especially on MacOSX, upgrading `setuptools` might fix that (you should need superuser permissions to do it)
 
 `easy_install -U setuptools`
 
@@ -284,55 +351,43 @@ Congratulations! You found a bug, please [let me know](https://github.com/berdar
 Running Tests
 -------------
 
-pew's test suite is a straight port of virtualenvwrapper's, dropping test related to things absent in pew and converting the scripts to use commands "echoed inside the workon commands" (almost surely there was a better approach, but I wasn't sure how to integrate it with shunit asserts, and I didn't want to rewrite all the tests as well); This means that they're slightly uglier and they spew out more unimportant output when running.
+The test suite for `pew` uses [tox](http://codespeak.net/tox). Most tests are actually integration tests that will fork shells, create virtualenvs and in some cases even download python packages from Pypi. The whole test suite takes around 1 minute to run on a single interpreter.
 
-The test suite for pew uses [shunit2](http://shunit2.googlecode.com/) and [tox](http://codespeak.net/tox). The shunit2 source is included in the `tests` directory, but tox must be installed separately (`pip install tox`).
+With every commit and pull request, the test suite is run over all supported interpreters on travis-ci (for unix-like) and appveyor (for windows).
 
 To run individual test scripts, run from the top level directory of the repository a command like:
 
-`tox tests/test_cd.sh`
+`tox tests/test_setproject.py`
 
-To run tests under a single version of Python, specify the appropriate environment when running tox:
+To run tests under a single version of Python, specify the appropriate environment when running `tox`:
 
 `tox -e py27`
 
 Combine the two modes to run specific tests with a single version of Python:
 
-`tox -e py27 tests/test_cd.sh`
+`tox -e py27 tests/test_setproject.py`
+
+You can also filter them:
+
+`tox -e py34 -- -k workon`
 
 Add new tests by modifying an existing file or creating new script in the tests directory.
 
 
-Differences from Virtualenvwrapper
-----------------------------------
+Display the environment name in the terminal prompt
+---------------------------------------------------
 
-### workon opens a new shell prompt ###
+### bash/zsh ###
 
-I don't think there's any shortcoming to workon on another environment without exiting from the previous, and I've done it myself some times while developing, you'll probably want to keep it in mind and remember to exit properly each time... After all you just need to press Ctrl+D.
+The first run setup should take care of this for you.
 
-Another consequence is that the prompt won't be updated... but this can be easily fixed by using the `$VIRTUAL_ENV` variable.
+You can do it manually by appending to your `.bashrc`/`.zshrc`
 
-To get a blue-colored name at the start of your prompt:
+`source $(pew shell_config)`
 
-#### bash prompt ####
+#### fish ####
 
-`PS1="\[\033[01;34m\]\$(basename '$VIRTUAL_ENV')\e[0m$PS1"`
-
-#### zsh prompt ####
-
-Add this to your .zshrc file, before your `PS1` declaration :
-
-`venv=$(basename "$VIRTUAL_ENV")`
-
-Then add this at the beginning of your `PS1` :
-
-`%{$fg_bold[blue]%}$venv${venv:+ }`
-
-#### fish prompt ####
-
-`set -g __fish_prompt_venv (set_color --bold -b blue white) (basename "$VIRTUAL_ENV") "$__fish_prompt_normal "`
-
-and then echo `__fish_prompt_venv` in the `fish_prompt` function.
+Just like for bash/zsh, but since fish uses a `fish_prompt` function and not a `PS1` environment variable, the setup will only make available to you a fish function `pew_prompt`. Just use its output in the `fish_prompt` function.
 
 #### powershell prompt ####
 
@@ -340,27 +395,9 @@ Add this to a prompt function:
 
 `Write-Host -NoNewLine -f blue ([System.IO.Path]::GetFileName($env:VIRTUAL_ENV))`
 
-### there're no cd* commands ###
-
-Due to the fact that the commands cannot change the environment from which they've been called, the `cdvirtualenv`, `cdsitepackages` and `cdproject` are missing.
-
-They can be simply implemented like:
-
-`cd $VIRTUAL_ENV` for `cdvirtualenv`
-
-`cd $(pew sitepackages_dir)` for `cdsitepackages`
-
-`cd $(cat $VIRTUAL_ENV/.project)` for `cdproject`
-
-Just like in the inve idea, a pew command that returns a string of commands to be sourced could be created, and by putting it in your .bashrc/.zshrc/config.fish these aliases/command creations could be automated.
-
-### due to argparse, not every argument order is supported ###
-
-If in doubt, for the commands that use argparse, just run them with the `--help` flag, e.g.:
-
-`pew new --help`
-
 ### no hooks (for now) ###
+
+(There's currently a Pull Request open for it)
 
 Adding hooks for installing some packages on each new virtualenv creation is quite easy, but I couldn't find some comprehensive hook examples, and virtualenvwrapper's hook implementation lets the hook return a script to be sourced.
 
@@ -368,20 +405,37 @@ This could be handled by (instead of getting back a script to be sourced) gettin
 
 But to handle just the simple case, using the existing virtualenvwrapper's infrastructure (which relied on stevedore) seemed like overkill, and given that the most interesting virtualenvwrapper's extensions have been merged to the trunk at the end, and that I never used virtualenvwrapper's hook first hand, I decided to skip them, at least for now.
 
-### lots of VIRTUALENVWRAPPER* env variables aren't used ###
-
-Some of those, like VIRTUALENVWRAPPER_VIRTUALENV, just defaulted to virtualenv itself and never got any use inside virtualenvwrapper, and I couldn't find someone that made use for it in the wild... so, given that external commands can still be overridden (e.g. by changing the PATH) I chose to leave them out.
-
-### the commands don't have the same exact name ###
-
-Since `0.1.6`
 
 Thanks
 ------
 
-Thanks to Michael F. Lamb for his thought provoking gist
+Everyone who submitted patches/PR, as of September 2015:
 
-Thanks to Dough Hellman for his virtualenvwrapper code and for the tests and of his documentation that I got to reuse extensively
+- José Luis Lafuente
+- Arthur Vuillard
+- Jakub Stasiak
+- Ryan Hiebert
+- Michael Hofer
+- Daniel Harding
+- Timothy Corbett-Clark
+- Simon Junod
+- Robin
+- Matei Trușcă
+- Lucas Cimon
+
+
+Thanks also to Michael F. Lamb for his thought provoking gist and to Doug Hellman for virtualenvwrapper
+
+Rationale
+---------
+
+Pew is written in pure python and leverages [inve](https://gist.github.com/datagrok/2199506): the idea for a better activate script.
+
+Pew was originally a rewrite of virtualenvwrapper, the advantage is that pew doesn't hook into a shell, but is only a set of commands, thus completely shell-agnostic:
+
+It works on bash, zsh, fish, powershell, etc.
+
+Thanks to using Python libraries and setuptools for dependency management, to Python stricter error handling and the fact that "shelling out" let us avoid keeping track of the previous environment variable values, pew code is much shorter and easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s. How many Python programmers know at a glance what does `"${out_args[@]-}"` do? Or `eval "envname=\$$#"`?
 
 License
 -------

@@ -5,13 +5,10 @@ from pathlib import Path
 import pytest
 
 from pew._utils import invoke_pew as invoke
-
-windows = platform == 'win32'
-
-skip_windows = pytest.mark.skipif(windows, reason='cannot supply stdin to powershell')
+from utils import skip_windows
 
 
-@skip_windows
+@skip_windows(reason='cannot supply stdin to powershell')
 def test_mktmpenv(workon_home):
     envs = set(invoke('ls').out.split())
     envs2 = set(invoke('mktmpenv', inp='pew ls').out.split())
@@ -23,7 +20,7 @@ def test_mktmpenv_extra_name(workon_home):
         check_call('pew mktmpenv yada'.split())
 
 
-@skip_windows
+@skip_windows(reason='cannot supply stdin to powershell')
 def test_mktmpenv_ngsp(workon_home):
     site = Path(invoke('mktmpenv', inp='pew sitepackages_dir').out)
     assert (site.parent / 'no-global-site-packages.txt').exists

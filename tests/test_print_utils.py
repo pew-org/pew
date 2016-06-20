@@ -24,6 +24,12 @@ def test_get_rows_even():
 
 
 @patch('pew._print_utils.get_terminal_size', return_value=(8, 1))
+def test_get_best_columns_number_empty(mock):
+    number = get_best_columns_number([])
+    assert number == 1
+
+
+@patch('pew._print_utils.get_terminal_size', return_value=(8, 1))
 def test_get_best_columns_number(mock):
     number = get_best_columns_number(['a', 'b', 'c'])
     assert number == 3

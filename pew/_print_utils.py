@@ -22,11 +22,12 @@ def get_rows(venvs, columns_number):
 
 
 def row_len(names):
-    return sum(map(len, names)) + L*len(names) - L
+    return sum(map(len, names)) + L * len(names) - L
 
 
 def get_best_columns_number(venvs):
     max_width, _ = get_terminal_size()
+    columns_number = 1
     for columns_number in range(1, len(venvs) + 1):
         rows = get_rows(venvs, columns_number)
         if max(map(row_len, rows)) > max_width:
