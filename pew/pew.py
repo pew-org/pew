@@ -169,7 +169,7 @@ def inve(env, command, *args, **kwargs):
         unsetenv('__PYVENV_LAUNCHER__')
 
         #load environment variables from .env
-        envfile = envdir / '.env'
+        envfile = workon_home / env / '.env'
         if envfile.exists():
             parser = EnvParser()
             parser.load(str(envfile))
@@ -668,14 +668,14 @@ def version_cmd(argv):
     """Prints current pew version"""
     print(__version__)
 
-def var_cmd():
+def var_cmd(argv):
     """Sets, unsets and prints virtual environment variables."""
     parser = argparse.ArgumentParser()
     parser.add_argument('env', help="virtual environment")
     parser.add_argument('var_name', nargs="?", help="variable name")
     parser.add_argument('var_value', nargs="?", help="variable value")
     parser.add_argument('-u','--unset',action='store_true', help="unset environment variable")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     envfile = workon_home / args.env / '.env'
     envvars = EnvParser()
     if envfile.exists():
