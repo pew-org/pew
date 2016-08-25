@@ -639,7 +639,7 @@ def first_run_setup():
                            , 'zsh': '~/.zshrc'
                            , 'fish': '~/.config/fish/config.fish'}[shell])
         with rcpath.open('r+') as rcfile:
-            if (source_cmd + '\n') not in rcfile.readlines():
+            if source_cmd not in (line.strip() for line in rcfile.readlines()):
                 choice = 'X'
                 while choice not in ('y', '', 'n'):
                     choice = input("It seems that you're running pew for the first time\n"
