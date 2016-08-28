@@ -18,13 +18,12 @@ Pew is completely shell-agnostic and thus works on bash, zsh, fish, powershell, 
 Installation
 ------------
 
-### pip
-
 _Pew and its dependencies rely on a couple of features of pip/setuptools which might not be available on old versions. In case your distribution doesn't ship with one recent enough, you'll probably want to run `pip install --upgrade pip` before the installation._
 
-`pip install pew`
+If you cannot upgrade the version of setuptools on your system, and one of the packages listed below is of no use to you, I suggest to use [`pipsi`](https://pypi.python.org/pypi/pipsi) rather than plain `pip`
 
 
+`pipsi install pew`
 
 See the [troubleshooting](#troubleshooting) section, if needed.
 
