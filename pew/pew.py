@@ -27,8 +27,6 @@ if not windows:
     from pythonz.commands.list import ListCommand as ListPythons
     from pythonz.define import PATH_PYTHONS
     from pythonz.commands.locate import LocateCommand as LocatePython
-    from pythonz.define import PATH_PYTHONS
-    from pythonz.util import Package, is_installed
 else:
     # Pythonz does not support windows
     InstallCommand = ListPythons = LocatePython = UninstallCommand = \
@@ -44,11 +42,13 @@ if sys.version_info[0] == 2:
 
 err = partial(print, file=sys.stderr)
 
+if windows:
+    default_home = '~/.virtualenvs'
+else:
+    default_home = os.path.join(
+        os.environ.get('XDG_DATA_HOME', '~/.local/share'), 'virtualenvs')
 workon_home = expandpath(
-    os.environ.get('WORKON_HOME',
-                   os.path.join(os.environ.get('XDG_DATA_HOME',
-                                               '~/.local/share'),
-                                'virtualenvs')))
+    os.environ.get('WORKON_HOME', default_home))
 
 
 def makedirs_and_symlink_if_needed(workon_home):
