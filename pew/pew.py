@@ -229,23 +229,28 @@ project directory to associate with the new environment.')
 
 
 def rmvirtualenvs(envs):
+    error_happened = False
     for env in envs:
         env = workon_home / env
         if os.environ.get('VIRTUAL_ENV') == str(env):
             err("ERROR: You cannot remove the active environment (%s)." % env)
+            error_happened = True
             break
         try:
             shutil.rmtree(str(env))
         except OSError as e:
             err("Error while trying to remove the {0} env: \n{1}".format
                 (env, e.strerror))
+            error_happened = True
+    return error_happened
+
 
 
 def rm_cmd(argv):
     """Remove one or more environment, from $WORKON_HOME."""
     if len(argv) < 1:
         sys.exit("Please specify an environment")
-    rmvirtualenvs(argv)
+    return rmvirtualenvs(argv)
 
 
 def packages(site_packages):
@@ -441,7 +446,7 @@ def rename_cmd(argv):
     parser.add_argument('target')
     pargs = parser.parse_args(argv)
     copy_virtualenv_project(pargs.source, pargs.target)
-    rmvirtualenvs([pargs.source])
+    return rmvirtualenvs([pargs.source])
 
 
 def setvirtualenvproject(env, project):
@@ -521,7 +526,7 @@ def mktmpenv_cmd(argv):
             # only used for testing on windows
             shell(env)
     finally:
-        rmvirtualenvs([env])
+        return rmvirtualenvs([env])
 
 
 def wipeenv_cmd(argv):
