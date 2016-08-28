@@ -310,6 +310,8 @@ def workon_cmd(argv):
         lsvirtualenv(False)
         return
 
+    if env.startswith('/'):
+        sys.exit("ERROR: Invalid environment name '{0}'.".format(env))
     env_path = workon_home / env
     if not env_path.exists():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
@@ -569,6 +571,8 @@ def in_cmd(argv):
         return workon_cmd(argv)
 
     env = argv[0]
+    if env.startswith('/'):
+        sys.exit("ERROR: Invalid environment name '{0}'.".format(env))
     if not (workon_home / env).exists():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
 'pew new {0}'.".format(env))

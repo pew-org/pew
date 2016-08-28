@@ -7,6 +7,7 @@ import pytest
 
 
 @skip_windows(reason='Pythonz is unsupported')
+@pytest.mark.skipif(sys.platform == 'cygwin', 'Pythonz is unsupported')
 @pytest.mark.skipif(sys.version_info > (2,7) and os.environ.get('CI') == 'true',
                     reason='Limit this slow and expensive test to the oldest '
                     'Python version in the CI environment')

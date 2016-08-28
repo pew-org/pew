@@ -32,4 +32,9 @@ def test_no_symlink(env1):
 def test_no_pew_workon_home(workon_home):
     with temp_environ():
         os.environ['WORKON_HOME'] += '/not_there'
-        assert 'does not exist' in invoke('in', 'doesnt_exist').err
+        assert 'does not exist' in invoke('workon', 'doesnt_exist').err
+
+
+def test_invalid_pew_workon_env_name(workon_home):
+    with temp_environ():
+        assert 'Invalid environment' in invoke('workon', '/home/toto').err
