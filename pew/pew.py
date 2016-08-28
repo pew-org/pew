@@ -22,13 +22,16 @@ windows = sys.platform == 'win32'
 from clonevirtualenv import clone_virtualenv
 if not windows:
     from pythonz.commands.install import InstallCommand
+    from pythonz.commands.uninstall import UninstallCommand
     from pythonz.installer.pythoninstaller import PythonInstaller, AlreadyInstalledError
     from pythonz.commands.list import ListCommand as ListPythons
     from pythonz.define import PATH_PYTHONS
     from pythonz.commands.locate import LocateCommand as LocatePython
+    from pythonz.define import PATH_PYTHONS
+    from pythonz.util import Package, is_installed
 else:
     # Pythonz does not support windows
-    InstallCommand = ListPythons = LocatePython = \
+    InstallCommand = ListPythons = LocatePython = UninstallCommand = \
         lambda : sys.exit('Command not supported on this platform')
 
 from pew import __version__
@@ -611,6 +614,11 @@ def install_cmd(argv):
             actual_installer.install()
         except AlreadyInstalledError as e:
             print(e)
+
+
+def uninstall_cmd(argv):
+    '''Use Pythonz to uninstall the specified Python version'''
+    UninstallCommand().run(argv)
 
 
 def list_pythons_cmd(argv):

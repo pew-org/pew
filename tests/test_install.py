@@ -5,14 +5,20 @@ from pew._utils import invoke_pew as invoke
 from utils import skip_windows
 import pytest
 
+pytestmark = skip_windows(reason='Pythonz is unsupported')(
+    pytest.mark.skipif(sys.platform == 'cygwin', reason='Pythonz is unsupported')(
+        pytest.mark.skipif(sys.version_info > (2,7) and os.environ.get('CI') == 'true',
+            reason='Limit this slow and expensive test to the oldest '
+            'Python version in the CI environment')))
 
-@skip_windows(reason='Pythonz is unsupported')
-@pytest.mark.skipif(sys.platform == 'cygwin', 'Pythonz is unsupported')
-@pytest.mark.skipif(sys.version_info > (2,7) and os.environ.get('CI') == 'true',
-                    reason='Limit this slow and expensive test to the oldest '
-                    'Python version in the CI environment')
 def test_install():
     py_version = ['2.6.1', '--type', 'pypy']
     assert invoke('install', *py_version).returncode == 0
     py = invoke('locate_python', *py_version).out
     check_call([py, '-V'])
+
+def test_uninstall():
+    py_version = ['2.6.1', '--type', 'pypy']
+    invoke('install', *py_version)
+    assert invoke('uninstall', *py_version).returncode == 0
+    assert invoke('locate_python', *py_version).returncode != 0
