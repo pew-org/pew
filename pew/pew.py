@@ -255,7 +255,7 @@ def packages(site_packages):
 
 def showvirtualenv(env):
     columns, _ = get_terminal_size()
-    pkgs = packages(sitepackages_dir(env))
+    pkgs = sorted(packages(sitepackages_dir(env)))
     env_python = workon_home / env / env_bin_dir / 'python'
     l = len(env) + 2
     version = invoke(str(env_python), '-V')
@@ -374,7 +374,7 @@ def sitepackages_dir_cmd(argv):
 def lssitepackages_cmd(argv):
     """Show the content of the site-packages directory of the current virtualenv."""
     site = sitepackages_dir()
-    print(*site.iterdir())
+    print(*sorted(site.iterdir()), sep=os.linesep)
     extra_paths = site / '_virtualenv_path_extensions.pth'
     if extra_paths.exists():
         print('from _virtualenv_path_extensions.pth:')
