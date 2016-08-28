@@ -31,4 +31,4 @@ _pew()
     COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
 
 } &&
-complete -F _pew pew
+complete -o default -F _pew pew
