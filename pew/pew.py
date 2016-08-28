@@ -660,21 +660,29 @@ def first_run_setup():
         rcpath = expandpath({'bash': '~/.bashrc'
                            , 'zsh': '~/.zshrc'
                            , 'fish': '~/.config/fish/config.fish'}[shell])
-        with rcpath.open('r+') as rcfile:
-            if source_cmd not in (line.strip() for line in rcfile.readlines()):
-                choice = 'X'
-                while choice not in ('y', '', 'n'):
-                    choice = input("It seems that you're running pew for the first time\n"
-                                   "do you want to modify %s to source completions and"
-                                   " update your prompt? [y/N]\n> " % rcpath).lower()
-                if choice == 'y':
-                    rcfile.write('\n# added by Pew\n%s\n' % source_cmd)
-                    print('Done')
-                else:
-                    print('\nOk, if you want to do it manually, just add\n %s\nat'
-                          ' the end of %s' % (source_cmd, rcpath))
-                print('\nWill now continue with the command:', *sys.argv[1:])
-                input('[enter]')
+        if rcpath.exists():
+            update_config_file(rcpath, source_cmd)
+        else:
+            print("It seems that you're running pew for the first time\n"
+                  "If you want source shell competions and update your prompt, "
+                  "Add the following line to your shell config file:\n %s" % source_cmd)
+        print('\nWill now continue with the command:', *sys.argv[1:])
+        input('[enter]')
+
+def update_config_file(rcpath, source_cmd):
+    with rcpath.open('r+') as rcfile:
+        if source_cmd not in (line.strip() for line in rcfile.readlines()):
+            choice = 'X'
+            while choice not in ('y', '', 'n'):
+                choice = input("It seems that you're running pew for the first time\n"
+                               "do you want to modify %s to source completions and"
+                               " update your prompt? [y/N]\n> " % rcpath).lower()
+            if choice == 'y':
+                rcfile.write('\n# added by Pew\n%s\n' % source_cmd)
+                print('Done')
+            else:
+                print('\nOk, if you want to do it manually, just add\n %s\nat'
+                      ' the end of %s' % (source_cmd, rcpath))
 
 
 def print_commands(cmds):
