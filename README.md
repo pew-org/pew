@@ -41,12 +41,30 @@ For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubun
     sudo apt-get update
     sudo apt-get install pew
 
+
+Usage
+-----
+
+### Which SHELL is Pew going to use?
+
+Ok, Pew is shell-agnostic, but how is your shell going to be selected?
+
+Look for the `SHELL` environment variable: on most unix-like systems it's already defined in a login shell, and you can verify it with commands like:
+
+    env | grep SHELL
+
+or
+
+    python3 -c 'import os;print(os.environ.get("SHELL","No shell defined"))'
+
+Since that variable is not commonly used on Windows, we're defaulting to `powershell` over there. In all other cases we default instead to `sh`. Custom selection for other shells might be added in the future.
+
 ### Windows/Cygwin notes
 
 A python installed from the normal `.exe` file [behaves differently](https://github.com/berdario/pew/issues/80#issuecomment-168279648) from a python installed inside Cygwin. For this reason if you want to use Pew inside a Cygwin shell, you should use a Cygwin python, and if you want to use it inside Powershell, you should use your normal Python install, and avoid a Cygwin one.
 
-Usage
------
+Common workflow
+---------------
 
 You can create a new virtualenv, with a non-default python and specifying some packages to be installed in it, like this:
 
@@ -424,7 +442,7 @@ Pew was originally a rewrite of virtualenvwrapper, the advantage is that pew doe
 
 It works on bash, zsh, fish, powershell, etc.
 
-Thanks to using Python libraries and setuptools for dependency management, to Python stricter error handling and the fact that "shelling out" let us avoid keeping track of the previous environment variable values, pew code is much shorter and easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s. How many Python programmers know at a glance what does `"${out_args[@]-}"` do? Or `eval "envname=\$$#"`?
+Thanks to using Python libraries and setuptools for dependency management, to Python stricter error handling and the fact that "shelling out" let us avoid keeping track of the previous environment variable values, pew code is much shorter and easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s. How many Python programmers know at a glance what does `"${out_args[@]-}"` do? Or `eval "envname=\$$#"`? Or [all other bash quirks](http://mywiki.wooledge.org/BashPitfalls) for that matter?
 
 License
 -------
