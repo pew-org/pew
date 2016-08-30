@@ -164,11 +164,30 @@ def fork_bash(env, cwd):
         fork_shell(env, ['bash'], cwd)
 
 
+def fork_cmder(env, cwd):
+    shell_cmd = ['cmd']
+    cmderrc_path = r'%CMDER_ROOT%\vendor\init.bat'
+    if expandpath(cmderrc_path).exists():
+        shell_cmd += ['/k', cmderrc_path]
+    os.environ['CMDER_START'] = cwd
+    fork_shell(env, shell_cmd, cwd)
+
+
 def shell(env, cwd=None):
     env = str(env)
-    shell = os.environ.get('SHELL', 'powershell' if windows else 'sh')
+    shell = os.environ.get('SHELL', None)
+    # TODO this should be refactored before adding new shells
+    # a list of Namedtuple('SHELL', [('command', Callable), ('executable', str), ('selector', Callable), ('should_check', bool)])
+    # ordered by selector priority is probably the cleanest approach
+    if not shell:
+        if 'CMDER_ROOT' in os.environ:
+            shell = 'Cmder'
+        elif windows:
+            shell = 'powershell'
+        else:
+            shell = 'sh'
     shell_name = Path(shell).stem
-    if shell_name not in ('powershell', 'bash', 'elvish'):
+    if shell_name not in ('Cmder', 'bash', 'elvish', 'powershell'):
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
         shell_check = (sys.executable + ' -c "from pew.pew import '
@@ -179,6 +198,8 @@ def shell(env, cwd=None):
             return
     if shell_name == 'bash':
         fork_bash(env, cwd)
+    elif shell_name == 'Cmder':
+        fork_cmder(env, cwd)
     else:
         fork_shell(env, [shell], cwd)
 
