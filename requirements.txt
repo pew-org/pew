@@ -2,3 +2,6 @@ setuptools>=17.1
 virtualenv==1.11.6
 virtualenv-clone==0.2.5
 pytest==2.6.2
+pythonz-bd==1.11.2
+requests==2.11.1
+resumable-urlretrieve==0.1.2
