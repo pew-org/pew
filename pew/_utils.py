@@ -19,7 +19,7 @@ windows = sys.platform == 'win32'
 if py2 or windows:
     locale.setlocale(locale.LC_CTYPE, '')
 
-encoding = locale.getlocale()[1]
+encoding = locale.getlocale()[1] or 'ascii'
 
 if py2:
     @wraps(_ntf)
