@@ -33,14 +33,6 @@ There are also some packages, more or less up-to-date:
 
 For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
 
-### Ubuntu PPA
-
-For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubuntu/ppa/):
-
-    sudo add-apt-repository ppa:pew-maintainers/ppa
-    sudo apt-get update
-    sudo apt-get install pew
-
 
 Usage
 -----
