@@ -169,7 +169,8 @@ def fork_cmder(env, cwd):
     cmderrc_path = r'%CMDER_ROOT%\vendor\init.bat'
     if expandpath(cmderrc_path).exists():
         shell_cmd += ['/k', cmderrc_path]
-    os.environ['CMDER_START'] = cwd
+    if cwd:
+        os.environ['CMDER_START'] = cwd
     fork_shell(env, shell_cmd, cwd)
 
 
