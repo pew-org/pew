@@ -220,9 +220,9 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
         if project:
             setvirtualenvproject(envname, project.absolute())
         if requirements:
-            inve(envname, 'pip', 'install', '--allow-all-external', '-r', str(expandpath(requirements)))
+            inve(envname, 'pip', 'install', '-r', str(expandpath(requirements)))
         if packages:
-            inve(envname, 'pip', 'install', '--allow-all-external', *packages)
+            inve(envname, 'pip', 'install', *packages)
 
 
 def mkvirtualenv_argparser():
