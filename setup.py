@@ -14,7 +14,7 @@ https://github.com/berdario/pew#usage'''
 
 setup(
     name='pew',
-    version='0.1.24',
+    version='0.1.25',
     description='tool to manage multiple virtualenvs written in pure python',
     long_description=long_desc,
     author='Dario Bertini',

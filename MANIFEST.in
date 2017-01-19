@@ -1,2 +1,3 @@
 recursive-include pew/shell_config *
 recursive-exclude pew *~
+include README.md
