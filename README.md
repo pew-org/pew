@@ -311,6 +311,11 @@ Prints the path for the current $SHELL helper file
 
 `usage: pew shell_config`
 
+### dir ###
+
+Prints the path for the supplied env
+
+`usage: pew dir env`
 
 
 Configuration

@@ -333,27 +333,27 @@ def ls_cmd(argv):
     args = parser.parse_args(argv)
     lsvirtualenv(args.long)
 
+def parse_envname(argv, no_arg_callback):
+    if len(argv) < 1:
+        no_arg_callback()
 
-def workon_cmd(argv):
-    """List or change working virtual environments."""
-    try:
-        env = argv[0]
-    except IndexError:
-        lsvirtualenv(False)
-        return
-
+    env = argv[0]
     if env.startswith('/'):
         sys.exit("ERROR: Invalid environment name '{0}'.".format(env))
-    env_path = workon_home / env
-    if not env_path.exists():
+    if not (workon_home / env).exists():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
 'pew new {0}'.".format(env))
     else:
+        return env
 
-        # Check if the virtualenv has an associated project directory and in
-        # this case, use it as the current working directory.
-        project_dir = get_project_dir(env) or os.getcwd()
-        shell(env, cwd=project_dir)
+def workon_cmd(argv):
+    """List or change working virtual environments."""
+    env = parse_envname(argv, lambda: lsvirtualenv(False))
+
+    # Check if the virtualenv has an associated project directory and in
+    # this case, use it as the current working directory.
+    project_dir = get_project_dir(env) or os.getcwd()
+    shell(env, cwd=project_dir)
 
 
 def sitepackages_dir(env=os.environ.get('VIRTUAL_ENV')):
@@ -596,18 +596,10 @@ def inall_cmd(argv):
 def in_cmd(argv):
     """Run a command in the given virtualenv."""
 
-    if len(argv) < 1:
-        sys.exit('You must provide a valid virtualenv to target')
-
     if len(argv) == 1:
         return workon_cmd(argv)
 
-    env = argv[0]
-    if env.startswith('/'):
-        sys.exit("ERROR: Invalid environment name '{0}'.".format(env))
-    if not (workon_home / env).exists():
-        sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
-'pew new {0}'.".format(env))
+    parse_envname(argv, lambda : sys.exit('You must provide a valid virtualenv to target'))
 
     inve(*argv)
 
@@ -623,6 +615,12 @@ def restore_cmd(argv):
     exact_py = py.resolve().name
 
     check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=str(workon_home))
+
+
+def dir_cmd(argv):
+    """Print the path for the virtualenv directory"""
+    env = parse_envname(argv, lambda : sys.exit('You must provide a valid virtualenv to target'))
+    print(workon_home / env)
 
 
 def install_cmd(argv):
