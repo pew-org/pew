@@ -72,7 +72,7 @@ def test_list_templates(testtemplate):
     assert 'test' in invoke('mkproject', '-l').out
 
 
-@skip_windows(reason='cannot scripts written in an arbitrary language on '
+@skip_windows(reason='cannot execute scripts written in an arbitrary language on '
                      'windows by relying on the shebang')
 def test_apply_template(project_home, testtemplate):
     projname = 'project1'

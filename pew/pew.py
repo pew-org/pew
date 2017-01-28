@@ -24,12 +24,14 @@ windows = sys.platform == 'win32'
 from clonevirtualenv import clone_virtualenv
 if not windows:
     from pythonz.commands.install import InstallCommand
+    from pythonz.commands.uninstall import UninstallCommand
     from pythonz.installer.pythoninstaller import PythonInstaller, AlreadyInstalledError
     from pythonz.commands.list import ListCommand as ListPythons
+    from pythonz.define import PATH_PYTHONS
     from pythonz.commands.locate import LocateCommand as LocatePython
 else:
     # Pythonz does not support windows
-    InstallCommand = ListPythons = LocatePython = \
+    InstallCommand = ListPythons = LocatePython = UninstallCommand = \
         lambda : sys.exit('Command not supported on this platform')
 
 from pew import __version__
@@ -42,11 +44,13 @@ if sys.version_info[0] == 2:
 
 err = partial(print, file=sys.stderr)
 
+if windows:
+    default_home = '~/.virtualenvs'
+else:
+    default_home = os.path.join(
+        os.environ.get('XDG_DATA_HOME', '~/.local/share'), 'virtualenvs')
 workon_home = expandpath(
-    os.environ.get('WORKON_HOME',
-                   os.path.join(os.environ.get('XDG_DATA_HOME',
-                                               '~/.local/share'),
-                                'virtualenvs')))
+    os.environ.get('WORKON_HOME', default_home))
 
 
 def makedirs_and_symlink_if_needed(workon_home):
@@ -190,7 +194,9 @@ def fork_shell(env, shellcmd, cwd):
     or_ctrld = '' if windows else "or 'Ctrl+D' "
     err("Launching subshell in virtual environment. Type 'exit' ", or_ctrld,
         "to return.", sep='')
-
+    if 'VIRTUAL_ENV' in os.environ:
+        err("Be aware that this environment will be nested on top "
+            "of '%s'" % Path(os.environ['VIRTUAL_ENV']).name)
     inve(env, *shellcmd, cwd=cwd)
 
 
@@ -209,11 +215,31 @@ def fork_bash(env, cwd):
         fork_shell(env, ['bash'], cwd)
 
 
+def fork_cmder(env, cwd):
+    shell_cmd = ['cmd']
+    cmderrc_path = r'%CMDER_ROOT%\vendor\init.bat'
+    if expandpath(cmderrc_path).exists():
+        shell_cmd += ['/k', cmderrc_path]
+    if cwd:
+        os.environ['CMDER_START'] = cwd
+    fork_shell(env, shell_cmd, cwd)
+
+
 def shell(env, cwd=None):
     env = str(env)
-    shell = os.environ.get('SHELL', 'powershell' if windows else 'sh')
+    shell = os.environ.get('SHELL', None)
+    # TODO this should be refactored before adding new shells
+    # a list of Namedtuple('SHELL', [('command', Callable), ('executable', str), ('selector', Callable), ('should_check', bool)])
+    # ordered by selector priority is probably the cleanest approach
+    if not shell:
+        if 'CMDER_ROOT' in os.environ:
+            shell = 'Cmder'
+        elif windows:
+            shell = 'powershell'
+        else:
+            shell = 'sh'
     shell_name = Path(shell).stem
-    if shell_name not in ('powershell', 'bash', 'elvish'):
+    if shell_name not in ('Cmder', 'bash', 'elvish', 'powershell'):
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
         shell_check = (sys.executable + ' -c "from pew.pew import '
@@ -224,6 +250,8 @@ def shell(env, cwd=None):
             return
     if shell_name == 'bash':
         fork_bash(env, cwd)
+    elif shell_name == 'Cmder':
+        fork_cmder(env, cwd)
     else:
         fork_shell(env, [shell], cwd)
 
@@ -243,9 +271,9 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
         if project:
             setvirtualenvproject(envname, project.absolute())
         if requirements:
-            inve(envname, 'pip', 'install', '--allow-all-external', '-r', str(expandpath(requirements)))
+            inve(envname, 'pip', 'install', '-r', str(expandpath(requirements)))
         if packages:
-            inve(envname, 'pip', 'install', '--allow-all-external', *packages)
+            inve(envname, 'pip', 'install', *packages)
 
 
 def mkvirtualenv_argparser():
@@ -279,23 +307,28 @@ project directory to associate with the new environment.')
 
 
 def rmvirtualenvs(envs):
+    error_happened = False
     for env in envs:
         env = workon_home / env
         if os.environ.get('VIRTUAL_ENV') == str(env):
             err("ERROR: You cannot remove the active environment (%s)." % env)
+            error_happened = True
             break
         try:
             shutil.rmtree(str(env))
         except OSError as e:
             err("Error while trying to remove the {0} env: \n{1}".format
                 (env, e.strerror))
+            error_happened = True
+    return error_happened
+
 
 
 def rm_cmd(argv):
     """Remove one or more environment, from $WORKON_HOME."""
     if len(argv) < 1:
         sys.exit("Please specify an environment")
-    rmvirtualenvs(argv)
+    return rmvirtualenvs(argv)
 
 
 def packages(site_packages):
@@ -305,7 +338,7 @@ def packages(site_packages):
 
 def showvirtualenv(env):
     columns, _ = get_terminal_size()
-    pkgs = packages(sitepackages_dir(env))
+    pkgs = sorted(packages(sitepackages_dir(env)))
     env_python = workon_home / env / env_bin_dir / 'python'
     l = len(env) + 2
     version = invoke(str(env_python), '-V')
@@ -351,25 +384,27 @@ def ls_cmd(argv):
     args = parser.parse_args(argv)
     lsvirtualenv(args.long)
 
+def parse_envname(argv, no_arg_callback):
+    if len(argv) < 1:
+        no_arg_callback()
 
-def workon_cmd(argv):
-    """List or change working virtual environments."""
-    try:
-        env = argv[0]
-    except IndexError:
-        lsvirtualenv(False)
-        return
-
-    env_path = workon_home / env
-    if not env_path.exists():
+    env = argv[0]
+    if env.startswith('/'):
+        sys.exit("ERROR: Invalid environment name '{0}'.".format(env))
+    if not (workon_home / env).exists():
         sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
 'pew new {0}'.".format(env))
     else:
+        return env
 
-        # Check if the virtualenv has an associated project directory and in
-        # this case, use it as the current working directory.
-        project_dir = get_project_dir(env) or os.getcwd()
-        shell(env, cwd=project_dir)
+def workon_cmd(argv):
+    """List or change working virtual environments."""
+    env = parse_envname(argv, lambda: lsvirtualenv(False))
+
+    # Check if the virtualenv has an associated project directory and in
+    # this case, use it as the current working directory.
+    project_dir = get_project_dir(env) or os.getcwd()
+    shell(env, cwd=project_dir)
 
 
 def sitepackages_dir(env=os.environ.get('VIRTUAL_ENV')):
@@ -422,7 +457,7 @@ def sitepackages_dir_cmd(argv):
 def lssitepackages_cmd(argv):
     """Show the content of the site-packages directory of the current virtualenv."""
     site = sitepackages_dir()
-    print(*site.iterdir())
+    print(*sorted(site.iterdir()), sep=os.linesep)
     extra_paths = site / '_virtualenv_path_extensions.pth'
     if extra_paths.exists():
         print('from _virtualenv_path_extensions.pth:')
@@ -489,7 +524,7 @@ def rename_cmd(argv):
     parser.add_argument('target')
     pargs = parser.parse_args(argv)
     copy_virtualenv_project(pargs.source, pargs.target)
-    rmvirtualenvs([pargs.source])
+    return rmvirtualenvs([pargs.source])
 
 
 def setvirtualenvproject(env, project):
@@ -569,7 +604,7 @@ def mktmpenv_cmd(argv):
             # only used for testing on windows
             shell(env)
     finally:
-        rmvirtualenvs([env])
+        return rmvirtualenvs([env])
 
 
 def wipeenv_cmd(argv):
@@ -612,16 +647,10 @@ def inall_cmd(argv):
 def in_cmd(argv):
     """Run a command in the given virtualenv."""
 
-    if len(argv) < 1:
-        sys.exit('You must provide a valid virtualenv to target')
-
     if len(argv) == 1:
         return workon_cmd(argv)
 
-    env = argv[0]
-    if not (workon_home / env).exists():
-        sys.exit("ERROR: Environment '{0}' does not exist. Create it with \
-'pew new {0}'.".format(env))
+    parse_envname(argv, lambda : sys.exit('You must provide a valid virtualenv to target'))
 
     inve(*argv)
 
@@ -639,6 +668,12 @@ def restore_cmd(argv):
     check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=str(workon_home))
 
 
+def dir_cmd(argv):
+    """Print the path for the virtualenv directory"""
+    env = parse_envname(argv, lambda : sys.exit('You must provide a valid virtualenv to target'))
+    print(workon_home / env)
+
+
 def install_cmd(argv):
     '''Use Pythonz to download and build the specified Python version'''
     installer = InstallCommand()
@@ -654,8 +689,17 @@ def install_cmd(argv):
             print(e)
 
 
+def uninstall_cmd(argv):
+    '''Use Pythonz to uninstall the specified Python version'''
+    UninstallCommand().run(argv)
+
+
 def list_pythons_cmd(argv):
     '''List the pythons installed by Pythonz (or all the installable ones)'''
+    try:
+        Path(PATH_PYTHONS).mkdir(parents=True)
+    except OSError:
+        pass
     ListPythons().run(argv)
 
 
@@ -722,21 +766,29 @@ def first_run_setup():
         rcpath = expandpath({'bash': '~/.bashrc'
                            , 'zsh': '~/.zshrc'
                            , 'fish': '~/.config/fish/config.fish'}[shell])
-        with rcpath.open('r+') as rcfile:
-            if (source_cmd + '\n') not in rcfile.readlines():
-                choice = 'X'
-                while choice not in ('y', '', 'n'):
-                    choice = input("It seems that you're running pew for the first time\n"
-                                   "do you want to modify %s to source completions and"
-                                   " update your prompt? [y/N]\n> " % rcpath).lower()
-                if choice == 'y':
-                    rcfile.write('\n# added by Pew\n%s\n' % source_cmd)
-                    print('Done')
-                else:
-                    print('\nOk, if you want to do it manually, just add\n %s\nat'
-                          ' the end of %s' % (source_cmd, rcpath))
-                print('\nWill now continue with the command:', *sys.argv[1:])
-                input('[enter]')
+        if rcpath.exists():
+            update_config_file(rcpath, source_cmd)
+        else:
+            print("It seems that you're running pew for the first time\n"
+                  "If you want source shell competions and update your prompt, "
+                  "Add the following line to your shell config file:\n %s" % source_cmd)
+        print('\nWill now continue with the command:', *sys.argv[1:])
+        input('[enter]')
+
+def update_config_file(rcpath, source_cmd):
+    with rcpath.open('r+') as rcfile:
+        if source_cmd not in (line.strip() for line in rcfile.readlines()):
+            choice = 'X'
+            while choice not in ('y', '', 'n'):
+                choice = input("It seems that you're running pew for the first time\n"
+                               "do you want to modify %s to source completions and"
+                               " update your prompt? [y/N]\n> " % rcpath).lower()
+            if choice == 'y':
+                rcfile.write('\n# added by Pew\n%s\n' % source_cmd)
+                print('Done')
+            else:
+                print('\nOk, if you want to do it manually, just add\n %s\nat'
+                      ' the end of %s' % (source_cmd, rcpath))
 
 
 def print_commands(cmds):

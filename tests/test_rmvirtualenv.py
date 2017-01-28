@@ -19,4 +19,4 @@ def test_remove(to_be_deleted):
 
 def test_no_such_env(workon_home):
     assert not (workon_home / 'not_here').exists()
-    check_call('pew rm not_here'.split())
+    assert invoke('rm', 'not_here').returncode != 0

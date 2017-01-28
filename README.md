@@ -18,13 +18,12 @@ Pew is completely shell-agnostic and thus works on bash, zsh, fish, powershell, 
 Installation
 ------------
 
-### pip
-
 _Pew and its dependencies rely on a couple of features of pip/setuptools which might not be available on old versions. In case your distribution doesn't ship with one recent enough, you'll probably want to run `pip install --upgrade pip` before the installation._
 
-`pip install pew`
+If you cannot upgrade the version of setuptools on your system, and one of the packages listed below is of no use to you, I suggest to use [`pipsi`](https://pypi.python.org/pypi/pipsi) rather than plain `pip`
 
 
+`pipsi install pew`
 
 See the [troubleshooting](#troubleshooting) section, if needed.
 
@@ -34,20 +33,32 @@ There are also some packages, more or less up-to-date:
 
 For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
 
-### Ubuntu PPA
 
-For Ubuntu, there's a [PPA](https://launchpad.net/~pew-maintainers/+archive/ubuntu/ppa/):
+Usage
+-----
 
-    sudo add-apt-repository ppa:pew-maintainers/ppa
-    sudo apt-get update
-    sudo apt-get install pew
+### Which SHELL is Pew going to use?
+
+Ok, Pew is shell-agnostic, but how is your shell going to be selected?
+
+Look for the `SHELL` environment variable: on most unix-like systems it's already defined in a login shell, and you can verify it with commands like:
+
+    env | grep SHELL
+
+or
+
+    python3 -c 'import os;print(os.environ.get("SHELL","No shell defined"))'
+
+Since that variable is not commonly used on Windows, we're defaulting to `powershell` over there. In all other cases we default instead to `sh`.
+
+If `CMDER_ROOT` is defined this will select Cmder (a custom configuration of `cmd.exe`). Custom selection for even more shells might be added in the future.
 
 ### Windows/Cygwin notes
 
 A python installed from the normal `.exe` file [behaves differently](https://github.com/berdario/pew/issues/80#issuecomment-168279648) from a python installed inside Cygwin. For this reason if you want to use Pew inside a Cygwin shell, you should use a Cygwin python, and if you want to use it inside Powershell, you should use your normal Python install, and avoid a Cygwin one.
 
-Usage
------
+Common workflow
+---------------
 
 You can create a new virtualenv, with a non-default python and specifying some packages to be installed in it, like this:
 
@@ -244,7 +255,7 @@ Adds the specified directories to the Python path for the currently-active virtu
 
 `usage: pew add [-h] [-d] dirs [dirs ...]`
 
-Sometimes it is desirable to share installed packages that are not in the system `site-packages` directory and which should not be installed in each virtualenv. One possible solution is to symlink the source into the environment `site-packages` directory, but it is also easy to add extra directories to the PYTHONPATH by including them in a `.pth` file inside `site-packages` using `add2virtualenv`.
+Sometimes it is desirable to share installed packages that are not in the system `site-packages` directory and which should not be installed in each virtualenv. One possible solution is to symlink the source into the environment `site-packages` directory, but it is also easy to add extra directories to the PYTHONPATH by including them in a `.pth` file inside `site-packages` using `pew add`.
 
 The `-d` flag removes previously added directiories.
 
@@ -300,6 +311,11 @@ Prints the path for the current $SHELL helper file
 
 `usage: pew shell_config`
 
+### dir ###
+
+Prints the path for the supplied env
+
+`usage: pew dir env`
 
 
 ### var ###
@@ -435,7 +451,7 @@ Pew was originally a rewrite of virtualenvwrapper, the advantage is that pew doe
 
 It works on bash, zsh, fish, powershell, etc.
 
-Thanks to using Python libraries and setuptools for dependency management, to Python stricter error handling and the fact that "shelling out" let us avoid keeping track of the previous environment variable values, pew code is much shorter and easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s. How many Python programmers know at a glance what does `"${out_args[@]-}"` do? Or `eval "envname=\$$#"`?
+Thanks to using Python libraries and setuptools for dependency management, to Python stricter error handling and the fact that "shelling out" let us avoid keeping track of the previous environment variable values, pew code is much shorter and easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s. How many Python programmers know at a glance what does `"${out_args[@]-}"` do? Or `eval "envname=\$$#"`? Or [all other bash quirks](http://mywiki.wooledge.org/BashPitfalls) for that matter?
 
 License
 -------
