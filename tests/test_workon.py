@@ -16,7 +16,6 @@ def test_workon(env1):
     assert 'env1' == os.path.basename(out.splitlines()[-1].strip())
 
 
-@pytest.mark.xfail
 def test_workon_no_arg(env1, env2):
     result = invoke('workon')
     out = result.out
