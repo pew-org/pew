@@ -336,6 +336,7 @@ There're multiple way to overcome this issue:
 * Move your export statements into the profile (`.bash_profile` and `.zprofile` for bash and zsh respectively, or in fish wrap your statements in a `if status --is-login` block ) and set up your terminal emulator to launch your shell as a login shell
 * Change your exports to put the new location at the tail, instead of the head of the PATH, e.g.: `export PATH=${PATH}:/usr/bin`
 * Change the files your OS provides to setup the base environment (it might be useful to look into `/etc/paths.d`, `/etc/profile`, and [environment.plist](http://stackoverflow.com/a/8421952/293735))
+* fish shell [documentation](https://fishshell.com/docs/current/tutorial.html#tut_path] recommends using `set -U fish_user_paths /usr/local/bin $fish_user_paths` to set the PATH. Using the alternative `set -x PATH /usr/local/bin $PATH` in `config.fish` fixes this.
 
 If you're running the `zsh` configuration tool `prezto`, and/or you're on MacOSX, [you might want to read this](https://github.com/thoughtbot/dotfiles/pull/426#issue-109716011) (it's about another project for handling dotfiles, but the misconfiguration described is quite similar to one witnessed on other OSX/prezto systems).
 
