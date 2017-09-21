@@ -20,17 +20,19 @@ except ImportError:
 windows = sys.platform == 'win32'
 
 from clonevirtualenv import clone_virtualenv
+
+has_pythonz = False
 if not windows:
-    from pythonz.commands.install import InstallCommand
-    from pythonz.commands.uninstall import UninstallCommand
-    from pythonz.installer.pythoninstaller import PythonInstaller, AlreadyInstalledError
-    from pythonz.commands.list import ListCommand as ListPythons
-    from pythonz.define import PATH_PYTHONS
-    from pythonz.commands.locate import LocateCommand as LocatePython
-else:
-    # Pythonz does not support windows
-    InstallCommand = ListPythons = LocatePython = UninstallCommand = \
-        lambda : sys.exit('Command not supported on this platform')
+    try:
+        from pythonz.commands.install import InstallCommand
+        from pythonz.commands.uninstall import UninstallCommand
+        from pythonz.installer.pythoninstaller import PythonInstaller, AlreadyInstalledError
+        from pythonz.commands.list import ListCommand as ListPythons
+        from pythonz.define import PATH_PYTHONS
+        from pythonz.commands.locate import LocateCommand as LocatePython
+        has_pythonz = True
+    except ImportError:
+        pass
 
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir,
@@ -623,38 +625,39 @@ def dir_cmd(argv):
     print(workon_home / env)
 
 
-def install_cmd(argv):
-    '''Use Pythonz to download and build the specified Python version'''
-    installer = InstallCommand()
-    options, versions = installer.parser.parse_args(argv)
-    if len(versions) != 1:
-        installer.parser.print_help()
-        sys.exit(1)
-    else:
+if has_pythonz:
+    def install_cmd(argv):
+        '''Use Pythonz to download and build the specified Python version'''
+        installer = InstallCommand()
+        options, versions = installer.parser.parse_args(argv)
+        if len(versions) != 1:
+            installer.parser.print_help()
+            sys.exit(1)
+        else:
+            try:
+                actual_installer = PythonInstaller.get_installer(versions[0], options)
+                actual_installer.install()
+            except AlreadyInstalledError as e:
+                print(e)
+
+
+    def uninstall_cmd(argv):
+        '''Use Pythonz to uninstall the specified Python version'''
+        UninstallCommand().run(argv)
+
+
+    def list_pythons_cmd(argv):
+        '''List the pythons installed by Pythonz (or all the installable ones)'''
         try:
-            actual_installer = PythonInstaller.get_installer(versions[0], options)
-            actual_installer.install()
-        except AlreadyInstalledError as e:
-            print(e)
+            Path(PATH_PYTHONS).mkdir(parents=True)
+        except OSError:
+            pass
+        ListPythons().run(argv)
 
 
-def uninstall_cmd(argv):
-    '''Use Pythonz to uninstall the specified Python version'''
-    UninstallCommand().run(argv)
-
-
-def list_pythons_cmd(argv):
-    '''List the pythons installed by Pythonz (or all the installable ones)'''
-    try:
-        Path(PATH_PYTHONS).mkdir(parents=True)
-    except OSError:
-        pass
-    ListPythons().run(argv)
-
-
-def locate_python_cmd(argv):
-    '''Locate the path for the python version installed by Pythonz'''
-    LocatePython().run(argv)
+    def locate_python_cmd(argv):
+        '''Locate the path for the python version installed by Pythonz'''
+        LocatePython().run(argv)
 
 
 def version_cmd(argv):
