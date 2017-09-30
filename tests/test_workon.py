@@ -4,6 +4,7 @@ import sys
 from pew._utils import temp_environ, invoke_pew as invoke
 from utils import skip_windows
 
+import pytest
 
 check_env = [sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"]
 
@@ -13,6 +14,16 @@ def test_workon(env1):
     cmd = '{0} {1} "{2}"'.format(*check_env)
     out = invoke('workon', 'env1', inp=cmd).out
     assert 'env1' == os.path.basename(out.splitlines()[-1].strip())
+
+
+def test_workon_no_arg(env1, env2):
+    result = invoke('workon')
+    out = result.out
+    envs = [ x.strip() for x in out.split() ]
+
+    assert 0 == result.returncode
+    assert 'env1' in envs
+    assert 'env2' in envs
 
 
 @skip_windows(reason='cannot supply stdin to powershell')

@@ -346,7 +346,12 @@ def parse_envname(argv, no_arg_callback):
 
 def workon_cmd(argv):
     """List or change working virtual environments."""
-    env = parse_envname(argv, lambda: lsvirtualenv(False))
+
+    def list_and_exit():
+        lsvirtualenv(False)
+        sys.exit(0)
+
+    env = parse_envname(argv, list_and_exit)
 
     # Check if the virtualenv has an associated project directory and in
     # this case, use it as the current working directory.
