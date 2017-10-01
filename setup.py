@@ -23,7 +23,7 @@ setup(
     license='MIT License',
     packages=['pew'],
     install_requires=[
-        'virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=17.1', 'pythonz-bd>=1.10.2'
+        'virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=17.1',
     ],
     extras_require={
         ':python_version=="2.6"': [
@@ -36,6 +36,7 @@ setup(
             'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
         ],
         ':python_version=="3.3"': ['pathlib'],
+        'pythonz': ['pythonz-bd>=1.10.2'],
     },
     include_package_data=True,
     zip_safe=False,
