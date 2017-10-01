@@ -215,8 +215,10 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
     if python:
         rest = ["--python=%s" % python] + rest
 
+    path = (workon_home / envname).absolute()
+
     try:
-        check_call(["virtualenv", envname] + rest, cwd=str(workon_home))
+        check_call(["virtualenv", str(path)] + rest)
     except (CalledProcessError, KeyboardInterrupt):
         rmvirtualenvs([envname])
         raise
@@ -620,10 +622,11 @@ def restore_cmd(argv):
         sys.exit('You must provide a valid virtualenv to target')
 
     env = argv[0]
-    py = workon_home / env / env_bin_dir / ('python.exe' if windows else 'python')
+    path = workon_home / env
+    py = path / env_bin_dir / ('python.exe' if windows else 'python')
     exact_py = py.resolve().name
 
-    check_call(["virtualenv", env, "--python=%s" % exact_py], cwd=str(workon_home))
+    check_call(["virtualenv", str(path.absolute()), "--python=%s" % exact_py])
 
 
 def dir_cmd(argv):
