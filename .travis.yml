@@ -1,14 +1,19 @@
 language: python
-sudo: false
-python:
-  - 3.4
-env:
-  matrix:
-    - TOXENV="py26"
-    - TOXENV="py27"
-    - TOXENV="py33"
-    - TOXENV="py34"
-    - TOXENV="pypy"
 
-install: pip install tox==2.5.0
-script: tox -e $TOXENV
+sudo: false
+
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "pypy"
+  # - "2.6"
+
+
+install:
+  - pip install -e . --upgrade
+  - pip install pytest
+
+script: py.test tests/
