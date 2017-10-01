@@ -12,6 +12,8 @@ python:
   - "pypy"
 
 
-install: pip install -e . --upgrade
+install:
+  - pip install -e . --upgrade
+  - pip install pytest
 
 script: pytest tests/
