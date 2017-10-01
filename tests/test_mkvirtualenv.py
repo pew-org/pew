@@ -1,3 +1,5 @@
+import re
+import sys
 from os import unlink
 from subprocess import check_call, CalledProcessError
 from pathlib import Path
@@ -12,6 +14,10 @@ except ImportError:
 import pytest
 
 from pew._utils import invoke_pew as invoke
+from utils import skip_windows
+
+if not sys.platform == 'win32':
+    from pythonz.define import PATH_PYTHONS
 
 
 def are_we_connected():
@@ -24,6 +30,48 @@ def are_we_connected():
 
 connection_required = pytest.mark.skipif(not are_we_connected(),
                                          reason="An internet connection is required")
+
+
+def pythonz_python_found():
+    python_path = Path(PATH_PYTHONS)
+    found = python_path.exists()
+    if found:
+        found = sum(1 for __ in python_path.iterdir()) > 0
+    return found
+
+
+pythonz_python_required = pytest.mark.skipif(not pythonz_python_found(),
+                                             reason='Pythonz is required')
+
+def get_pythonz_python_version():
+    python_path = Path(PATH_PYTHONS)
+    pattern = '^\w+-(\d+\.?)+?'
+    for f in python_path.iterdir():
+        if re.match(pattern, f.name):
+            return f.name.split('-')[1]
+
+
+@skip_windows(reason="Pythonz is unsupported")
+@pythonz_python_required
+def test_good_version_resolved_correctly(workon_home):
+    version = get_pythonz_python_version()
+    returncode = invoke('new', 'env', '-d', '-p', version).returncode
+    invoke('rm', 'env')
+    assert returncode == 0
+
+
+@skip_windows(reason="Pythonz is unsupported")
+@pythonz_python_required
+def test_bad_version_not_resolved(workon_home):
+    version = get_pythonz_python_version() + ".broken"
+    returncode = invoke('new', 'env', '-d', '-p', version).returncode
+    assert returncode != 0
+
+
+def test_explict_path_accepted(workon_home):
+    returncode = invoke('new', 'env', '-d', '-p', 'python').returncode
+    invoke('rm', 'env')
+    assert returncode == 0
 
 
 def test_create(workon_home):
