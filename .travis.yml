@@ -14,6 +14,6 @@ python:
 
 install:
   - pip install -e . --upgrade
-  - pip install pytest
+  - pip install pytest pytest-xdist
 
-script: pytest tests/
+script: pytest -n 4 tests/
