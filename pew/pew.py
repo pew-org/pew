@@ -77,6 +77,32 @@ def supported_shell():
         return shell
 
 
+def get_shell():
+    # TODO this should be refactored before adding new shells
+    # a list of Namedtuple('SHELL', [('command', Callable), ('executable', str), ('selector', Callable), ('should_check', bool)])
+    # ordered by selector priority is probably the cleanest approach
+    if 'CMDER_ROOT' in os.environ:
+        shell = 'Cmder'
+    elif windows:
+        shell_info = delegator.run('tasklist /fi "PID eq {0}" /fo csv /nh'.format(os.getppid())).out
+        shell = re.sub('.exe$', '', shell_info[0])
+    else:
+        shell = 'sh'
+
+    shell_name = Path(shell).stem
+    if shell_name not in ('Cmder', 'bash', 'elvish', 'powershell', 'klingon', 'cmd'):
+        # On Windows the PATH is usually set with System Utility
+        # so we won't worry about trying to check mistakes there
+        shell_check = (sys.executable + ' -c "from pew.pew import '
+                       'prevent_path_errors; prevent_path_errors()"')
+        try:
+            inve(env, shell, '-c', shell_check)
+        except CalledProcessError:
+            return
+
+    return shell
+
+
 def shell_config_cmd(argv):
     "Prints the path for the current $SHELL helper file"
     shell = supported_shell()
@@ -183,28 +209,8 @@ def fork_cmder(env, cwd):
 
 def shell(env, cwd=None):
     env = str(env)
-    shell = os.environ.get('SHELL', None)
-    # TODO this should be refactored before adding new shells
-    # a list of Namedtuple('SHELL', [('command', Callable), ('executable', str), ('selector', Callable), ('should_check', bool)])
-    # ordered by selector priority is probably the cleanest approach
-    if not shell:
-        if 'CMDER_ROOT' in os.environ:
-            shell = 'Cmder'
-        elif windows:
-            shell_info = delegator.run('tasklist /fi "PID eq {0}" /fo csv /nh'.format(os.getppid())).out
-            shell = re.sub('.exe$', '', shell_info[0])
-        else:
-            shell = 'sh'
-    shell_name = Path(shell).stem
-    if shell_name not in ('Cmder', 'bash', 'elvish', 'powershell', 'klingon', 'cmd'):
-        # On Windows the PATH is usually set with System Utility
-        # so we won't worry about trying to check mistakes there
-        shell_check = (sys.executable + ' -c "from pew.pew import '
-                       'prevent_path_errors; prevent_path_errors()"')
-        try:
-            inve(env, shell, '-c', shell_check)
-        except CalledProcessError:
-            return
+    shell_env = os.environ.get('SHELL', None)
+    shell = shell_env if shell_env else get_shell()
     if shell_name == 'bash':
         fork_bash(env, cwd)
     elif shell_name == 'Cmder':
