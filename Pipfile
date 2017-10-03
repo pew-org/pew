@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+virtualenv = "==1.11.6"
+"virtualenv-clone" = "==0.2.5"
+"pythonz-bd" = "==1.11.2"
+"delegator.py" = "==0.0.13"
+
+[dev-packages]
+
+pytest = "==2.6.2"
