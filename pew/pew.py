@@ -10,6 +10,8 @@ from functools import partial
 from subprocess import CalledProcessError
 from pathlib import Path
 
+import delegator
+
 try:
     from shutil import get_terminal_size
 except ImportError:
@@ -188,7 +190,9 @@ def shell(env, cwd=None):
         if 'CMDER_ROOT' in os.environ:
             shell = 'Cmder'
         elif windows:
-            shell = 'powershell'
+            c = delegator.run('tasklist /fi "PID eq {0}" /fo csv /nh'.format(os.getppid()))
+            l = c.out
+            shell = l[0].replace('.exe', '')
         else:
             shell = 'sh'
     shell_name = Path(shell).stem
