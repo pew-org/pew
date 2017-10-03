@@ -7,3 +7,5 @@ dist
 devenv
 .tox
 **/#*#
+
+/.vscode/
