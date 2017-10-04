@@ -209,8 +209,10 @@ def fork_cmder(env, cwd):
 
 def shell(env, cwd=None):
     env = str(env)
-    shell_env = os.environ.get('SHELL', None)
-    shell = shell_env if shell_env else get_shell()
+    shell = os.environ.get('SHELL', None)
+    if not shell:
+        shell = get_shell()
+    print("Shell", shell)
     if shell_name == 'bash':
         fork_bash(env, cwd)
     elif shell_name == 'Cmder':
