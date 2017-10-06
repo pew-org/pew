@@ -7,3 +7,6 @@ dist
 devenv
 .tox
 **/#*#
+
+/.vscode/
+/Pipfile.lock

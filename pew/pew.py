@@ -177,22 +177,23 @@ def fork_cmder(env, cwd):
         os.environ['CMDER_START'] = cwd
     fork_shell(env, shell_cmd, cwd)
 
-
-def shell(env, cwd=None):
-    env = str(env)
+def _detect_shell():
     shell = os.environ.get('SHELL', None)
-    # TODO this should be refactored before adding new shells
-    # a list of Namedtuple('SHELL', [('command', Callable), ('executable', str), ('selector', Callable), ('should_check', bool)])
-    # ordered by selector priority is probably the cleanest approach
     if not shell:
         if 'CMDER_ROOT' in os.environ:
             shell = 'Cmder'
         elif windows:
-            shell = 'powershell'
+            parent_pid = os.getppid()
+            shell = invoke('tasklist', '/fi', 'PID eq {}'.format(parent_pid), '/fo', 'csv', '/nh').out.strip()
         else:
             shell = 'sh'
+    return shell
+
+def shell(env, cwd=None):
+    env = str(env)
+    shell = _detect_shell()
     shell_name = Path(shell).stem
-    if shell_name not in ('Cmder', 'bash', 'elvish', 'powershell'):
+    if shell_name not in ('Cmder', 'bash', 'elvish', 'powershell', 'klingon', 'cmd'):
         # On Windows the PATH is usually set with System Utility
         # so we won't worry about trying to check mistakes there
         shell_check = (sys.executable + ' -c "from pew.pew import '
