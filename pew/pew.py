@@ -1,7 +1,6 @@
 from __future__ import print_function, absolute_import, unicode_literals
 
 import os
-import re
 import sys
 import argparse
 import shutil
@@ -10,8 +9,6 @@ import textwrap
 from functools import partial
 from subprocess import CalledProcessError
 from pathlib import Path
-
-import delegator
 
 try:
     from shutil import get_terminal_size
@@ -191,8 +188,8 @@ def shell(env, cwd=None):
         if 'CMDER_ROOT' in os.environ:
             shell = 'Cmder'
         elif windows:
-            shell_info = delegator.run('tasklist /fi "PID eq {0}" /fo csv /nh'.format(os.getppid())).out
-            shell = re.sub('.exe$', '', shell_info[0])
+            parent_pid = os.getppid()
+            shell = invoke('tasklist', '/fi', 'PID eq {}'.format(parent_pid), '/fo', 'csv', '/nh').out.strip()
         else:
             shell = 'sh'
     shell_name = Path(shell).stem
