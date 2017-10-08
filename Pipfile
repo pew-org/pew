@@ -8,6 +8,7 @@ name = "pypi"
 virtualenv = "==1.11.6"
 "virtualenv-clone" = "==0.2.5"
 "pythonz-bd" = "==1.11.2"
+"psutil" = "*"
 
 [dev-packages]
 

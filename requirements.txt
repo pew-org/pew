@@ -3,4 +3,4 @@ virtualenv==1.11.6
 virtualenv-clone==0.2.5
 pytest==2.6.2
 pythonz-bd==1.11.2
-delegator.py==0.0.13
+psutil==5.3.1

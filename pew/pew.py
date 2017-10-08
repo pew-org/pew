@@ -36,6 +36,8 @@ else:
     InstallCommand = ListPythons = LocatePython = UninstallCommand = \
         lambda : sys.exit('Command not supported on this platform')
 
+    import psutil
+
 from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir,
                         check_path, temp_environ, NamedTemporaryFile, to_unicode)
@@ -183,8 +185,7 @@ def _detect_shell():
         if 'CMDER_ROOT' in os.environ:
             shell = 'Cmder'
         elif windows:
-            parent_pid = os.getppid()
-            shell = invoke('tasklist', '/fi', 'PID eq {}'.format(parent_pid), '/fo', 'csv', '/nh').out.strip()
+            shell = psutil.Process(os.getppid()).parent().name()
         else:
             shell = 'sh'
     return shell
