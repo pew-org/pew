@@ -1,12 +1,23 @@
 import os
 import sys
 
+from pew.pew import _detect_shell
 from pew._utils import temp_environ, invoke_pew as invoke
 from utils import skip_windows
 
 import pytest
 
 check_env = [sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"]
+
+def test_detect_shell():
+    with temp_environ():
+        del os.environ['SHELL']
+        if sys.platform == 'win32':
+            assert _detect_shell() in ['pytest', 'tox']
+        else:
+            assert _detect_shell() == 'sh'
+        os.environ['SHELL'] = 'foo'
+        assert _detect_shell() == 'foo'
 
 
 @skip_windows(reason='cannot supply stdin to powershell')
