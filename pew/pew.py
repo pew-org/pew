@@ -185,7 +185,7 @@ def _detect_shell():
         if 'CMDER_ROOT' in os.environ:
             shell = 'Cmder'
         elif windows:
-            shell = psutil.Process(os.getppid()).parent().name()
+            shell = psutil.Process(os.getpid()).parent().parent().name()
         else:
             shell = 'sh'
     return shell
