@@ -49,9 +49,9 @@ or
 
     python3 -c 'import os;print(os.environ.get("SHELL","No shell defined"))'
 
-Since that variable is not commonly used on Windows, we're defaulting to `powershell` over there. In all other cases we default instead to `sh`.
+Since that variable is not commonly used on Windows, we're detecting the parent process from which pew has been invoked and use that as the user's preferred shell. If `CMDER_ROOT` is defined this will select Cmder (a custom configuration of `cmd.exe`).
 
-If `CMDER_ROOT` is defined this will select Cmder (a custom configuration of `cmd.exe`). Custom selection for even more shells might be added in the future.
+In all other cases we default instead to `sh`.
 
 ### Windows/Cygwin notes
 
