@@ -220,7 +220,7 @@ def mkvirtualenv(envname, python=None, packages=[], project=None,
     path = (workon_home / envname).absolute()
 
     try:
-        check_call(["virtualenv", str(path)] + rest)
+        check_call([sys.executable, "-m", "virtualenv", str(path)] + rest)
     except (CalledProcessError, KeyboardInterrupt):
         rmvirtualenvs([envname])
         raise
@@ -628,7 +628,7 @@ def restore_cmd(argv):
     py = path / env_bin_dir / ('python.exe' if windows else 'python')
     exact_py = py.resolve().name
 
-    check_call(["virtualenv", str(path.absolute()), "--python=%s" % exact_py])
+    check_call([sys.executable, "-m", "virtualenv", str(path.absolute()), "--python=%s" % exact_py])
 
 
 def dir_cmd(argv):
