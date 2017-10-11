@@ -11,7 +11,10 @@ check_env = [sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"
 
 def test_detect_shell():
     with temp_environ():
-        del os.environ['SHELL']
+        try:
+            del os.environ['SHELL']
+        except KeyError:
+            pass
         if sys.platform == 'win32':
             assert _detect_shell() in ['pytest', 'tox']
         else:
