@@ -1,0 +1,25 @@
+let
+  pkgs = import <nixpkgs> {};
+  pythonPackages = pkgs.python3Packages;
+  python = pythonPackages.python;
+in
+pythonPackages.buildPythonPackage {
+  name = "pew";
+  propagatedBuildInputs = with pythonPackages; [ virtualenv virtualenv-clone pytest ];
+  src = ./.;
+  doCheck = false;
+  checkPhase = ''
+    py.test
+  '';
+  postFixup = ''
+    set -euo pipefail
+    PEW_SITE="$out/lib/${python.libPrefix}/site-packages"
+    SETUPTOOLS="${pythonPackages.setuptools}/lib/${python.libPrefix}/site-packages"
+    SETUPTOOLS_SITE=$SETUPTOOLS/$(cat $SETUPTOOLS/setuptools.pth)
+    CLONEVENV_SITE="${pythonPackages.virtualenv-clone}/lib/${python.libPrefix}/site-packages"
+    SITE_PACKAGES="[\'$PEW_SITE\',\'$SETUPTOOLS_SITE\',\'$CLONEVENV_SITE\']"
+    substituteInPlace $PEW_SITE/pew/pew.py \
+      --replace "from pew.pew" "import sys; sys.path.extend($SITE_PACKAGES); from pew.pew" \
+      --replace 'sys.executable, "-m", "virtualenv"' "'${pythonPackages.virtualenv}/bin/virtualenv'"
+  '';
+}

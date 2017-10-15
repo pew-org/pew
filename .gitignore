@@ -10,3 +10,4 @@ devenv
 .cache
 /.vscode/
 /Pipfile.lock
+/result
