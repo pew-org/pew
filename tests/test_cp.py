@@ -3,7 +3,7 @@ from subprocess import check_call
 from pathlib import Path
 
 from pew._utils import invoke_pew as invoke
-from utils import skip_windows
+from utils import skip_windows, xfail_nix
 
 import pytest
 
@@ -22,6 +22,7 @@ def copied_env(workon_home, env1):
     invoke('rm', 'destination')
 
 
+@xfail_nix
 def test_new_env_activated(workon_home, testpackageenv):
     invoke('cp', 'source', 'destination', '-d')
     testscript = Path(invoke('in', 'destination', which_cmd, 'testscript.py').out.strip())
@@ -36,6 +37,7 @@ def test_virtualenv_variable(copied_env):
     assert str(copied_env) == envname
 
 
+@xfail_nix
 def test_source_relocatable(workon_home, testpackageenv):
     check_call(['virtualenv', '--relocatable', str(workon_home / 'source')])
     invoke('cp', 'source', 'destination', '-d')

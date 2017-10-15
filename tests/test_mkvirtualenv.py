@@ -12,7 +12,7 @@ except ImportError:
 import pytest
 
 from pew._utils import invoke_pew as invoke
-from utils import skip_windows
+from utils import skip_windows, xfail_nix
 
 
 def are_we_connected():
@@ -36,6 +36,7 @@ def test_create(workon_home):
 
 
 @skip_windows(reason="symlinks on windows are not well supported")
+@xfail_nix
 def test_create_in_symlink(workon_sym_home):
     invoke('new', 'env', '-d')
     pip_path = Path(invoke('in', 'env', 'which', 'pip').out)

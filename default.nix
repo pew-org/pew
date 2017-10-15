@@ -5,10 +5,12 @@ let
 in
 pythonPackages.buildPythonPackage {
   name = "pew";
-  propagatedBuildInputs = with pythonPackages; [ virtualenv virtualenv-clone pytest ];
+  buildInputs = with pythonPackages; [ pytest ];
+  propagatedBuildInputs = with pythonPackages; [ virtualenv virtualenv-clone ];
   src = ./.;
-  doCheck = false;
   checkPhase = ''
+    export NIX=1
+    export PATH=$out/bin:$PATH
     py.test
   '';
   postFixup = ''
