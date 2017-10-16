@@ -18,20 +18,26 @@ Pew is completely shell-agnostic and thus works on bash, zsh, fish, powershell, 
 Installation
 ------------
 
+### Nix (Linux and Macos)
+
+You can use Nix to install Pew on [Nixos](http://nixos.org/) as well as [other Linux distributions or Macos](http://nixos.org/nix/download.html):
+
+    nix-env --install --attr pew
+
+### Arch linux
+
+For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
+
+### Pypi
+
 _Pew and its dependencies rely on a couple of features of pip/setuptools which might not be available on old versions. In case your distribution doesn't ship with one recent enough, you'll probably want to run `pip install --upgrade pip` before the installation._
 
 If you cannot upgrade the version of setuptools on your system, and one of the packages listed below is of no use to you, I suggest to use [`pipsi`](https://pypi.python.org/pypi/pipsi) rather than plain `pip`
 
 
-`pipsi install pew`
+    pipsi install pew
 
 See the [troubleshooting](#troubleshooting) section, if needed.
-
-There are also some packages, more or less up-to-date:
-
-### Arch linux
-
-For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
 
 
 Usage
