@@ -324,6 +324,16 @@ Prints the path for the supplied env
 `usage: pew dir env`
 
 
+### var ###
+Set, unset or display environment variables for the virtual environment. pew shells must be restarted to reflect changes to environment variables. Variable information is stored in an .env file in the virtual environment. The .env file format is compatible with foreman and honcho.
+When called with only an environment, displays the vairables and values that are set for the virtual environment.
+When called with the `-u` or `--unset` option will remove all variables set in the environment.
+When called with the `-u` or `--unset` option and a variable name, will remove that variable from the environment.
+When called with a variable name, will display the value of that variable.
+When call with a variable name and a value, will set that variable to that value within the environment (overwriting any previous values). 
+
+`usage: pew-var env [-u [VARNAME] | [VARNAME [VARVALUE]]`
+
 Configuration
 -------------
 

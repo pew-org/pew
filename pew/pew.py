@@ -9,6 +9,8 @@ import textwrap
 from functools import partial
 from subprocess import CalledProcessError
 from pathlib import Path
+import shlex
+import re
 
 try:
     from shutil import get_terminal_size
@@ -107,6 +109,48 @@ def get_project_dir(env):
                 err('Corrupted or outdated:', project_file, '\nDirectory',
                     project_dir, "doesn't exist.")
 
+#class to support reading ini file
+class EnvParser:
+    def __init__(self, filename=None):
+        self._d={}
+        self._filename = filename
+        if self._filename:
+            self.load(filename)
+
+    def load(self, filename):
+        #code taken from honcho
+        #Copyright (c) 2012 Nick Stenning, http://whiteink.com/
+        self._d = {}
+        self._filename = filename
+        with open(filename,'rU') as f:
+            for line in f.readlines():
+                lexer = shlex.shlex(line, posix=True)
+                tokens = list(lexer)
+                if len(tokens) < 3:
+                    continue
+                name, op = tokens[:2]
+                value = ''.join(tokens[2:])
+                if op != '=':
+                    continue
+                if not re.match(r'[A-Za-z_][A-Za-z_0-9]*', name):
+                    continue
+                value = value.replace(r'\n', '\n')
+                value = value.replace(r'\t', '\t')
+                self._d[name]=value
+
+    def save(self, filename):
+        with open(filename,'w') as f:
+            for k in self._d.keys():
+                print("%s=%s"%(k,self._d[k]),file=f)
+
+    def items(self):
+        return self._d
+
+    def add_variable(self, key, value):
+        self._d[key]=value
+
+    def del_variable(self, key):
+        self._d.pop(key,None)
 
 def unsetenv(key):
     if key in os.environ:
@@ -133,6 +177,13 @@ def inve(env, command, *args, **kwargs):
 
         unsetenv('PYTHONHOME')
         unsetenv('__PYVENV_LAUNCHER__')
+
+        #load environment variables from .env
+        envfile = workon_home / env / '.env'
+        if envfile.exists():
+            parser = EnvParser()
+            parser.load(str(envfile))
+            os.environ.update(parser.items())
 
         try:
             return check_call([command] + list(args), shell=windows, **kwargs)
@@ -674,6 +725,39 @@ def locate_python_cmd(argv):
 def version_cmd(argv):
     """Prints current pew version"""
     print(__version__)
+
+def var_cmd(argv):
+    """Sets, unsets and prints virtual environment variables."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument('env', help="virtual environment")
+    parser.add_argument('var_name', nargs="?", help="variable name")
+    parser.add_argument('var_value', nargs="?", help="variable value")
+    parser.add_argument('-u','--unset',action='store_true', help="unset environment variable")
+    args = parser.parse_args(argv)
+    envfile = workon_home / args.env / '.env'
+    envvars = EnvParser()
+    if envfile.exists():
+        envvars.load(str(envfile))
+    if args.unset:
+        if args.var_name:
+            envvars.del_variable(args.var_name)
+            envvars.save(str(envfile))
+        else:
+            if envfile.exists() and envfile.is_file():
+                envfile.unlink()
+    else:
+        if args.var_name:
+            if args.var_value:
+                envvars.add_variable(args.var_name, args.var_value)
+                envvars.save(str(envfile))
+            else:
+                d = envvars.items()
+                if args.var_name in envvars.items():
+                    print(envvars.items()[args.var_name])
+        else:
+            d = envvars.items()
+            for k in d.keys():
+                print("%s=%s"%(k, d[k]))
 
 
 def prevent_path_errors():

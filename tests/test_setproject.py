@@ -15,7 +15,7 @@ def test_project_dont_exist(env1):
 
 
 def check_project_dir(workon_home, env, projdir):
-    return (workon_home / env / '.project').open().read() == projdir
+    return Path((workon_home / env / '.project').open().read()).resolve() == Path(projdir).resolve()
 
 
 @skip_windows(reason="empty stdin on windows doesn't close the subprocess used by workon")
@@ -64,4 +64,4 @@ def test_workon_when_project_is_relative(env1):
         tmpdir = Path(tmpdir)
         invoke('setproject', 'env1', tmpdir.name, cwd=str(tmpdir.parent))
         workon_projdir = invoke('workon', 'env1', inp='pwd').out.strip()
-        assert workon_projdir == str(tmpdir)
+        assert Path(workon_projdir).resolve() == tmpdir.resolve()
