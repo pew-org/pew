@@ -38,7 +38,6 @@ else:
 
     import psutil
 
-from pew import __version__
 from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir,
                         check_path, temp_environ, NamedTemporaryFile, to_unicode)
 from pew._print_utils import print_virtualenvs
@@ -673,6 +672,14 @@ def locate_python_cmd(argv):
 
 def version_cmd(argv):
     """Prints current pew version"""
+    import pkg_resources
+
+    try:
+        __version__ = pkg_resources.get_distribution('pew').version
+    except pkg_resources.DistributionNotFound:
+        __version__ = 'unknown'
+        print('Setuptools has some issues here, failed to get our own package.', file=sys.stderr)
+
     print(__version__)
 
 
