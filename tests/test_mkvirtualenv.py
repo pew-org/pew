@@ -2,29 +2,11 @@ from os import unlink
 from subprocess import check_call, CalledProcessError
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-try:
-    from urllib.request import urlopen
-    from urllib.error import URLError
-except ImportError:
-    from urllib import urlopen
-    URLError = IOError
 
 import pytest
 
 from pew._utils import invoke_pew as invoke
-from utils import skip_windows, xfail_nix
-
-
-def are_we_connected():
-    try:
-        urlopen('http://google.com')
-        return True
-    except URLError:
-        return False
-
-
-connection_required = pytest.mark.skipif(not are_we_connected(),
-                                         reason="An internet connection is required")
+from utils import skip_windows, xfail_nix, connection_required
 
 
 def test_create(workon_home):
