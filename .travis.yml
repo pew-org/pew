@@ -6,40 +6,40 @@ matrix:
       install:
         - pip install -e .[pythonz] --upgrade
         - pip install pytest
-      script: py.test tests/
+      script: py.test -rws tests/
     - language: python
       sudo: false
       python: "3.3"
       install:
         - pip install -e . --upgrade
         - pip install pytest
-      script: py.test tests/
+      script: py.test -rws tests/
     - language: python
       sudo: false
       python: "3.4"
       install:
         - pip install -e . --upgrade
         - pip install pytest
-      script: py.test tests/
+      script: py.test -rws tests/
     - language: python
       sudo: false
       python: "3.5"
       install:
         - pip install -e . --upgrade
         - pip install pytest
-      script: py.test tests/
+      script: py.test -rws tests/
     - language: python
       sudo: false
       python: "3.6"
       install:
         - pip install -e .[pythonz] --upgrade
         - pip install pytest
-      script: py.test tests/
+      script: py.test -rws tests/
     - language: python
       sudo: false
       python: "pypy"
       install:
         - pip install -e . --upgrade
         - pip install pytest
-      script: py.test tests/
+      script: py.test -rws tests/
     - language: nix

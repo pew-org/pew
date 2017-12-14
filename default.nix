@@ -11,7 +11,7 @@ pythonPackages.buildPythonPackage {
   checkPhase = ''
     export NIX=1
     export PATH=$out/bin:$PATH
-    py.test
+    py.test -rws
   '';
   postFixup = ''
     set -euo pipefail
