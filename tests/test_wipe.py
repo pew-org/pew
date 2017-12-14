@@ -1,9 +1,8 @@
 from pew._utils import invoke_pew as invoke
 
-from utils import xfail_nix, connection_required
+from utils import connection_required
 
 
-@xfail_nix
 @connection_required
 def test_wipe(env1):
     assert not invoke('in', 'env1', 'pip', 'install', 'WebTest').err

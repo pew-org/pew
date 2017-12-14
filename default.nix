@@ -5,12 +5,13 @@ let
 in
 pythonPackages.buildPythonPackage {
   name = "pew";
-  buildInputs = with pythonPackages; [ pytest ];
+  buildInputs = with pkgs; [ which ] ++ (with pythonPackages; [ pytest ]);
   propagatedBuildInputs = with pythonPackages; [ virtualenv virtualenv-clone ];
   src = ./.;
   checkPhase = ''
     export NIX=1
     export PATH=$out/bin:$PATH
+    export HOME=$(mktemp -d)
     py.test -rws
   '';
   postFixup = ''
