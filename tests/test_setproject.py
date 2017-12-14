@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from pew._utils import temp_environ, invoke_pew as invoke
-from utils import skip_windows, xfail_nix, TemporaryDirectory
+from utils import skip_windows, TemporaryDirectory
 
 
 def test_project_dont_exist(env1):
@@ -26,7 +26,6 @@ def test_implicit(workon_home, env1):
         assert check_project_dir(workon_home, 'env1', tmpdir)
 
 
-@xfail_nix
 def test_implicit_project(workon_home, env1):
     "use the cwd as project directory"
     with temp_environ():
@@ -37,7 +36,6 @@ def test_implicit_project(workon_home, env1):
             assert check_project_dir(workon_home, 'env1', tmpdir)
 
 
-@xfail_nix
 def test_setproject(workon_home, env1):
     with temp_environ():
         os.environ.pop('VIRTUAL_ENV', None)
@@ -48,7 +46,6 @@ def test_setproject(workon_home, env1):
 
 
 @skip_windows(reason="empty stdin on windows doesn't close the subprocess used by workon")
-@xfail_nix
 def test_ignore_environ(workon_home, env1, env2):
     with temp_environ():
         os.environ.pop('VIRTUAL_ENV', None)
