@@ -50,14 +50,16 @@ def workon_sym_home():
 
 @pytest.yield_fixture()
 def env1(workon_home):
-    invoke('new', 'env1', '-d')
+    result = invoke('new', 'env1', '-d')
+    assert result.returncode == 0, result.err
     yield
     invoke('rm', 'env1')
 
 
 @pytest.yield_fixture()
 def env2(workon_home):
-    invoke('new', 'env2', '-d')
+    result = invoke('new', 'env2', '-d')
+    assert result.returncode == 0, result.err
     yield
     invoke('rm', 'env2')
 
@@ -65,8 +67,10 @@ def env2(workon_home):
 @pytest.yield_fixture()
 def testpackageenv(workon_home):
     testpackage = str(Path(__file__).parent / 'testpackage')
-    invoke('new', 'source', '-d')
-    invoke('in', 'source', 'python', 'setup.py', 'install', cwd=testpackage)
+    result = invoke('new', 'source', '-d')
+    assert result.returncode == 0, result.err
+    result = invoke('in', 'source', 'python', 'setup.py', 'install', cwd=testpackage)
+    assert result.returncode == 0, result.err
     yield
     invoke('rm', 'source')
 

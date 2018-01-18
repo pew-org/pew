@@ -23,9 +23,15 @@ def copied_env(workon_home, env1):
 
 
 def test_new_env_activated(workon_home, testpackageenv):
-    invoke('cp', 'source', 'destination', '-d')
-    testscript = Path(invoke('in', 'destination', which_cmd, 'testscript.py').out.strip())
+    result = invoke('cp', 'source', 'destination', '-d')
+    assert result.returncode == 0, result.err
+
+    result = invoke('in', 'destination', which_cmd, 'testscript.py')
+    assert result.returncode == 0, result.err
+
+    testscript = Path(result.out.strip())
     assert ('destination', 'testscript.py') == (testscript.parts[-3], testscript.parts[-1])
+
     with testscript.open() as f:
         assert str(workon_home / 'destination') in f.read()
     invoke('rm', 'destination')
