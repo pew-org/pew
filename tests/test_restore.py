@@ -2,7 +2,10 @@ from itertools import chain
 
 from pew._utils import invoke_pew as invoke
 
+from utils import skip_venv
 
+
+@skip_venv(reason='venv does not copy system packages so this test does not work')
 def test_restore(workon_home, env1):
     patterns = ['lib*/*/site.py*', 'Lib/site.py*']
     to_be_deleted = set(chain(*((workon_home / 'env1').glob(pat) for pat in patterns)))

@@ -3,7 +3,7 @@ from subprocess import check_call
 from pathlib import Path
 
 from pew._utils import invoke_pew as invoke
-from utils import skip_windows
+from utils import skip_windows, skip_venv_site_packages
 
 import pytest
 
@@ -57,6 +57,7 @@ def test_source_does_not_exists(workon_home):
     invoke('rm', 'destination')
 
 
+@skip_venv_site_packages()
 def test_no_global_site_packages(copied_env):
     site = Path(invoke('workon', copied_env.name, inp='pew sitepackages_dir').out)
     assert (site.parent / 'no-global-site-packages.txt').exists
