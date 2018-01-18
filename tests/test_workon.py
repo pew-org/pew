@@ -9,6 +9,11 @@ import pytest
 
 check_env = [sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"]
 
+
+@pytest.mark.skipif(
+    sys.version_info < (2, 7),
+    reason='psutils raises TypeError on 2.6. Not our fault.',
+)
 def test_detect_shell():
     with temp_environ():
         try:

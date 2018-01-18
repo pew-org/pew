@@ -1,7 +1,7 @@
 install:
-  - SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%
-  - pip install tox
+  - SET PATH=C:\\Python36;C:\\Python35;C:\\Python34;C:\\Python33;C:\\Python27;C:\\Python26;%PATH%
+  - C:\\Python36\\Scripts\\pip.exe install tox
 
 build: false
 
-test_script: tox -e "py27,py34"
+test_script: C:\\Python36\\Scripts\\tox.exe

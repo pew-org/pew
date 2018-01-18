@@ -23,6 +23,14 @@ matrix:
       script: py.test -rws tests/ --ignore=tests/test_install.py
     - language: python
       sudo: false
+      python: "3.4"
+      env: PEW_USE_VIRTUALENV=1
+      install:
+        - pip install -e . --upgrade
+        - pip install pytest
+      script: py.test -rws tests/ --ignore=tests/test_install.py
+    - language: python
+      sudo: false
       python: "3.5"
       install:
         - pip install -e . --upgrade
@@ -30,7 +38,23 @@ matrix:
       script: py.test -rws tests/ --ignore=tests/test_install.py
     - language: python
       sudo: false
+      python: "3.5"
+      env: PEW_USE_VIRTUALENV=1
+      install:
+        - pip install -e . --upgrade
+        - pip install pytest
+      script: py.test -rws tests/ --ignore=tests/test_install.py
+    - language: python
+      sudo: false
       python: "3.6"
+      install:
+        - pip install -e .[pythonz] --upgrade
+        - pip install pytest
+      script: py.test -rws tests/
+    - language: python
+      sudo: false
+      python: "3.6"
+      env: PEW_USE_VIRTUALENV=1
       install:
         - pip install -e .[pythonz] --upgrade
         - pip install pytest
