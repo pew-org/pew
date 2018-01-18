@@ -15,7 +15,7 @@ try:
 except ImportError:
     from backports.shutil_get_terminal_size import get_terminal_size
 
-windows = sys.platform == 'win32'
+from pew._utils import windows
 
 from clonevirtualenv import clone_virtualenv
 if not windows:
@@ -38,7 +38,7 @@ else:
 
     import psutil
 
-from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir,
+from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir, workon_home,
                         check_path, temp_environ, NamedTemporaryFile, to_unicode)
 from pew._print_utils import print_virtualenvs
 
@@ -46,14 +46,6 @@ if sys.version_info[0] == 2:
     input = raw_input
 
 err = partial(print, file=sys.stderr)
-
-if windows:
-    default_home = '~/.virtualenvs'
-else:
-    default_home = os.path.join(
-        os.environ.get('XDG_DATA_HOME', '~/.local/share'), 'virtualenvs')
-workon_home = expandpath(
-    os.environ.get('WORKON_HOME', default_home))
 
 
 def makedirs_and_symlink_if_needed(workon_home):

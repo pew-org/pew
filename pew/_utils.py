@@ -64,13 +64,22 @@ invoke_pew = partial(invoke, 'pew')
 
 env_bin_dir = 'bin' if sys.platform != 'win32' else 'Scripts'
 
+if windows:
+    default_home = '~/.virtualenvs'
+else:
+    default_home = os.path.join(
+        os.environ.get('XDG_DATA_HOME', '~/.local/share'), 'virtualenvs')
+
 
 def expandpath(path):
     return Path(os.path.expanduser(os.path.expandvars(path)))
 
 
+workon_home = expandpath(os.environ.get('WORKON_HOME', default_home))
+
+
 def own(path):
-    if sys.platform == 'win32':
+    if windows:
         # Even if run by an administrator, the permissions will be set
         # correctly on Windows, no need to check
         return True
