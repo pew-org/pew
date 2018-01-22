@@ -29,11 +29,7 @@ skip_windows = functools.partial(pytest.mark.skipif, platform == 'win32')
 
 
 def use_venv():
-    return (
-        platform != 'win32' and
-        version_info >= (3, 4) and
-        not os.environ.get('PEW_USE_VIRTUALENV')
-    )
+    return version_info >= (3, 4) and not os.environ.get('PEW_USE_VIRTUALENV')
 
 
 skip_venv = functools.partial(pytest.mark.skipif, use_venv())

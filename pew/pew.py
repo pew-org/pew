@@ -41,7 +41,7 @@ else:
 from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir, workon_home,
                         check_path, temp_environ, NamedTemporaryFile, to_unicode)
 from pew._print_utils import print_virtualenvs
-from pew._venv import choose_backend, guess_backend
+from pew._venv import choose_backend, guess_backend, BrokenEnvironmentError
 
 if sys.version_info[0] == 2:
     input = raw_input
@@ -205,18 +205,21 @@ def shell(env, cwd=None):
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
                  requirements=None, rest=[]):
-
-    if python:
-        rest = ["--python=%s" % python] + rest
-
     path = (workon_home / envname).absolute()
     backend = choose_backend(path)
 
     try:
-        backend.create_env(rest)
+        backend.create_env(py=python, args=rest)
     except (CalledProcessError, KeyboardInterrupt):
         rmvirtualenvs([envname])
         raise
+    except BrokenEnvironmentError:
+        rmvirtualenvs([envname])
+        if python:
+            raise
+        err('Failed to find Python from your environment. '
+            'Maybe try providing a Python executable with "--python"?')
+        sys.exit(1)
     else:
         if project:
             setvirtualenvproject(envname, project.absolute())
