@@ -12,6 +12,7 @@ pythonPackages.buildPythonPackage {
     export NIX=1
     export PATH=$out/bin:$PATH
     export HOME=$(mktemp -d)
+    export PEW_USE_VIRTUALENV=1
     py.test -rws -k test_new_env_activated
   '';
   postFixup = ''
