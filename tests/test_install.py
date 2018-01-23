@@ -2,7 +2,7 @@ import sys
 import os
 from subprocess import check_call
 from pew._utils import invoke_pew as invoke
-from utils import skip_windows
+from utils import skip_windows, connection_required
 import pytest
 
 def skip_marker(f):
@@ -11,7 +11,8 @@ def skip_marker(f):
             sys.platform == 'cygwin',
             reason='Pythonz unavailable in Cygwin')(
                 pytest.mark.skipif(os.environ.get('NIX'),
-                                   reason='Pythonz unavailable in Nix')(f)))
+                                   reason='Pythonz unavailable in Nix')(
+                    connection_required(f))))
 
 @skip_marker
 def test_install():
