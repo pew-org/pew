@@ -23,10 +23,12 @@ def copied_env(workon_home, env1):
 
 
 def test_new_env_activated(workon_home, testpackageenv):
-    result = invoke('cp', 'source', 'destination', '-d')
-    destperm = oct((workon_home / 'destination/bin/activate.csh').stat().st_mode)
+    wperm = oct(workon_home.stat().st_mode)
+    wsperm = oct((workon_home / 'source').stat().st_mode)
+    wsbperm = oct((workon_home / 'source/bin').stat().st_mode)
     sourceperm = oct((workon_home / 'source/bin/activate.csh').stat().st_mode)
-    assert False, 'PERMS: sourceperm:{}\ndestperm:{}'.format(sourceperm, destperm)
+    assert False, 'PERMS: workonperm:{}\nworkonsourceperm:{}\nsourcebinperm:{}\nactivateperm:{}'.format(wperm, wsperm, wsbperm, sourceperm)
+    result = invoke('cp', 'source', 'destination', '-d')
 
     result = invoke('in', 'destination', which_cmd, 'testscript.py')
     assert result.returncode == 0, result.err
