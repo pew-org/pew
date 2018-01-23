@@ -5,6 +5,8 @@ from pathlib import Path
 from pew._utils import invoke_pew as invoke
 from utils import skip_windows, skip_venv_site_packages
 
+from tempfile import gettempdir
+
 import pytest
 
 which_cmd = 'where' if platform == 'win32' else 'which'
@@ -23,11 +25,12 @@ def copied_env(workon_home, env1):
 
 
 def test_new_env_activated(workon_home, testpackageenv):
+    tmpperm = oct(Path(os.environ.get('TMPDIR', gettempdir())).stat().st_mode)
     wperm = oct(workon_home.stat().st_mode)
     wsperm = oct((workon_home / 'source').stat().st_mode)
     wsbperm = oct((workon_home / 'source/bin').stat().st_mode)
     sourceperm = oct((workon_home / 'source/bin/activate.csh').stat().st_mode)
-    assert False, 'PERMS: workonperm:{}\nworkonsourceperm:{}\nsourcebinperm:{}\nactivateperm:{}'.format(wperm, wsperm, wsbperm, sourceperm)
+    assert False, 'PERMS: tmpperm:{}\nworkonperm:{}\nworkonsourceperm:{}\nsourcebinperm:{}\nactivateperm:{}'.format(tmpperm, wperm, wsperm, wsbperm, sourceperm)
     result = invoke('cp', 'source', 'destination', '-d')
 
     result = invoke('in', 'destination', which_cmd, 'testscript.py')
