@@ -26,7 +26,7 @@ def test_new_env_activated(workon_home, testpackageenv):
     result = invoke('cp', 'source', 'destination', '-d')
     destperm = oct((workon_home / 'destination/bin/activate.csh').stat().st_mode)
     sourceperm = oct((workon_home / 'source/bin/activate.csh').stat().st_mode)
-    assert result.returncode == 0, 'PERMS: sourceperm:{}\ndestperm:{}'.format(sourceperm, destperm)
+    assert False, 'PERMS: sourceperm:{}\ndestperm:{}'.format(sourceperm, destperm)
 
     result = invoke('in', 'destination', which_cmd, 'testscript.py')
     assert result.returncode == 0, result.err
