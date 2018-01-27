@@ -7,7 +7,7 @@ import sys
 import warnings
 
 from ._cfg import Cfg
-from ._utils import env_bin_dir, invoke, windows
+from ._utils import env_bin_dir, invoke, uses_venv, windows
 
 
 class Backend(object):
@@ -130,11 +130,11 @@ class VenvBackend(Backend):
 def choose_backend(root):
     """Choose a preferred virtual environment backend to use.
     """
-    if sys.version_info < (3, 4) or os.environ.get('PEW_USE_VIRTUALENV'):
+    if not uses_venv():
         return VirtualenvBackend(root)
 
     # Without ensurepip the venv can can't bootstrap Setuptools and Pip.
-    # That would not be useful for us.
+    # The venv would not be useful for us without them.
     for module_name in ['ensurepip', 'venv']:
         try:
             __import__(module_name)

@@ -96,3 +96,7 @@ def temp_environ():
     finally:
         os.environ.clear()
         os.environ.update(environ)
+
+
+def uses_venv():
+    return sys.version_info >= (3, 4) and not os.environ.get('PEW_USE_VIRTUALENV')

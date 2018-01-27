@@ -20,22 +20,19 @@ except ImportError:
 
 
 import functools
-import os
-from sys import platform, version_info
+import sys
 
 import pytest
 
-skip_windows = functools.partial(pytest.mark.skipif, platform == 'win32')
+from pew._utils import uses_venv
+
+skip_windows = functools.partial(pytest.mark.skipif, sys.platform == 'win32')
 
 
-def use_venv():
-    return version_info >= (3, 4) and not os.environ.get('PEW_USE_VIRTUALENV')
-
-
-skip_venv = functools.partial(pytest.mark.skipif, use_venv())
+skip_venv = functools.partial(pytest.mark.skipif, uses_venv())
 
 skip_venv_site_packages = functools.partial(
-    pytest.mark.skipif, use_venv(),
+    pytest.mark.skipif, uses_venv(),
     reason='TODO: Add a similar test for pyvenv.cfg',
 )
 
