@@ -466,8 +466,23 @@ def copy_virtualenv_project(source, target):
             target_name, workon_home
         ))
 
+    modified = []
+    for path in source.joinpath('bin').iterdir():
+        if path.stem != 'activate':
+            continue
+        mode = path.stat().st_mode
+        if not mode & 0o200:
+            path.chmod(mode | 0o200)
+            modified.append(target.joinpath('bin', path.name))
+
     print('Copying {0} in {1}'.format(source, target_name))
     clone_virtualenv(str(source), str(target))
+
+    for path in modified:
+        mode = path.stat().st_mode
+        if mode & 0o200:
+            path.chmod(mode & ~0o200)
+
     return target_name
 
 
