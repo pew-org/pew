@@ -20,12 +20,22 @@ except ImportError:
 
 
 import functools
-import os
-from sys import platform
+import sys
 
 import pytest
 
-skip_windows = functools.partial(pytest.mark.skipif, platform == 'win32')
+from pew._utils import uses_venv
+
+skip_windows = functools.partial(pytest.mark.skipif, sys.platform == 'win32')
+
+
+skip_venv = functools.partial(pytest.mark.skipif, uses_venv())
+
+skip_venv_site_packages = functools.partial(
+    pytest.mark.skipif, uses_venv(),
+    reason='TODO: Add a similar test for pyvenv.cfg',
+)
+
 
 def are_we_connected():
     try:
@@ -35,5 +45,7 @@ def are_we_connected():
         return False
 
 
-connection_required = pytest.mark.skipif(not are_we_connected(),
-                                         reason="An internet connection is required")
+connection_required = pytest.mark.skipif(
+    not are_we_connected(),
+    reason="An internet connection is required",
+)

@@ -15,7 +15,7 @@ try:
 except ImportError:
     from backports.shutil_get_terminal_size import get_terminal_size
 
-windows = sys.platform == 'win32'
+from pew._utils import windows
 
 from clonevirtualenv import clone_virtualenv
 if not windows:
@@ -38,22 +38,15 @@ else:
 
     import psutil
 
-from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir,
+from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir, workon_home,
                         check_path, temp_environ, NamedTemporaryFile, to_unicode)
 from pew._print_utils import print_virtualenvs
+from pew._venv import choose_backend, guess_backend, BrokenEnvironmentError
 
 if sys.version_info[0] == 2:
     input = raw_input
 
 err = partial(print, file=sys.stderr)
-
-if windows:
-    default_home = '~/.virtualenvs'
-else:
-    default_home = os.path.join(
-        os.environ.get('XDG_DATA_HOME', '~/.local/share'), 'virtualenvs')
-workon_home = expandpath(
-    os.environ.get('WORKON_HOME', default_home))
 
 
 def makedirs_and_symlink_if_needed(workon_home):
@@ -212,17 +205,21 @@ def shell(env, cwd=None):
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
                  requirements=None, rest=[]):
-
-    if python:
-        rest = ["--python=%s" % python] + rest
-
     path = (workon_home / envname).absolute()
+    backend = choose_backend(path)
 
     try:
-        check_call([sys.executable, "-m", "virtualenv", str(path)] + rest)
+        backend.create_env(py=python, args=rest)
     except (CalledProcessError, KeyboardInterrupt):
         rmvirtualenvs([envname])
         raise
+    except BrokenEnvironmentError:
+        rmvirtualenvs([envname])
+        if python:
+            raise
+        err('Failed to find Python from your environment. '
+            'Maybe try providing a Python executable with "--python"?')
+        sys.exit(1)
     else:
         if project:
             setvirtualenvproject(envname, project.absolute())
@@ -372,9 +369,8 @@ def sitepackages_dir(env=os.environ.get('VIRTUAL_ENV')):
     if not env:
         sys.exit('ERROR: no virtualenv active')
     else:
-        env_python = workon_home / env / env_bin_dir / 'python'
-        return Path(invoke(str(env_python), '-c', 'import distutils; \
-print(distutils.sysconfig.get_python_lib())').out)
+        backend = guess_backend(workon_home / env)
+        return backend.get_sitepackages_dir()
 
 
 def add_cmd(argv):
@@ -429,16 +425,13 @@ def lssitepackages_cmd(argv):
 def toggleglobalsitepackages_cmd(argv):
     """Toggle the current virtualenv between having and not having access to the global site-packages."""
     quiet = argv == ['-q']
-    site = sitepackages_dir()
-    ngsp_file = site.parent / 'no-global-site-packages.txt'
-    if ngsp_file.exists():
-        ngsp_file.unlink()
-        if not quiet:
+    backend = guess_backend(workon_home / os.environ.get('VIRTUAL_ENV'))
+    enabled = backend.toggle_global_sitepackages()
+    if not quiet:
+        if enabled:
             print('Enabled global site-packages')
-    else:
-        with ngsp_file.open('w'):
-            if not quiet:
-                print('Disabled global site-packages')
+        else:
+            print('Disabled global site-packages')
 
 
 def cp_cmd(argv):
@@ -473,8 +466,23 @@ def copy_virtualenv_project(source, target):
             target_name, workon_home
         ))
 
+    modified = []
+    for path in source.joinpath('bin').iterdir():
+        if path.stem != 'activate':
+            continue
+        mode = path.stat().st_mode
+        if not mode & 0o200:
+            path.chmod(mode | 0o200)
+            modified.append(target.joinpath('bin', path.name))
+
     print('Copying {0} in {1}'.format(source, target_name))
     clone_virtualenv(str(source), str(target))
+
+    for path in modified:
+        mode = path.stat().st_mode
+        if mode & 0o200:
+            path.chmod(mode & ~0o200)
+
     return target_name
 
 
@@ -623,11 +631,8 @@ def restore_cmd(argv):
         sys.exit('You must provide a valid virtualenv to target')
 
     env = argv[0]
-    path = workon_home / env
-    py = path / env_bin_dir / ('python.exe' if windows else 'python')
-    exact_py = py.resolve().name
-
-    check_call([sys.executable, "-m", "virtualenv", str(path.absolute()), "--python=%s" % exact_py])
+    backend = guess_backend(workon_home / env)
+    backend.restore_env()
 
 
 def dir_cmd(argv):

@@ -6,7 +6,7 @@ from tempfile import NamedTemporaryFile
 import pytest
 
 from pew._utils import invoke_pew as invoke
-from utils import skip_windows, connection_required
+from utils import skip_venv, skip_venv_site_packages, skip_windows, connection_required
 
 
 def test_create(workon_home):
@@ -17,6 +17,7 @@ def test_create(workon_home):
     assert envs < envs2
 
 
+@skip_venv(reason='venv follows symlinks so this will fail')
 @skip_windows(reason="symlinks on windows are not well supported")
 def test_create_in_symlink(workon_sym_home):
     invoke('new', 'env', '-d')
@@ -32,6 +33,7 @@ def test_no_args(workon_home):
         check_call(['pew', 'new'])
 
 
+@skip_venv_site_packages()
 def test_gsp(workon_home):
     invoke('new', 'env', '--system-site-packages', '-d')
     site = invoke('in', 'env', 'pew', 'sitepackages_dir').out
