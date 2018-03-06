@@ -17,6 +17,7 @@ https://github.com/berdario/pew#usage'''
 here = os.path.abspath(os.path.dirname(__file__))
 VERSION = '1.1.2'
 
+
 class DebCommand(Command):
     """Support for setup.py deb"""
 
