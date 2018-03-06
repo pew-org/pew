@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 
-from setuptools import setup
+import os
+from shutil import rmtree
+from setuptools import setup, Command
 
 long_desc = '''Python Env Wrapper is a set of commands to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). Pew can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
@@ -11,10 +13,42 @@ Pew is completely shell-agnostic and thus works on bash, zsh, fish, powershell, 
 For the documentation, you might want to read here:
 https://github.com/berdario/pew#usage'''
 
+here = os.path.abspath(os.path.dirname(__file__))
+VERSION = '1.1.2'
+
+class DebCommand(Command):
+    """Support for setup.py deb"""
+
+    description = 'Build and publish the .deb package.'
+    user_options = []
+
+    @staticmethod
+    def status(s):
+        """Prints things in bold."""
+        print('\033[1m{0}\033[0m'.format(s))
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        try:
+            self.status('Removing previous builds…')
+            rmtree(os.path.join(here, 'deb_dist'))
+        except FileNotFoundError:
+            pass
+        self.status(u'Creating debian mainfest…')
+        os.system('python setup.py --command-packages=stdeb.command sdist_dsc -z artful')
+
+        self.status(u'Building .deb…')
+        os.chdir('deb_dist/pew-{0}'.format(VERSION))
+        os.system('dpkg-buildpackage -rfakeroot -uc -us')
 
 setup(
     name='pew',
-    version='1.1.2',
+    version=VERSION,
     description='tool to manage multiple virtualenvs written in pure python',
     long_description=long_desc,
     author='Dario Bertini',
@@ -47,6 +81,9 @@ setup(
     },
     include_package_data=True,
     zip_safe=False,
+    cmdclass={
+        'deb': DebCommand
+    },
     entry_points={
         'console_scripts': ['pew = pew.pew:pew']},
     classifiers=[
