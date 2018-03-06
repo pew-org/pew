@@ -43,7 +43,7 @@ class DebCommand(Command):
         except FileNotFoundError:
             pass
         self.status(u'Creating debian mainfest…')
-        os.system('{0} setup.py --command-packages=stdeb.command sdist_dsc -z artful'.format(sys.executable))
+        os.system('{0} setup.py --command-packages=stdeb.command sdist_dsc -z artful -m "Kenneth Reitz <me@kennethreitz.org>"'.format(sys.executable))
 
         self.status(u'Building .deb…')
         os.chdir('deb_dist/pew-{0}'.format(VERSION))
