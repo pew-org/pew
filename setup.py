@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 import os
 from shutil import rmtree
 from setuptools import setup, Command
@@ -42,7 +43,7 @@ class DebCommand(Command):
         except FileNotFoundError:
             pass
         self.status(u'Creating debian mainfest…')
-        os.system('python setup.py --command-packages=stdeb.command sdist_dsc -z artful')
+        os.system('{0} setup.py --command-packages=stdeb.command sdist_dsc -z artful'.format(sys.executable))
 
         self.status(u'Building .deb…')
         os.chdir('deb_dist/pew-{0}'.format(VERSION))
