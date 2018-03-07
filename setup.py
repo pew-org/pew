@@ -16,7 +16,7 @@ For the documentation, you might want to read here:
 https://github.com/berdario/pew#usage'''
 
 here = os.path.abspath(os.path.dirname(__file__))
-VERSION = '1.1.3'
+VERSION = '1.1.4'
 
 
 class DebCommand(Command):
@@ -43,7 +43,7 @@ class DebCommand(Command):
         except FileNotFoundError:
             pass
         self.status(u'Creating debian mainfest…')
-        os.system('{0} setup.py --command-packages=stdeb.command sdist_dsc -z artful --package3=pew'.format(sys.executable))
+        os.system('{0} setup.py --command-packages=stdeb.command sdist_dsc -z artful --package3=pew --depends3=python3-virtualenv-clone'.format(sys.executable))
 
         self.status(u'Building .deb…')
         os.chdir('deb_dist/pew-{0}'.format(VERSION))
