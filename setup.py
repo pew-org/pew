@@ -43,7 +43,7 @@ class DebCommand(Command):
         except FileNotFoundError:
             pass
         self.status(u'Creating debian mainfest…')
-        os.system('{0} setup.py --command-packages=stdeb.command sdist_dsc -z artful -m "me@kennethreitz.org"'.format(sys.executable))
+        os.system('{0} setup.py --command-packages=stdeb.command sdist_dsc -z artful'.format(sys.executable))
 
         self.status(u'Building .deb…')
         os.chdir('deb_dist/pew-{0}'.format(VERSION))
@@ -54,8 +54,8 @@ setup(
     version=VERSION,
     description='tool to manage multiple virtualenvs written in pure python',
     long_description=long_desc,
-    author='Dario Bertini',
-    author_email='berdario+pypi@gmail.com',
+    author='Kenneth Reitz',
+    author_email='me@kennethreitz.org',
     url='https://github.com/berdario/pew',
     license='MIT License',
     packages=['pew'],
