@@ -5,7 +5,7 @@ from utils import connection_required
 
 @connection_required
 def test_wipe(env1):
-    assert not invoke('in', 'env1', 'pip', 'install', 'WebTest').err
+    assert invoke('in', 'env1', 'pip', 'install', 'WebTest').returncode == 0
     assert 'WebTest' in invoke('in', 'env1', 'pip', 'freeze').out
     invoke('wipeenv', 'env1')
     assert 'WebTest' not in invoke('in', 'env1', 'pip', 'freeze').out
