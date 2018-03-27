@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from pew._utils import invoke_pew as invoke
+from utils import TemporaryDirectory
 
 
 @pytest.yield_fixture(scope='session')
@@ -61,6 +62,12 @@ def env2(workon_home):
     yield
     invoke('rm', 'env2')
 
+@pytest.yield_fixture()
+def env_with_project(workon_home): # TODO: use for test_setproject/test_mkvirtualenv ?
+    with TemporaryDirectory() as projectdir:
+        invoke('new', 'env_with_project', '-d', '-a', projectdir)
+        yield Path(projectdir)
+        invoke('rm', 'env_with_project')
 
 @pytest.yield_fixture()
 def testpackageenv(workon_home):

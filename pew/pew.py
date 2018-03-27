@@ -365,7 +365,7 @@ def workon_cmd(argv):
     # Check if the virtualenv has an associated project directory and in
     # this case, use it as the current working directory.
     project_dir = get_project_dir(env)
-    if project_dir is None or argv[-1] == '--here':
+    if project_dir is None or argv[-1] == '--here': # TODO: use argparse
         project_dir = os.getcwd()
     
     shell(env, cwd=project_dir)
