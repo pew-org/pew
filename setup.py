@@ -16,7 +16,7 @@ For the documentation, you might want to read here:
 https://github.com/berdario/pew#usage'''
 
 here = os.path.abspath(os.path.dirname(__file__))
-VERSION = '1.1.4'
+VERSION = '1.1.5'
 
 AUTHOR = os.environ.get('DEBFULLNAME', 'Dario Bertini')
 EMAIL = os.environ.get('DEBEMAIL', 'berdario+pypi@gmail.com')
