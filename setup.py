@@ -18,6 +18,8 @@ https://github.com/berdario/pew#usage'''
 here = os.path.abspath(os.path.dirname(__file__))
 VERSION = '1.1.4'
 
+AUTHOR = os.environ.get('DEBFULLNAME', 'Dario Bertini')
+EMAIL = os.environ.get('DEBEMAIL', 'berdario+pypi@gmail.com')
 
 class DebCommand(Command):
     """Support for setup.py deb"""
@@ -54,8 +56,8 @@ setup(
     version=VERSION,
     description='tool to manage multiple virtualenvs written in pure python',
     long_description=long_desc,
-    author='Kenneth Reitz',
-    author_email='me@kennethreitz.org',
+    author=AUTHOR,
+    author_email=EMAIL,
     url='https://github.com/berdario/pew',
     license='MIT License',
     packages=['pew'],
