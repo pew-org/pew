@@ -77,9 +77,6 @@ setup(
         ':python_version=="3.3"': [
             'pathlib'
         ],
-        ':sys_platform=="win32"': [
-            'psutil==5.3.1'
-        ],
         'pythonz': [
             'pythonz-bd>=1.10.2'
         ]
