@@ -114,7 +114,7 @@ def unsetenv(key):
 
 
 def compute_path(env):
-    envdir = workon_home / env
+    envdir = get_workon_home() / env
     return os.pathsep.join([
         str(envdir / env_bin_dir),
         os.environ['PATH'],
