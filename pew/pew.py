@@ -512,6 +512,24 @@ def setproject_cmd(argv):
     setvirtualenvproject(env, project)
 
 
+def getproject_cmd(argv):
+    """Print a virtualenv's project directory, if set.
+
+    If called without providing a virtualenv name as argument, print the
+    current virtualenv's project directory.
+    """
+    env = argv[0] if argv else os.environ.get('VIRTUAL_ENV')
+    if not env:
+        sys.exit('ERROR: no virtualenv active')
+    if not (workon_home / env).exists():
+        sys.exit("ERROR: Environment '{0}' does not exist.".format(env))
+    project_dir = get_project_dir(env)
+    if project_dir is None:
+        sys.exit("ERROR: no project directory set for Environment '{0}'"
+                 .format(env))
+    print(project_dir)
+
+
 def mkproject_cmd(argv):
     """Create a new project directory and its associated virtualenv."""
     if '-l' in argv or '--list' in argv:

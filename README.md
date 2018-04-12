@@ -292,6 +292,14 @@ Bind an existing virtualenv to an existing project.
 
 When no arguments are given, the current virtualenv and current directory are assumed.
 
+### getproject ###
+
+Return a virtualenv's project directory.
+
+`usage: pew getproject [env]`
+
+When no arguments are given, the current virtualenv is assumed.
+
 ### restore ###
 
 Try to restore a broken virtualenv by reinstalling the same python
