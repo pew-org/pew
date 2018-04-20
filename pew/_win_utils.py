@@ -6,12 +6,12 @@
 # (BSD License) - adapted from Celery
 # https://github.com/celery/celery/blob/2.5-archived/celery/concurrency/processes/_win.py
 import os
-import six
 from ctypes import (
     byref, sizeof, windll, Structure, WinError, POINTER,
     c_size_t, c_char, c_void_p
 )
 from ctypes.wintypes import DWORD, LONG
+from ._utils import to_unicode
 
 ERROR_NO_MORE_FILES = 18
 INVALID_HANDLE_VALUE = c_void_p(-1).value
@@ -85,7 +85,7 @@ def get_all_processes():
     pe = Process32First(h_process)
     while pe:
         pids[pe.th32ProcessID] = {
-            'executable': str(pe.szExeFile.decode('utf-8'))
+            'executable': str(to_unicode(pe.szExeFile))
         }
         if pe.th32ParentProcessID:
             pids[pe.th32ProcessID]['parent_pid'] = pe.th32ParentProcessID
@@ -97,7 +97,7 @@ def get_all_processes():
 def _get_executable(process_dict):
     if hasattr(process_dict, 'keys'):
         executable = process_dict.get('executable')
-        if isinstance(executable, six.string_types):
+        if executable:
             return executable.lower().rsplit('.', 1)[0]
     return ''
 
