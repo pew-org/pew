@@ -16,6 +16,10 @@ from ._utils import to_unicode
 ERROR_NO_MORE_FILES = 18
 INVALID_HANDLE_VALUE = c_void_p(-1).value
 SHELL_NAMES = ['cmd', 'powershell', 'pwsh', 'cmder']
+global SHELL_NAMES
+
+if os.environ.get('RUNNING_CI'):
+    SHELL_NAMES.append('python')
 
 
 class PROCESSENTRY32(Structure):
@@ -85,7 +89,7 @@ def get_all_processes():
     pe = Process32First(h_process)
     while pe:
         pids[pe.th32ProcessID] = {
-            'executable': str(to_unicode(pe.szExeFile))
+            'executable': to_unicode(pe.szExeFile)
         }
         if pe.th32ParentProcessID:
             pids[pe.th32ProcessID]['parent_pid'] = pe.th32ParentProcessID
@@ -108,14 +112,29 @@ def get_shell(pid=None, max_depth=6):
     if not pid:
         pid = os.getpid()
     processes = get_all_processes()
+    own_exe = to_unicode(processes[pid]['executable'])
 
-    def check_parent(pid, lvl=0):
+    def check_parent(pid, lvl=0, processes=None):
+        if not processes:
+            processes = get_all_processes()
+        if pid not in processes:
+            # see if the process graph has updated since the last check
+            processes = get_all_processes()
+            if pid not in processes:
+                return
         ppid = processes[pid].get('parent_pid')
         if ppid and _get_executable(processes.get(ppid)) in SHELL_NAMES:
-            return processes[ppid]['executable']
+            return to_unicode(processes[ppid]['executable'])
         if lvl >= max_depth:
             return
-        return check_parent(ppid, lvl=lvl+1)
+        return check_parent(ppid, lvl=lvl+1, processes=processes)
+
+    if os.environ.get('RUNNING_CI'):
+        global SHELL_NAMES
+        max_depth = 4
+        if 'python' not in SHELL_NAMES:
+            SHELL_NAMES = ['python'] + SHELL_NAMES
+
     if _get_executable(processes.get(pid)) in SHELL_NAMES:
-        return processes[pid]['executable']
-    return check_parent(pid)
+        return own_exe
+    return check_parent(pid, processes=processes) or own_exe
