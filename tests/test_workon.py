@@ -4,10 +4,13 @@ from pathlib import Path
 
 from pew.pew import _detect_shell
 from pew._utils import temp_environ, invoke_pew as invoke
+from pew._win_utils import SHELL_NAMES as WIN_SHELL_NAMES
 from utils import skip_windows
-
 import pytest
 
+
+WIN_SHELL_NAMES = ['python'] + WIN_SHELL_NAMES
+win_shell_exes = ['{0}.exe'.format(shell) for shell in WIN_SHELL_NAMES]
 check_env = [sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"]
 check_cwd = [sys.executable, '-c', "import pathlib; print(pathlib.Path().absolute())"]
 
@@ -18,7 +21,7 @@ def test_detect_shell():
         except KeyError:
             pass
         if sys.platform == 'win32':
-            assert _detect_shell() in ['python.exe']
+            assert _detect_shell() in win_shell_exes + WIN_SHELL_NAMES
         else:
             assert _detect_shell() == 'sh'
         os.environ['SHELL'] = 'foo'
