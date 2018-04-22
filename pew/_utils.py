@@ -30,7 +30,12 @@ if py2:
         return x.decode(encoding)
 else:
     NamedTemporaryFile = _ntf
-    to_unicode = str
+
+    def to_unicode(x):
+        if isinstance(x, (bytes, bytearray)):
+            x = x.decode(encoding)
+        return str(x)
+
 
 def check_path():
     parent = os.path.dirname
