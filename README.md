@@ -170,9 +170,9 @@ The `-r` option can be used to specify a text file listing packages to be instal
 
 List or change working virtual environments.
 
-`usage: pew workon [environment_name] [--here]`
+`usage: pew workon [-h] [-n] [envname]`
 
-If no `environment_name` is given the list of available environments is printed to stdout. If `--here` is provided, current directory is not changed even if a project path is associated with `environment_name`.
+If no `envname` is given the list of available environments is printed to stdout. If `-n` or `--no-cd` is provided, current directory is not changed even if a project path is associated with `environment_name`.
 
 ### mktmpenv ###
 
@@ -435,6 +435,7 @@ Everyone who submitted patches/PR, as of September 2015:
 - Matei Trușcă
 - Lucas Cimon
 - Alexandre Decan
+- Ashwin Vishnu Mohanan
 
 
 Thanks also to Michael F. Lamb for his thought provoking gist and to Doug Hellman for virtualenvwrapper

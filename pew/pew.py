@@ -357,7 +357,7 @@ def workon_cmd(argv):
     """List or change working virtual environments."""
     parser = argparse.ArgumentParser(prog='pew workon')
     parser.add_argument('envname', nargs='?')
-    args = parser.add_argument(
+    parser.add_argument(
         '-n', '--no-cd', action='store_true',
         help=('Do not change working directory to project directory after '
               'activating virtualenv.')
