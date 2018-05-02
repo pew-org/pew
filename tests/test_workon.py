@@ -79,5 +79,5 @@ def test_workon_project(env_with_project):
 def test_workon_project_but_here(env_with_project):
     cwd = Path().absolute()
     cmd = '{0} {1} "{2}"'.format(*check_cwd)
-    out = invoke('workon', 'env_with_project', '--here', inp=cmd).out
+    out = invoke('workon', 'env_with_project', '--no-cd', inp=cmd).out
     assert cwd == Path(out.splitlines()[-1].strip())
