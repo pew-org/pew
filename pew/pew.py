@@ -341,7 +341,7 @@ def ls_cmd(argv):
     lsvirtualenv(args.long)
 
 def parse_envname(argv, no_arg_callback):
-    if len(argv) < 1:
+    if len(argv) < 1 or argv[0] is None:
         no_arg_callback()
 
     env = argv[0]
@@ -355,19 +355,27 @@ def parse_envname(argv, no_arg_callback):
 
 def workon_cmd(argv):
     """List or change working virtual environments."""
+    parser = argparse.ArgumentParser(prog='pew workon')
+    parser.add_argument('envname', nargs='?')
+    parser.add_argument(
+        '--here', action='store_true',
+        help=('Do not change working directory to project directory after '
+              'activating virtualenv.')
+    )
+    args = parser.parse_args(argv)
 
     def list_and_exit():
         lsvirtualenv(False)
         sys.exit(0)
 
-    env = parse_envname(argv, list_and_exit)
+    env = parse_envname([args.envname], list_and_exit)
 
     # Check if the virtualenv has an associated project directory and in
     # this case, use it as the current working directory.
     project_dir = get_project_dir(env)
-    if project_dir is None or argv[-1] == '--here': # TODO: use argparse
+    if project_dir is None or args.here:
         project_dir = os.getcwd()
-    
+
     shell(env, cwd=project_dir)
 
 
