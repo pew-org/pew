@@ -7,6 +7,7 @@ dist
 devenv
 .tox
 **/#*#
+.pytest_cache
 .cache
 /.vscode/
 /Pipfile.lock
