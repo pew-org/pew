@@ -746,7 +746,7 @@ def first_run_setup():
         if shell == 'fish':
             source_cmd = 'source (pew shell_config)'
         else:
-            source_cmd = 'source $(pew shell_config)'
+            source_cmd = 'source "$(pew shell_config)"'
         rcpath = expandpath({'bash': '~/.bashrc'
                            , 'zsh': '~/.zshrc'
                            , 'fish': '~/.config/fish/config.fish'}[shell])
