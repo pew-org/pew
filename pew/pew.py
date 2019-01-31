@@ -663,7 +663,7 @@ def list_pythons_cmd(argv):
     '''List the pythons installed by Pythonz (or all the installable ones)'''
     try:
         Path(PATH_PYTHONS).mkdir(parents=True)
-    except OSError:
+    except (OSError, NameError):
         pass
     ListPythons().run(argv)
 
