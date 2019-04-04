@@ -1,11 +1,11 @@
+{ nixpkgs ? import <nixpkgs> {} }:
 let
-  pkgs = import <nixpkgs> {};
-  pythonPackages = pkgs.python3Packages;
+  pythonPackages = nixpkgs.python3Packages;
   python = pythonPackages.python;
 in
 pythonPackages.buildPythonPackage {
   name = "pew";
-  buildInputs = with pkgs; [ which ] ++ (with pythonPackages; [ pytest ]);
+  checkInputs = with nixpkgs; [ which ] ++ (with pythonPackages; [ pytest ]);
   propagatedBuildInputs = with pythonPackages; [ virtualenv virtualenv-clone ];
   src = ./.;
   checkPhase = ''
