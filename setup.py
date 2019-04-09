@@ -78,7 +78,7 @@ setup(
             'pathlib'
         ],
         ':sys_platform=="win32"': [
-            'psutil'
+            'shellingham'
         ],
         'pythonz': [
             'pythonz-bd>=1.10.2'

@@ -8,7 +8,7 @@ name = "pypi"
 virtualenv = "==1.11.6"
 "virtualenv-clone" = "==0.2.5"
 "pythonz-bd" = {"version" = "*", "sys_platform" = "!='win32'" }
-"psutil" = {"version" = "*", "sys_platform" = "=='win32'" }
+"shellingham" = {"version" = "*", "sys_platform" = "=='win32'" }
 
 [dev-packages]
 
