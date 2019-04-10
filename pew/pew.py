@@ -187,7 +187,7 @@ def _detect_shell():
             try:
                 _, shell = shellingham.detect_shell()
             except shellingham.ShellDetectionFailure:
-                shell = os.environ['COMSPEC']
+                shell = os.environ.get('COMSPEC', 'cmd.exe')
         else:
             shell = 'sh'
     return shell
@@ -370,7 +370,7 @@ def workon_cmd(argv):
     project_dir = get_project_dir(env)
     if project_dir is None or argv[-1] == '--here': # TODO: use argparse
         project_dir = os.getcwd()
-    
+
     shell(env, cwd=project_dir)
 
 
