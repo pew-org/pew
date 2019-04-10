@@ -11,6 +11,7 @@ import pytest
 check_env = [sys.executable, '-c', "import os; print(os.environ['VIRTUAL_ENV'])"]
 check_cwd = [sys.executable, '-c', "import pathlib; print(pathlib.Path().absolute())"]
 
+@pytest.mark.shell
 def test_detect_shell():
     with temp_environ():
         try:
@@ -18,7 +19,12 @@ def test_detect_shell():
         except KeyError:
             pass
         if sys.platform == 'win32':
-            assert _detect_shell() in ['cmd.exe']
+            # NOTE: This assumes your current shell is CMD, and would fail if
+            # you run the test in e.g. Powershell. You can safely ignore the
+            # error as long as the _detect_shell() makes sense to you.
+            # Hint: Disable this test like this: pytest -m 'not shell'
+            # https://github.com/berdario/pew/pull/204#discussion_r273835108
+            assert _detect_shell() == 'cmd.exe'
         else:
             assert _detect_shell() == 'sh'
         os.environ['SHELL'] = 'foo'
