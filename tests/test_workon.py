@@ -18,7 +18,7 @@ def test_detect_shell():
         except KeyError:
             pass
         if sys.platform == 'win32':
-            assert _detect_shell() in ['python.exe']
+            assert _detect_shell() in ['cmd.exe']
         else:
             assert _detect_shell() == 'sh'
         os.environ['SHELL'] = 'foo'
