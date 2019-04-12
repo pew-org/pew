@@ -369,7 +369,7 @@ def workon_cmd(argv):
     parser = argparse.ArgumentParser(prog='pew workon')
     parser.add_argument('envname', nargs='?')
     parser.add_argument(
-        '--here', action='store_true',
+        '-n', '--no-cd', action='store_true',
         help=('Do not change working directory to project directory after '
               'activating virtualenv.')
     )
@@ -384,7 +384,7 @@ def workon_cmd(argv):
     # Check if the virtualenv has an associated project directory and in
     # this case, use it as the current working directory.
     project_dir = get_project_dir(env)
-    if project_dir is None or args.here:
+    if project_dir is None or args.no_cd:
         project_dir = os.getcwd()
 
     return shell(env, cwd=project_dir)
