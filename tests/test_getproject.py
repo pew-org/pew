@@ -7,7 +7,7 @@ from utils import TemporaryDirectory
 
 
 def test_getproject(env1):
-    """Check that ``getproject`` prints an environment’s project directory."""
+    """Check that ``getproject`` prints an environment's project directory."""
     with temp_environ():
         os.environ.pop('VIRTUAL_ENV', None)
         with TemporaryDirectory() as tmpdir:
