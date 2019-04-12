@@ -6,9 +6,6 @@ Pew - Python Env Wrapper
 [![Build status](https://ci.appveyor.com/api/projects/status/xxe096txh1fuqfag/branch/master?svg=true)](https://ci.appveyor.com/project/berdario/pew/branch/master)
 [![PyPi](https://img.shields.io/pypi/format/pew.svg)](https://pypi.python.org/pypi/pew/)
 
-[![Pull Request stats](http://www.issuestats.com/github/berdario/pew/badge/pr?style=flat-square)](http://www.issuestats.com/github/berdario/pew)
-[![Issue stats](http://www.issuestats.com/github/berdario/pew/badge/issue?style=flat-square)](http://www.issuestats.com/github/berdario/pew)
-
 Python Env Wrapper is a set of commands to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). Pew can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
 Virtualenvs makes it easier to work on more than one project at a time without introducing conflicts in their dependencies.
