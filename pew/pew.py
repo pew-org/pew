@@ -147,6 +147,7 @@ def inve(env, command, *args, **kwargs):
         except OSError as e:
             if e.errno == 2:
                 err('Unable to find', command)
+                return 2
             else:
                 raise
 
@@ -158,7 +159,7 @@ def fork_shell(env, shellcmd, cwd):
     if 'VIRTUAL_ENV' in os.environ:
         err("Be aware that this environment will be nested on top "
             "of '%s'" % Path(os.environ['VIRTUAL_ENV']).name)
-    inve(env, *shellcmd, cwd=cwd)
+    return inve(env, *shellcmd, cwd=cwd)
 
 
 def fork_bash(env, cwd):
@@ -171,9 +172,9 @@ def fork_bash(env, cwd):
                 rcfile.write(bashrc.read())
             rcfile.write('\nexport PATH="' + to_unicode(compute_path(env)) + '"')
             rcfile.flush()
-            fork_shell(env, ['bash', '--rcfile', rcfile.name], cwd)
+            return fork_shell(env, ['bash', '--rcfile', rcfile.name], cwd)
     else:
-        fork_shell(env, ['bash'], cwd)
+        return fork_shell(env, ['bash'], cwd)
 
 
 def fork_cmder(env, cwd):
@@ -183,7 +184,7 @@ def fork_cmder(env, cwd):
         shell_cmd += ['/k', cmderrc_path]
     if cwd:
         os.environ['CMDER_START'] = cwd
-    fork_shell(env, shell_cmd, cwd)
+    return fork_shell(env, shell_cmd, cwd)
 
 def _detect_shell():
     shell = os.environ.get('SHELL', None)
@@ -213,11 +214,11 @@ def shell(env, cwd=None):
         except CalledProcessError:
             return
     if shell_name == 'bash':
-        fork_bash(env, cwd)
+        return fork_bash(env, cwd)
     elif shell_name == 'Cmder':
-        fork_cmder(env, cwd)
+        return fork_cmder(env, cwd)
     else:
-        fork_shell(env, [shell], cwd)
+        return fork_shell(env, [shell], cwd)
 
 
 def mkvirtualenv(envname, python=None, packages=[], project=None,
@@ -386,7 +387,7 @@ def workon_cmd(argv):
     if project_dir is None or args.here:
         project_dir = os.getcwd()
 
-    shell(env, cwd=project_dir)
+    return shell(env, cwd=project_dir)
 
 
 def sitepackages_dir(env=os.environ.get('VIRTUAL_ENV')):
@@ -640,7 +641,7 @@ def wipeenv_cmd(argv):
         if to_remove:
             print("Ignoring:\n %s" % "\n ".join(ignored))
             print("Uninstalling packages:\n %s" % "\n ".join(to_remove))
-            inve(env, 'pip', 'uninstall', '-y', *to_remove)
+            return inve(env, 'pip', 'uninstall', '-y', *to_remove)
         else:
             print("Nothing to remove")
 
@@ -667,7 +668,7 @@ def in_cmd(argv):
 
     parse_envname(argv, lambda : sys.exit('You must provide a valid virtualenv to target'))
 
-    inve(*argv)
+    return inve(*argv)
 
 
 def restore_cmd(argv):
@@ -681,7 +682,7 @@ def restore_cmd(argv):
     py = path / env_bin_dir / ('python.exe' if windows else 'python')
     exact_py = py.resolve().name
 
-    check_call([sys.executable, "-m", "virtualenv", str(path.absolute()), "--python=%s" % exact_py])
+    return check_call([sys.executable, "-m", "virtualenv", str(path.absolute()), "--python=%s" % exact_py])
 
 
 def dir_cmd(argv):
@@ -700,24 +701,24 @@ def install_cmd(argv):
     else:
         try:
             actual_installer = PythonInstaller.get_installer(versions[0], options)
-            actual_installer.install()
+            return actual_installer.install()
         except AlreadyInstalledError as e:
             print(e)
 
 
 def uninstall_cmd(argv):
     '''Use Pythonz to uninstall the specified Python version'''
-    UninstallCommand().run(argv)
+    return UninstallCommand().run(argv)
 
 
 def list_pythons_cmd(argv):
     '''List the pythons installed by Pythonz (or all the installable ones)'''
-    ListPythons().run(argv)
+    return ListPythons().run(argv)
 
 
 def locate_python_cmd(argv):
     '''Locate the path for the python version installed by Pythonz'''
-    LocatePython().run(argv)
+    return LocatePython().run(argv)
 
 
 def version_cmd(argv):
