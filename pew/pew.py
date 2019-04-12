@@ -518,15 +518,30 @@ def getproject_cmd(argv):
     If called without providing a virtualenv name as argument, print the
     current virtualenv's project directory.
     """
-    env = argv[0] if argv else os.environ.get('VIRTUAL_ENV')
-    if not env:
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description="Print an environment's project directory.",
+    )
+    parser.add_argument(
+        'envname',
+        nargs='?',
+        default=os.environ.get('VIRTUAL_ENV'),
+        help=(
+            'The name of the environment to return the project directory '
+            'for.  If omitted, will use the currently active environment.'
+        ),
+    )
+    args = parser.parse_args(argv)
+    # Now, do the actual work
+    if not args.envname:
         sys.exit('ERROR: no virtualenv active')
-    if not (workon_home / env).exists():
-        sys.exit("ERROR: Environment '{0}' does not exist.".format(env))
-    project_dir = get_project_dir(env)
+    if not (workon_home / args.envname).exists():
+        sys.exit("ERROR: Environment '{0}' does not exist."
+                 .format(args.envname))
+    project_dir = get_project_dir(args.envname)
     if project_dir is None:
         sys.exit("ERROR: no project directory set for Environment '{0}'"
-                 .format(env))
+                 .format(args.envname))
     print(project_dir)
 
 
