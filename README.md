@@ -172,7 +172,7 @@ List or change working virtual environments.
 
 `usage: pew workon [-h] [-n] [envname]`
 
-If no `envname` is given the list of available environments is printed to stdout. If `-n` or `--no-cd` is provided, current directory is not changed even if a project path is associated with `environment_name`.
+If no `envname` is given the list of available environments is printed to stdout. If `-n` or `--no-cd` is provided, current directory is not changed even if a project path is associated with `envname`.
 
 ### mktmpenv ###
 
