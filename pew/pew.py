@@ -24,9 +24,16 @@ if not windows:
         from pythonz.commands.install import InstallCommand
         from pythonz.commands.uninstall import UninstallCommand
         from pythonz.installer.pythoninstaller import PythonInstaller, AlreadyInstalledError
-        from pythonz.commands.list import ListCommand as ListPythons
+        from pythonz.commands.list import ListCommand
         from pythonz.define import PATH_PYTHONS
         from pythonz.commands.locate import LocateCommand as LocatePython
+
+        def ListPythons():
+            try:
+                Path(PATH_PYTHONS).mkdir(parents=True)
+            except OSError:
+                pass
+            return ListCommand()
     except:
         # create mock commands
         InstallCommand = ListPythons = LocatePython = UninstallCommand = \
@@ -705,10 +712,6 @@ def uninstall_cmd(argv):
 
 def list_pythons_cmd(argv):
     '''List the pythons installed by Pythonz (or all the installable ones)'''
-    try:
-        Path(PATH_PYTHONS).mkdir(parents=True)
-    except OSError:
-        pass
     ListPythons().run(argv)
 
 
