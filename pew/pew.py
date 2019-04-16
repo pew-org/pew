@@ -517,7 +517,7 @@ def setvirtualenvproject(env, project):
 
 
 def setproject_cmd(argv):
-    """Given a virtualenv directory and a project directory, set the
+    """Given a virtualenv directory and a project directory, set the \
     virtualenv up to be associated with the project."""
     args = dict(enumerate(argv))
     project = os.path.abspath(args.get(1, '.'))
