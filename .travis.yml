@@ -38,6 +38,22 @@ matrix:
         - pip install pytest
       script: py.test -rws tests/ --ignore=tests/test_install.py
     - language: python
+      dist: xenial
+      sudo: required
+      python: "3.8"
+      install:
+        - pip install -e . --upgrade
+        - pip install pytest
+      script: py.test -rws tests/ --ignore=tests/test_install.py
+    - language: python
+      dist: xenial
+      sudo: required
+      python: "3.9"
+      install:
+        - pip install -e . --upgrade
+        - pip install pytest
+      script: py.test -rws tests/ --ignore=tests/test_install.p
+    - language: python
       sudo: false
       python: "pypy"
       install:
