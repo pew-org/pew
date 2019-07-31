@@ -65,17 +65,8 @@ setup(
         'virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=17.1'
     ],
     extras_require={
-        ':python_version=="2.6"': [
-            'argparse', 'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
-        ],
         ':python_version=="2.7"': [
             'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
-        ],
-        ':python_version=="3.2"': [
-            'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
-        ],
-        ':python_version=="3.3"': [
-            'pathlib'
         ],
         ':sys_platform=="win32"': [
             'shellingham'
