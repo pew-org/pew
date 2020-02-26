@@ -2,28 +2,11 @@ from os import unlink
 from subprocess import check_call, CalledProcessError
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-try:
-    from urllib.request import urlopen
-    from urllib.error import URLError
-except ImportError:
-    from urllib import urlopen
-    URLError = IOError
 
 import pytest
 
 from pew._utils import invoke_pew as invoke
-
-
-def are_we_connected():
-    try:
-        urlopen('http://google.com')
-        return True
-    except URLError:
-        return False
-
-
-connection_required = pytest.mark.skipif(not are_we_connected(),
-                                         reason="An internet connection is required")
+from utils import skip_windows, connection_required
 
 
 def test_create(workon_home):
@@ -32,6 +15,16 @@ def test_create(workon_home):
     envs2 = set(invoke('in', 'env', 'pew', 'ls').out.split())
     invoke('rm', 'env')
     assert envs < envs2
+
+
+@skip_windows(reason="symlinks on windows are not well supported")
+def test_create_in_symlink(workon_sym_home):
+    invoke('new', 'env', '-d')
+    pip_path = Path(invoke('in', 'env', 'which', 'pip').out)
+    with pip_path.open() as f:
+        pip_shebang = f.readline()
+    # check it is using the symlinked path, not the real path
+    assert str(workon_sym_home) in pip_shebang
 
 
 def test_no_args(workon_home):

@@ -63,3 +63,10 @@ def test_print_columns(mock, capsys):
 def test_print_columns_2(mock, capsys):
     columns = columnize(['a', 'b', 'ccc', 'dddd'])
     assert '\n'.join(columns) == "a   \nb   \nccc \ndddd"
+
+
+@patch('pew._print_utils.get_terminal_size', return_value=(9, 1))
+def test_print_columns_3(mock, capsys):
+    columns = list(columnize(['aaa', 'b', 'c', 'd', 'e', 'fff']))
+    assert max(map(len, columns)) <= 9
+    assert '\n'.join(columns) == "aaa  d  \nb    e  \nc    fff"

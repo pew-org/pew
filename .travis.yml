@@ -1,15 +1,54 @@
-language: python
-sudo: false
-python:
-  - 3.4
-env:
-  matrix:
-    - TOXENV="py26"
-    - TOXENV="py27"
-    - TOXENV="py33"
-    - TOXENV="py34"
-    - TOXENV="py35"
-    - TOXENV="pypy"
-
-install: pip install tox
-script: tox -e $TOXENV
+matrix:
+  fast_finish: true
+  include:
+    - language: python
+      sudo: false
+      python: "2.7"
+      install:
+        - pip install -e .[pythonz] --upgrade
+        - pip install pytest
+      script: py.test -rws tests/
+    - language: python
+      sudo: false
+      python: "3.4"
+      install:
+        - pip install -e . --upgrade
+        - pip install pytest
+      script: py.test -rws tests/ --ignore=tests/test_install.py
+    - language: python
+      sudo: false
+      python: "3.5"
+      install:
+        - pip install -e . --upgrade
+        - pip install pytest
+      script: py.test -rws tests/ --ignore=tests/test_install.py
+    - language: python
+      sudo: false
+      python: "3.6"
+      install:
+        - pip install -e .[pythonz] --upgrade
+        - pip install pytest
+      script: py.test -rws tests/
+    - language: python
+      dist: xenial
+      sudo: required
+      python: "3.7"
+      install:
+        - pip install -e . --upgrade
+        - pip install pytest
+      script: py.test -rws tests/ --ignore=tests/test_install.py
+    - language: python
+      sudo: false
+      python: "pypy"
+      install:
+        - pip install -e .[pythonz] --upgrade
+        - pip install pytest
+      script: py.test -rws tests/
+    - language: nix
+      script: nix build -v --arg nixpkgs "import (fetchTarball ''https://github.com/NixOS/nixpkgs-channels/archive/$CHANNEL_HASH.tar.gz'') {}"
+      env: CHANNEL_HASH=07b42ccf2de451342982b550657636d891c4ba35
+    - language: nix
+      script: nix build -v --arg nixpkgs "import (fetchTarball ''https://github.com/NixOS/nixpkgs-channels/archive/$CHANNEL_HASH.tar.gz'') {}"
+      env: CHANNEL_HASH=nixos-unstable
+  allow_failures:
+    - env: CHANNEL_HASH=nixos-unstable

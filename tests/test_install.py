@@ -2,21 +2,26 @@ import sys
 import os
 from subprocess import check_call
 from pew._utils import invoke_pew as invoke
-from utils import skip_windows
+from utils import skip_windows, connection_required
 import pytest
 
-pytestmark = skip_windows(reason='Pythonz is unsupported')(
-    pytest.mark.skipif(sys.platform == 'cygwin', reason='Pythonz is unsupported')(
-        pytest.mark.skipif(sys.version_info > (2,7) and os.environ.get('CI') == 'true',
-            reason='Limit this slow and expensive test to the oldest '
-            'Python version in the CI environment')))
+def skip_marker(f):
+    return skip_windows(reason='Pythonz unavailable in Windows')(
+        pytest.mark.skipif(
+            sys.platform == 'cygwin',
+            reason='Pythonz unavailable in Cygwin')(
+                pytest.mark.skipif(os.environ.get('NIX'),
+                                   reason='Pythonz unavailable in Nix')(
+                    connection_required(f))))
 
+@skip_marker
 def test_install():
     py_version = ['2.6.1', '--type', 'pypy']
     assert invoke('install', *py_version).returncode == 0
     py = invoke('locate_python', *py_version).out
     check_call([py, '-V'])
 
+@skip_marker
 def test_uninstall():
     py_version = ['2.6.1', '--type', 'pypy']
     invoke('install', *py_version)

@@ -4,7 +4,7 @@ compinit
 function virtualenv_prompt_info() {
     if [ -n "$VIRTUAL_ENV" ]; then
         local name=$(basename $VIRTUAL_ENV)
-        echo "($name)"
+        echo "($name) "
     fi
 }
 PS1="$(virtualenv_prompt_info)$PS1"

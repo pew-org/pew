@@ -29,7 +29,7 @@ def test_implicit(workon_home, env1):
 def test_implicit_project(workon_home, env1):
     "use the cwd as project directory"
     with temp_environ():
-        del os.environ['VIRTUAL_ENV']
+        os.environ.pop('VIRTUAL_ENV', None)
         with TemporaryDirectory() as tmpdir:
             res = invoke('setproject', 'env1', cwd=tmpdir)
             assert not res.err
@@ -38,7 +38,7 @@ def test_implicit_project(workon_home, env1):
 
 def test_setproject(workon_home, env1):
     with temp_environ():
-        del os.environ['VIRTUAL_ENV']
+        os.environ.pop('VIRTUAL_ENV', None)
         with TemporaryDirectory() as tmpdir:
             res = invoke('setproject', 'env1', tmpdir)
             assert not res.err
@@ -48,7 +48,7 @@ def test_setproject(workon_home, env1):
 @skip_windows(reason="empty stdin on windows doesn't close the subprocess used by workon")
 def test_ignore_environ(workon_home, env1, env2):
     with temp_environ():
-        del os.environ['VIRTUAL_ENV']
+        os.environ.pop('VIRTUAL_ENV', None)
         with TemporaryDirectory() as tmpdir:
             res = invoke('workon', 'env1', inp='pew setproject env2 ' + tmpdir)
             assert not (workon_home / 'env1' / '.project').exists()

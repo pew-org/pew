@@ -1,4 +1,4 @@
-from sys import platform
+from sys import platform, executable
 from subprocess import check_call
 from pathlib import Path
 
@@ -37,7 +37,8 @@ def test_virtualenv_variable(copied_env):
 
 
 def test_source_relocatable(workon_home, testpackageenv):
-    check_call(['virtualenv', '--relocatable', str(workon_home / 'source')])
+    check_call([executable, '-m', 'virtualenv', '--relocatable',
+                str(workon_home / 'source')])
     invoke('cp', 'source', 'destination', '-d')
     testscript = Path(invoke('workon', 'destination', inp='which testscript.py').out.strip())
     assert workon_home / 'destination' / 'bin' / 'testscript.py' == testscript

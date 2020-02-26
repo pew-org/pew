@@ -2,12 +2,11 @@ Pew - Python Env Wrapper
 ========================
 
 [![PyPi version](http://img.shields.io/pypi/v/pew.svg)](https://pypi.python.org/pypi/pew)
-[![Build Status](https://travis-ci.org/berdario/pew.png)](https://travis-ci.org/berdario/pew)
+[![Build Status](https://travis-ci.org/berdario/pew.svg)](https://travis-ci.org/berdario/pew)
 [![Build status](https://ci.appveyor.com/api/projects/status/xxe096txh1fuqfag/branch/master?svg=true)](https://ci.appveyor.com/project/berdario/pew/branch/master)
 [![PyPi](https://img.shields.io/pypi/format/pew.svg)](https://pypi.python.org/pypi/pew/)
 
-[![Pull Request stats](http://www.issuestats.com/github/berdario/pew/badge/pr?style=flat-square)](http://www.issuestats.com/github/berdario/pew)
-[![Issue stats](http://www.issuestats.com/github/berdario/pew/badge/issue?style=flat-square)](http://www.issuestats.com/github/berdario/pew)
+[Releases & changelog](https://github.com/berdario/pew/releases)
 
 Python Env Wrapper is a set of commands to manage multiple [virtual environments](http://pypi.python.org/pypi/virtualenv). Pew can create, delete and copy your environments, using a single command to switch to them wherever you are, while keeping them in a single (configurable) location.
 
@@ -18,20 +17,26 @@ Pew is completely shell-agnostic and thus works on bash, zsh, fish, powershell, 
 Installation
 ------------
 
+### Nix (Linux and Macos)
+
+You can use Nix to install Pew on [Nixos](http://nixos.org/) as well as [other Linux distributions or Macos](http://nixos.org/nix/download.html):
+
+    nix-env --install --attr pew
+
+### Arch linux
+
+For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
+
+### Pypi
+
 _Pew and its dependencies rely on a couple of features of pip/setuptools which might not be available on old versions. In case your distribution doesn't ship with one recent enough, you'll probably want to run `pip install --upgrade pip` before the installation._
 
 If you cannot upgrade the version of setuptools on your system, and one of the packages listed below is of no use to you, I suggest to use [`pipsi`](https://pypi.python.org/pypi/pipsi) rather than plain `pip`
 
 
-`pipsi install pew`
+    pipsi install pew
 
 See the [troubleshooting](#troubleshooting) section, if needed.
-
-There are also some packages, more or less up-to-date:
-
-### Arch linux
-
-For Archlinux, there's an [AUR package](https://aur.archlinux.org/packages/python-pew/)
 
 
 Usage
@@ -49,9 +54,9 @@ or
 
     python3 -c 'import os;print(os.environ.get("SHELL","No shell defined"))'
 
-Since that variable is not commonly used on Windows, we're defaulting to `powershell` over there. In all other cases we default instead to `sh`.
+Since that variable is not commonly used on Windows, we're detecting the parent process from which pew has been invoked and use that as the user's preferred shell. If `CMDER_ROOT` is defined this will select Cmder (a custom configuration of `cmd.exe`).
 
-If `CMDER_ROOT` is defined this will select Cmder (a custom configuration of `cmd.exe`). Custom selection for even more shells might be added in the future.
+In all other cases we default instead to `sh`.
 
 ### Windows/Cygwin notes
 
@@ -164,9 +169,9 @@ The `-r` option can be used to specify a text file listing packages to be instal
 
 List or change working virtual environments.
 
-`usage: pew workon [environment_name]`
+`usage: pew workon [-h] [--no-cd] [envname]`
 
-If no `environment_name` is given the list of available environments is printed to stdout.
+If no `envname` is given the list of available environments is printed to stdout. If `-n` or `--no-cd` is provided, current directory is not changed even if a project path is associated with `envname`.
 
 ### mktmpenv ###
 
@@ -285,6 +290,14 @@ Bind an existing virtualenv to an existing project.
 `usage: pew setproject [virtualenv_path] [project_path]`
 
 When no arguments are given, the current virtualenv and current directory are assumed.
+
+### getproject ###
+
+Return a virtualenv's project directory.
+
+`usage: pew getproject [env]`
+
+When no arguments are given, the current virtualenv is assumed.
 
 ### restore ###
 
@@ -428,6 +441,8 @@ Everyone who submitted patches/PR, as of September 2015:
 - Robin
 - Matei Trușcă
 - Lucas Cimon
+- Alexandre Decan
+- Ashwin Vishnu Mohanan
 
 
 Thanks also to Michael F. Lamb for his thought provoking gist and to Doug Hellman for virtualenvwrapper
@@ -442,24 +457,3 @@ Pew was originally a rewrite of virtualenvwrapper, the advantage is that pew doe
 It works on bash, zsh, fish, powershell, etc.
 
 Thanks to using Python libraries and setuptools for dependency management, to Python stricter error handling and the fact that "shelling out" let us avoid keeping track of the previous environment variable values, pew code is much shorter and easier to understand than [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/)'s. How many Python programmers know at a glance what does `"${out_args[@]-}"` do? Or `eval "envname=\$$#"`? Or [all other bash quirks](http://mywiki.wooledge.org/BashPitfalls) for that matter?
-
-License
--------
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.

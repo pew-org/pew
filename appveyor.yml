@@ -4,4 +4,4 @@ install:
 
 build: false
 
-test_script: tox -e "py27,py34"
+test_script: tox -e "py27,py37"
