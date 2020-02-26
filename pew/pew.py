@@ -395,7 +395,7 @@ def sitepackages_dir(env=os.environ.get('VIRTUAL_ENV')):
         sys.exit('ERROR: no virtualenv active')
     else:
         env_python = workon_home / env / env_bin_dir / 'python'
-        return Path(invoke(str(env_python), '-c', 'import distutils; \
+        return Path(invoke(str(env_python), '-c', 'import distutils.sysconfig; \
 print(distutils.sysconfig.get_python_lib())').out)
 
 
