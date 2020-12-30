@@ -262,7 +262,7 @@ Adds the specified directories to the Python path for the currently-active virtu
 
 Sometimes it is desirable to share installed packages that are not in the system `site-packages` directory and which should not be installed in each virtualenv. One possible solution is to symlink the source into the environment `site-packages` directory, but it is also easy to add extra directories to the PYTHONPATH by including them in a `.pth` file inside `site-packages` using `pew add`.
 
-The `-d` flag removes previously added directiories.
+The `-d` flag removes previously added directories.
 
 The directory names are added to a path file named `_virtualenv_path_extensions.pth` inside the site-packages directory for the environment.
 
