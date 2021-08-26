@@ -2,9 +2,11 @@ Pew - Python Env Wrapper
 ========================
 
 [![PyPi version](http://img.shields.io/pypi/v/pew.svg)](https://pypi.python.org/pypi/pew)
-[![Build Status](https://travis-ci.org/berdario/pew.svg)](https://travis-ci.org/berdario/pew)
-[![Build status](https://ci.appveyor.com/api/projects/status/xxe096txh1fuqfag/branch/master?svg=true)](https://ci.appveyor.com/project/berdario/pew/branch/master)
+[![CI test status][github-ci-tests-badge]][github-ci-tests-link]
 [![PyPi](https://img.shields.io/pypi/format/pew.svg)](https://pypi.python.org/pypi/pew/)
+
+[github-ci-tests-badge]: https://github.com/berdario/pew/workflows/ci-tests/badge.svg
+[github-ci-tests-link]: https://github.com/berdario/pew/actions?query=workflow:ci-tests+branch:master
 
 [Releases & changelog](https://github.com/berdario/pew/releases)
 
@@ -372,7 +374,7 @@ Running Tests
 
 The test suite for `pew` uses [tox](http://codespeak.net/tox). Most tests are actually integration tests that will fork shells, create virtualenvs and in some cases even download python packages from Pypi. The whole test suite takes around 1 minute to run on a single interpreter.
 
-With every commit and pull request, the test suite is run over all supported interpreters on travis-ci (for unix-like) and appveyor (for windows).
+With every commit and pull request, the test suite is run over all supported interpreters on GitHub Actions (which runs tests on Linux and Windows).
 
 To run individual test scripts, run from the top level directory of the repository a command like:
 
