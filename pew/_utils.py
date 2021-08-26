@@ -7,30 +7,15 @@ from subprocess import check_call, Popen, PIPE
 from collections import namedtuple
 from functools import partial, wraps
 from pathlib import Path
-from tempfile import NamedTemporaryFile as _ntf
-try:
-    from shutil import which
-except ImportError:
-    from shutilwhich import which
+from tempfile import NamedTemporaryFile
+from shutil import which
 
-py2 = sys.version_info[0] == 2
 windows = sys.platform == 'win32'
 
-if py2 or windows:
+if windows:
     locale.setlocale(locale.LC_CTYPE, '')
 
 encoding = locale.getlocale()[1] or 'ascii'
-
-if py2:
-    @wraps(_ntf)
-    def NamedTemporaryFile(mode):
-        return getwriter(encoding)(_ntf(mode))
-
-    def to_unicode(x):
-        return x.decode(encoding)
-else:
-    NamedTemporaryFile = _ntf
-    to_unicode = str
 
 def check_path():
     parent = os.path.dirname

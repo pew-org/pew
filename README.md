@@ -218,9 +218,9 @@ Use Pythonz to download and build a Python vm
 
 `usage: pew install [options] version`
 
-To install Python3.5.0
+To install Python3.8.0
 
-`pew install 3.5.0`
+`pew install 3.8.0`
 
 To install Pypy:
 
@@ -382,15 +382,15 @@ To run individual test scripts, run from the top level directory of the reposito
 
 To run tests under a single version of Python, specify the appropriate environment when running `tox`:
 
-`tox -e py27`
+`tox -e py38`
 
 Combine the two modes to run specific tests with a single version of Python:
 
-`tox -e py27 tests/test_setproject.py`
+`tox -e py38 tests/test_setproject.py`
 
 You can also filter them:
 
-`tox -e py34 -- -k workon`
+`tox -e py38 -- -k workon`
 
 Add new tests by modifying an existing file or creating new script in the tests directory.
 

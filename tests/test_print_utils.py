@@ -3,10 +3,7 @@ from pew._print_utils import (
     get_best_columns_number,
     columnize,
 )
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
+from unittest.mock import patch
 
 
 def test_get_rows():
