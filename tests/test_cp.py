@@ -36,15 +36,6 @@ def test_virtualenv_variable(copied_env):
     assert str(copied_env) == envname
 
 
-def test_source_relocatable(workon_home, testpackageenv):
-    check_call([executable, '-m', 'virtualenv', '--relocatable',
-                str(workon_home / 'source')])
-    invoke('cp', 'source', 'destination', '-d')
-    testscript = Path(invoke('workon', 'destination', inp='which testscript.py').out.strip())
-    assert workon_home / 'destination' / 'bin' / 'testscript.py' == testscript
-    invoke('rm', 'destination')
-
-
 def test_source_does_not_exists(workon_home):
     err = invoke('cp', 'virtualenvthatdoesntexist', 'foo').err.strip()
     assert 'Please provide a valid virtualenv to copy' == err
