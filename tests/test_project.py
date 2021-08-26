@@ -11,7 +11,7 @@ from pew._utils import temp_environ, invoke_pew as invoke
 from utils import skip_windows
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def project_home():
     tmpdir = os.environ.get('TMPDIR', gettempdir())
     project = Path(tmpdir) / 'PROJECT_HOME'
@@ -23,7 +23,7 @@ def project_home():
     rmtree(str(project))
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def project(workon_home, project_home):
     projname = 'project1'
     invoke('mkproject', projname, '-d')

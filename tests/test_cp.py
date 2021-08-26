@@ -15,7 +15,7 @@ pytestmark = skip_windows(
 )
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def copied_env(workon_home, env1):
     invoke('cp', 'env1', 'destination', '-d')
     yield workon_home / 'destination'

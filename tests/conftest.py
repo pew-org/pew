@@ -9,7 +9,7 @@ from pew._utils import invoke_pew as invoke
 from utils import TemporaryDirectory
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def workon_home():
     tmpdir = os.environ.get('TMPDIR', gettempdir())
     os.environ['WORKON_HOME'] = str(Path(tmpdir) / 'WORKON_HOME')
@@ -21,7 +21,7 @@ def workon_home():
     rmtree(str(workon))
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def workon_sym_home():
     # workon_home() fixture assumes it is the only one changing the environ
     # so save it and restore it after the test
@@ -49,27 +49,27 @@ def workon_sym_home():
     os.environ['WORKON_HOME'] = old_workon
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def env1(workon_home):
     invoke('new', 'env1', '-d')
     yield
     invoke('rm', 'env1')
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def env2(workon_home):
     invoke('new', 'env2', '-d')
     yield
     invoke('rm', 'env2')
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def env_with_project(workon_home): # TODO: use for test_setproject/test_mkvirtualenv ?
     with TemporaryDirectory() as projectdir:
         invoke('new', 'env_with_project', '-d', '-a', projectdir)
         yield Path(projectdir)
         invoke('rm', 'env_with_project')
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def testpackageenv(workon_home):
     testpackage = str(Path(__file__).parent / 'testpackage')
     invoke('new', 'source', '-d')
@@ -78,7 +78,7 @@ def testpackageenv(workon_home):
     invoke('rm', 'source')
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def testtemplate(workon_home):
     sourcetemplate = Path(__file__).parent / 'template_test'
     testtemplatefile = workon_home / 'template_test'
