@@ -5,11 +5,11 @@ name = "pypi"
 
 [packages]
 
-virtualenv = "==1.11.6"
-"virtualenv-clone" = "==0.2.5"
-"pythonz-bd" = {"version" = "*", "sys_platform" = "!='win32'" }
+virtualenv = ">=1.11"
+"virtualenv-clone" = ">=0.2.5"
+"pythonz-bd" = {"version" = ">1.10.2", "sys_platform" = "!='win32'" }
 "shellingham" = {"version" = "*", "sys_platform" = "=='win32'" }
 
 [dev-packages]
 
-pytest = "==2.6.2"
+pytest = "*"
