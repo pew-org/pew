@@ -69,48 +69,131 @@ Common workflow
 
 You can create a new virtualenv, with a non-default python and specifying some packages to be installed in it, like this:
 
-    ~> pew new --python=pypy -i django myproject
-    Running virtualenv with interpreter /home/dario/Applications/bin/pypy
-    New pypy executable in myproject/bin/pypy
-    Installing distribute..................................................................
-    .......................................................................................
-    ..................................................................done.
-    Installing pip................done.
-    Downloading/unpacking django
-    Downloading Django-1.5.1.tar.gz (8.0MB):
-    8.0MB downloaded
-    Running setup.py egg_info for package django
-
-    warning: no previously-included files matching '__pycache__' found under directory '*'
-    warning: no previously-included files matching '*.py[co]' found under directory '*'
-    Installing collected packages: django
-    [SNIP]
-    Successfully installed django Cleaning up...
+    ~> pew new --python=pypy3 -i django myproject
+    created virtual environment PyPy3.6.9.final.0-64 in 817ms
+    creator PyPy3Posix(dest=/home/tadej/.local/share/virtualenvs/myproject, clear=False, global=False)
+    seeder FromAppData(extra_search_dir=/usr/share/python-wheels,download=False, pip=bundle, setuptools=bundle, wheel=bundle, via=copy, app_data_dir=/home/tadej/.local/share/virtualenv)
+        added seed packages: pip==21.2.1, setuptools==57.4.0, wheel==0.36.2
+    activators BashActivator,CShellActivator,FishActivator,PowerShellActivator,PythonActivator,XonshActivator
+    Collecting django
+    Downloading Django-3.2.7-py3-none-any.whl (7.9 MB)
+        |████████████████████████████████| 7.9 MB 1.8 MB/s
+    Collecting asgiref<4,>=3.3.2
+    Downloading asgiref-3.4.1-py3-none-any.whl (25 kB)
+    Collecting pytz
+    Downloading pytz-2021.1-py2.py3-none-any.whl (510 kB)
+        |████████████████████████████████| 510 kB 10.6 MB/s
+    Collecting sqlparse>=0.2.2
+    Downloading sqlparse-0.4.2-py3-none-any.whl (42 kB)
+        |████████████████████████████████| 42 kB 833 kB/s
+    Collecting typing-extensions
+    Downloading typing_extensions-3.10.0.2-py3-none-any.whl (26 kB)
+    Installing collected packages: typing-extensions, sqlparse, pytz, asgiref, django
+    Successfully installed asgiref-3.4.1 django-3.2.7 pytz-2021.1 sqlparse-0.4.2 typing-extensions-3.10.0.2
+    WARNING: You are using pip version 21.2.1; however, version 21.2.4 is available.
+    You should consider upgrading via the '/home/tadej/.local/share/virtualenvs/myproject/bin/pypy3 -m pip install --upgrade pip' command.
     Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
 
-Once inside, you can check the current python version, list the packages present in its python's site-packages directory, and install additional packages like this:
+Once inside, you can check the current Python version, list the packages present in its python's site-packages directory, and install additional packages like this:
 
     myproject ~> python -V
-    Python 2.7.3 (b9c3566aa017, May 09 2013, 09:09:14)
-    [PyPy 2.0.0 with GCC 4.6.3]
+    Python 3.6.9 (831ff17f8cd1, May 26 2021, 11:41:48)
+    [PyPy 7.3.1 with GCC 10.3.1 20210422 (Red Hat 10.3.1-1)]
     myproject ~> pew lssitepackages
-    distribute-0.6.34-py2.7.egg Django-1.5.1-py2.7.egg-info setuptools.pth pip-1.3.1-py2.7.egg
-    easy-install.pth django
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/Django-3.2.7.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/__pycache__
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/_distutils_hack
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/_virtualenv.pth
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/_virtualenv.py
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/asgiref
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/asgiref-3.4.1.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/backports
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/backports.entry_points_selectable-1.1.0.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/clonevirtualenv.py
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/distlib
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/distlib-0.3.3.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/distutils-precedence.pth
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/django
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/easy-install.pth
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/filelock
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/filelock-3.1.0.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/importlib_metadata
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/importlib_metadata-4.8.1.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/importlib_resources
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/importlib_resources-5.2.2.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/pew.egg-link
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/pip
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/pip-21.2.1.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/pip-21.2.1.virtualenv
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/pkg_resources
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/platformdirs
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/platformdirs-2.4.0.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/pytz
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/pytz-2021.1.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/setuptools
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/setuptools-57.4.0.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/setuptools-57.4.0.virtualenv
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/six-1.16.0.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/six.py
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/sqlparse
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/sqlparse-0.4.2.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/typing_extensions-3.10.0.2.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/typing_extensions.py
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/virtualenv
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/virtualenv-20.8.1.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/virtualenv_clone-0.5.7.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/wheel
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/wheel-0.36.2.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/wheel-0.36.2.virtualenv
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/zipp-3.6.0.dist-info
+    /home/tadej/.local/share/virtualenvs/myproject/site-packages/zipp.py
     myproject ~> pip install pdbpp
-    Downloading/unpacking pdbpp
-    [SNIP]
-    Successfully installed pdbpp fancycompleter wmctrl pygments pyrepl
-    Cleaning up...
+    Collecting pdbpp
+    Downloading pdbpp-0.10.3-py2.py3-none-any.whl (23 kB)
+    Collecting fancycompleter>=0.8
+    Downloading fancycompleter-0.9.1-py3-none-any.whl (9.7 kB)
+    Collecting wmctrl
+    Downloading wmctrl-0.4.tar.gz (5.4 kB)
+    Collecting pygments
+    Downloading Pygments-2.10.0-py3-none-any.whl (1.0 MB)
+        |████████████████████████████████| 1.0 MB 2.4 MB/s
+    Collecting pyrepl>=0.8.2
+    Downloading pyrepl-0.9.0.tar.gz (48 kB)
+        |████████████████████████████████| 48 kB 3.0 MB/s
+    Building wheels for collected packages: pyrepl, wmctrl
+    Building wheel for pyrepl (setup.py) ... done
+    Created wheel for pyrepl: filename=pyrepl-0.9.0-py3-none-any.whl size=59906 sha256=de1c4017634f07823025e3cd6db0221c5ec6eafaade32f48c306b4774809c0db
+    Stored in directory: /home/tadej/.cache/pip/wheels/bd/32/c9/a638d4a50ae3bf39e8d6ac32f889746687f858794f2a841f84
+    Building wheel for wmctrl (setup.py) ... done
+    Created wheel for wmctrl: filename=wmctrl-0.4-py3-none-any.whl size=3858 sha256=e5aee6309b7b919a44423b524b6d0b66a238e6efdcafcefee34757cf2057f408
+    Stored in directory: /home/tadej/.cache/pip/wheels/1c/8e/da/50ccb9bb858eb7462f6047965be9badfa6f4d36d707ac5c5a2
+    Successfully built pyrepl wmctrl
+    Installing collected packages: pyrepl, wmctrl, pygments, fancycompleter, pdbpp
+    Successfully installed fancycompleter-0.9.1 pdbpp-0.10.3 pygments-2.10.0 pyrepl-0.9.0 wmctrl-0.4
     myproject ~> pip freeze
-    Django==1.5.1
-    Pygments==1.6
-    cffi==0.6
-    distribute==0.6.34
-    fancycompleter==0.4
-    pdbpp==0.7.2
-    pyrepl==0.8.4
-    wmctrl==0.1
-    wsgiref==0.1.2
+    asgiref==3.4.1
+    backports.entry-points-selectable==1.1.0
+    cffi==1.14.0
+    distlib==0.3.3
+    Django==3.2.7
+    fancycompleter==0.9.1
+    filelock==3.1.0
+    greenlet==0.4.13
+    importlib-metadata==4.8.1
+    importlib-resources==5.2.2
+    pdbpp==0.10.3
+    platformdirs==2.4.0
+    Pygments==2.10.0
+    pyrepl==0.9.0
+    pytz==2021.1
+    readline==6.2.4.1
+    six==1.16.0
+    sqlparse==0.4.2
+    typing-extensions==3.10.0.2
+    virtualenv==20.8.1
+    virtualenv-clone==0.5.7
+    wmctrl==0.4
+    zipp==3.6.0
     myproject ~> ^D
 
 You can also specify a requirements file, to be passed on to pip, and activate another virtualenv with workon:
