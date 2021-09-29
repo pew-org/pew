@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+markers = [
+    "shell: marks tests that require a shell (deselect with '-m \"not shell\"')",
+]
