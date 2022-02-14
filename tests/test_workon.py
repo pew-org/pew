@@ -25,7 +25,7 @@ def test_detect_shell():
             # you.
             # Hint: Disable this test like this: pytest -m 'not shell'
             # https://github.com/berdario/pew/pull/204#discussion_r273835108
-            assert _detect_shell() == 'pwsh.exe'
+            assert Path(_detect_shell()).name == 'pwsh.exe'
         else:
             assert _detect_shell() == 'sh'
         os.environ['SHELL'] = 'foo'
