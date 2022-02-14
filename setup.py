@@ -65,18 +65,6 @@ setup(
         'virtualenv>=1.11', 'virtualenv-clone>=0.2.5', 'setuptools>=17.1'
     ],
     extras_require={
-        ':python_version=="2.6"': [
-            'argparse', 'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
-        ],
-        ':python_version=="2.7"': [
-            'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
-        ],
-        ':python_version=="3.2"': [
-            'pathlib', 'backports.shutil_get_terminal_size', 'shutilwhich'
-        ],
-        ':python_version=="3.3"': [
-            'pathlib'
-        ],
         ':sys_platform=="win32"': [
             'shellingham'
         ],
@@ -92,7 +80,6 @@ setup(
     entry_points={
         'console_scripts': ['pew = pew.pew:pew']},
     classifiers=[
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Intended Audience :: Developers',
         'Environment :: Console']

@@ -1,7 +1,7 @@
 setuptools>=17.1
-virtualenv
-virtualenv-clone==0.2.5
+virtualenv>=1.11
+virtualenv-clone>=0.2.5
 pytest
-pythonz-bd==1.11.2 ; sys_platform != 'win32'
+pythonz-bd>=1.10.2 ; sys_platform != 'win32'
 shellingham ; sys_platform == 'win32'
 stdeb ; sys_platform == 'linux'

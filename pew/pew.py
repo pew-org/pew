@@ -1,5 +1,3 @@
-from __future__ import print_function, absolute_import, unicode_literals
-
 import os
 import sys
 import argparse
@@ -10,10 +8,7 @@ from functools import partial
 from subprocess import CalledProcessError
 from pathlib import Path
 
-try:
-    from shutil import get_terminal_size
-except ImportError:
-    from backports.shutil_get_terminal_size import get_terminal_size
+from shutil import get_terminal_size
 
 windows = sys.platform == 'win32'
 
@@ -46,11 +41,8 @@ else:
     import shellingham
 
 from pew._utils import (check_call, invoke, expandpath, own, env_bin_dir,
-                        check_path, temp_environ, NamedTemporaryFile, to_unicode)
+                        check_path, temp_environ, NamedTemporaryFile)
 from pew._print_utils import print_virtualenvs
-
-if sys.version_info[0] == 2:
-    input = raw_input
 
 err = partial(print, file=sys.stderr)
 
@@ -170,7 +162,7 @@ def fork_bash(env, cwd):
         with NamedTemporaryFile('w+') as rcfile:
             with bashrcpath.open() as bashrc:
                 rcfile.write(bashrc.read())
-            rcfile.write('\nexport PATH="' + to_unicode(compute_path(env)) + '"')
+            rcfile.write('\nexport PATH="' + compute_path(env) + '"')
             rcfile.flush()
             return fork_shell(env, ['bash', '--rcfile', rcfile.name], cwd)
     else:
@@ -395,8 +387,8 @@ def sitepackages_dir(env=os.environ.get('VIRTUAL_ENV')):
         sys.exit('ERROR: no virtualenv active')
     else:
         env_python = workon_home / env / env_bin_dir / 'python'
-        return Path(invoke(str(env_python), '-c', 'import distutils; \
-print(distutils.sysconfig.get_python_lib())').out)
+        return Path(invoke(str(env_python), '-c',
+            'from distutils.sysconfig import get_python_lib; print(get_python_lib())').out)
 
 
 def add_cmd(argv):

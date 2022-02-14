@@ -16,14 +16,14 @@ def skip_marker(f):
 
 @skip_marker
 def test_install():
-    py_version = ['2.6.1', '--type', 'pypy']
+    py_version = ['3.5.1']
     assert invoke('install', *py_version).returncode == 0
     py = invoke('locate_python', *py_version).out
     check_call([py, '-V'])
 
 @skip_marker
 def test_uninstall():
-    py_version = ['2.6.1', '--type', 'pypy']
+    py_version = ['3.5.1']
     invoke('install', *py_version)
     assert invoke('uninstall', *py_version).returncode == 0
     assert invoke('locate_python', *py_version).returncode != 0

@@ -1,16 +1,8 @@
-from __future__ import division, print_function
-
 import os
 from functools import partial
 from math import ceil
-try:
-    from itertools import zip_longest
-except ImportError:
-    from itertools import izip_longest as zip_longest
-try:
-    from shutil import get_terminal_size
-except ImportError:
-    from backports.shutil_get_terminal_size import get_terminal_size
+from itertools import zip_longest
+from shutil import get_terminal_size
 
 SEP = '  '
 L = len(SEP)

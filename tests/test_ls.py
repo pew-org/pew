@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 from pew._utils import invoke_pew as invoke
 
@@ -17,7 +18,7 @@ def test_get_site_packages_dir(workon_home):
 def test_lssitepackages(workon_home):
     invoke('new', 'env', '-d')
     pkgs = invoke('in', 'env', 'pew', 'lssitepackages').out
-    assert 'easy_install' in pkgs
+    assert re.search(r'setuptools-((\d+\.)+)dist-info', pkgs)
     invoke('rm', 'env')
 
 

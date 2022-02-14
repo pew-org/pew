@@ -5,7 +5,7 @@ import pytest
 from pew._utils import invoke_pew as invoke
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
 def to_be_deleted(workon_home):
     envname = 'to_be_deleted'
     invoke('new', envname, '-d')

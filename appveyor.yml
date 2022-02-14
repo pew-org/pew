@@ -1,7 +1,0 @@
-install:
-  - SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%
-  - pip install tox
-
-build: false
-
-test_script: tox -e "py27,py37"
