@@ -19,12 +19,13 @@ def test_detect_shell():
         except KeyError:
             pass
         if sys.platform == 'win32':
-            # NOTE: This assumes your current shell is CMD, and would fail if
-            # you run the test in e.g. Powershell. You can safely ignore the
-            # error as long as the _detect_shell() makes sense to you.
+            # NOTE: This assumes your current shell is PowerShell Core, and
+            # would fail if you run the test in e.g. CMD.exe. You can safely
+            # ignore the error as long as the _detect_shell() makes sense to
+            # you.
             # Hint: Disable this test like this: pytest -m 'not shell'
             # https://github.com/berdario/pew/pull/204#discussion_r273835108
-            assert _detect_shell() == 'cmd.exe'
+            assert Path(_detect_shell()).name == 'pwsh.exe'
         else:
             assert _detect_shell() == 'sh'
         os.environ['SHELL'] = 'foo'
