@@ -15,7 +15,7 @@ windows = sys.platform == 'win32'
 from clonevirtualenv import clone_virtualenv
 if not windows:
     try:
-        # Try importing these packages if avaiable
+        # Try importing these packages if available
         from pythonz.commands.install import InstallCommand
         from pythonz.commands.uninstall import UninstallCommand
         from pythonz.installer.pythoninstaller import PythonInstaller, AlreadyInstalledError
