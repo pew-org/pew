@@ -387,8 +387,12 @@ def sitepackages_dir(env=os.environ.get('VIRTUAL_ENV')):
         sys.exit('ERROR: no virtualenv active')
     else:
         env_python = workon_home / env / env_bin_dir / 'python'
-        return Path(invoke(str(env_python), '-c',
-            'from distutils.sysconfig import get_python_lib; print(get_python_lib())').out)
+        result = invoke(str(env_python), '-c', ('from distutils import sysconfig;'
+                                                'print(sysconfig.get_python_lib())'))
+        if result.returncode == 0:
+            return Path(result.out)
+        else:
+            sys.exit('ERROR: unable to find sitepackages directory')
 
 
 def add_cmd(argv):
