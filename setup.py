@@ -69,7 +69,7 @@ setup(
             'shellingham'
         ],
         'pythonz': [
-            'pythonz'
+            'pythonz-bd @ git+https://github.com/M0dM/pythonz.git@bd'
         ]
     },
     include_package_data=True,
